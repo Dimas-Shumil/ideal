@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#d7d7d6" />
+    <meta
+      name="description"
+      content="ИДЕАЛ — тренажёрный зал в Абакане. Тренировки, тренеры и абонементы спортивного клуба."
+    />
+    <title>ИДЕАЛ — тренажёрный зал в Абакане</title>
+    <link
+      rel="preload"
+      as="image"
+      href="site/img/hero-desktop.webp"
+      media="(min-width: 1025px), (orientation: landscape) and (min-width: 721px)"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="site/img/hero-mobile.webp"
+      media="(max-width: 720px), (max-width: 1024px) and (orientation: portrait)"
+    />
+    <!-- Подготавливаем первый кадр до отрисовки CSS: без вспышки светлого hero. -->
+    <script>
+      (() => {
+        const reduced = window.matchMedia(
+          '(prefers-reduced-motion: reduce)',
+        ).matches;
+        const deepLink =
+          window.location.hash && window.location.hash !== '#top';
+        if (!reduced && !deepLink && window.scrollY < 12) {
+          document.documentElement.classList.add('hero-intro');
+          // Failsafe: контент останется видимым, даже если основной JS не загрузится.
+          window.setTimeout(
+            () =>
+              document.documentElement.classList.remove(
+                'hero-intro',
+                'hero-intro-playing',
+              ),
+            6500,
+          );
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="site/css/main.css" />
+  </head>
+  <body>
+    <header class="header" id="top">
+      <a class="header__logo" href="#top" aria-label="ИДЕАЛ — на главную"
+        >ИДЕАЛ.</a
+      >
+      <nav class="header__navigation" aria-label="Главное меню">
+        <button class="header__nav-link" type="button" data-preview="О клубе">
+          О клубе
+        </button>
+        <button
+          class="header__nav-link"
+          type="button"
+          data-preview="Направления"
+        >
+          Направления
+        </button>
+        <button class="header__nav-link" type="button" data-preview="Тренеры">
+          Тренеры
+        </button>
+        <button
+          class="header__nav-link"
+          type="button"
+          data-preview="Абонементы"
+        >
+          Абонементы
+        </button>
+        <button class="header__nav-link" type="button" data-preview="Магазин">
+          Магазин
+        </button>
+        <button
+          class="header__nav-link"
+          type="button"
+          data-preview="Расписание"
+        >
+          Расписание
+        </button>
+        <button class="header__nav-link" type="button" data-preview="Контакты">
+          Контакты
+        </button>
+      </nav>
+      <div class="header__actions">
+        <button
+          class="header__appointment"
+          type="button"
+          data-preview="Записаться"
+        >
+          <span>Записаться</span>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12h14m-6-6 6 6-6 6" />
+          </svg>
+        </button>
+        <button
+          class="header__menu-toggle"
+          id="menu-toggle"
+          type="button"
+          aria-label="Открыть меню"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+        >
+          <span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <picture class="hero__background" aria-hidden="true">
+          <source
+            media="(max-width: 720px), (max-width: 1024px) and (orientation: portrait)"
+            srcset="site/img/hero-mobile.webp"
+          />
+          <img
+            src="site/img/hero-desktop.webp"
+            alt=""
+            fetchpriority="high"
+            decoding="async"
+          />
+        </picture>
+
+        <div class="hero__title-wrap">
+          <h1 class="hero__title" id="hero-title">ИДЕАЛ</h1>
+        </div>
+
+        <picture class="hero__foreground" aria-hidden="true">
+          <source
+            media="(max-width: 720px), (max-width: 1024px) and (orientation: portrait)"
+            srcset="site/img/figure-mobile.webp"
+          />
+          <img src="site/img/figure-desktop.webp" alt="" decoding="async" />
+        </picture>
+
+        <!-- Только вступительный затемняющий слой и дымка перехода. В финальном кадре невидимы. -->
+        <div class="hero__cinema-veil" aria-hidden="true"></div>
+        <div class="hero__transition-fog" aria-hidden="true"></div>
+
+        <p class="hero__type">
+          Тренажёрный зал
+          <span class="hero__type-rule" aria-hidden="true"></span
+          ><span class="hero__city">Абакан</span>
+        </p>
+
+        <div class="hero__manifesto">
+          <p class="hero__manifesto-top">Больше<br />чем тренировки</p>
+          <span class="hero__manifesto-rule" aria-hidden="true"></span>
+          <p class="hero__manifesto-bottom">
+            Сила<br />Здоровье<br />Движение<br />Ты
+          </p>
+        </div>
+
+        <div class="hero__cta-block">
+          <p class="hero__mobile-subtitle">Больше<br />чем тренировки</p>
+          <button type="button" class="hero__cta" data-preview="Абонементы">
+            <span>Выбрать абонемент</span>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 12h14m-6-6 6 6-6 6" />
+            </svg>
+          </button>
+        </div>
+
+        <button
+          class="hero__video"
+          type="button"
+          data-preview="Видео о клубе"
+          aria-label="Посмотреть видео о клубе"
+        >
+          <span class="hero__play" aria-hidden="true"
+            ><svg viewBox="0 0 20 20"><path d="m7 4 8 6-8 6z" /></svg
+          ></span>
+          <span class="hero__video-label"
+            >Посмотреть<br />видео о клубе<span
+              class="hero__video-rule"
+              aria-hidden="true"
+            ></span
+          ></span>
+        </button>
+
+        <p class="hero__address">
+          Бограда, 135 <span aria-hidden="true"></span>
+        </p>
+        <a
+          class="hero__scroll"
+          href="#next"
+          aria-label="Перейти к следующей секции"
+          ><span>Прокрутите вниз</span
+          ><span class="hero__scroll-rule" aria-hidden="true"></span
+        ></a>
+        <p class="hero__hours">
+          <span aria-hidden="true"></span>Работаем ежедневно<br />с 07:00 до
+          22:00
+        </p>
+      </section>
+
+      <section class="preview-next" id="next" aria-labelledby="next-heading">
+        <span class="preview-next__eyebrow"
+          >Спортивный клуб «ИДЕАЛ» · Абакан</span
+        >
+        <h2 id="next-heading">БОЛЬШЕ, ЧЕМ<br />ТРЕНИРОВКИ</h2>
+        <p>
+          Здесь будет следующая секция главной страницы. Сейчас готов только
+          первый экран — hero.
+        </p>
+      </section>
+    </main>
+
+    <div class="menu-panel" id="mobile-menu" hidden aria-hidden="true">
+      <div class="menu-panel__inner">
+        <p class="menu-panel__heading">Навигация / IDEAL</p>
+        <nav aria-label="Разделы сайта">
+          <button type="button" data-preview="О клубе" style="--item-index: 0">
+            <span>О клубе</span
+            ><span class="menu-panel__arrow" aria-hidden="true">↗</span>
+          </button>
+          <button
+            type="button"
+            data-preview="Направления"
+            style="--item-index: 1"
+          >
+            <span>Направления</span
+            ><span class="menu-panel__arrow" aria-hidden="true">↗</span>
+          </button>
+          <button type="button" data-preview="Тренеры" style="--item-index: 2">
+            <span>Тренеры</span
+            ><span class="menu-panel__arrow" aria-hidden="true">↗</span>
+          </button>
+          <button
+            type="button"
+            data-preview="Абонементы"
+            style="--item-index: 3"
+          >
+            <span>Абонементы</span
+            ><span class="menu-panel__arrow" aria-hidden="true">↗</span>
+          </button>
+          <button type="button" data-preview="Магазин" style="--item-index: 4">
+            <span>Магазин</span
+            ><span class="menu-panel__arrow" aria-hidden="true">↗</span>
+          </button>
+          <button
+            type="button"
+            data-preview="Расписание"
+            style="--item-index: 5"
+          >
+            <span>Расписание</span
+            ><span class="menu-panel__arrow" aria-hidden="true">↗</span>
+          </button>
+          <button type="button" data-preview="Контакты" style="--item-index: 6">
+            <span>Контакты</span
+            ><span class="menu-panel__arrow" aria-hidden="true">↗</span>
+          </button>
+        </nav>
+        <div class="menu-panel__bottom">
+          <p class="menu-panel__footnote">ИДЕАЛ · АБАКАН<br />БОГРАДА, 135</p>
+          <button
+            class="menu-panel__appointment"
+            type="button"
+            data-preview="Записаться"
+          >
+            <span>Записаться</span>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 12h14m-6-6 6 6-6 6" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <dialog
+      class="preview-dialog"
+      id="preview-dialog"
+      aria-labelledby="preview-dialog-title"
+    >
+      <button
+        class="preview-dialog__close"
+        id="preview-close"
+        type="button"
+        aria-label="Закрыть"
+      >
+        ×
+      </button>
+      <span class="preview-dialog__eyebrow">IDEAL / PREVIEW</span>
+      <h2 id="preview-dialog-title">Раздел в разработке</h2>
+      <p id="preview-dialog-description">
+        Пока мы собираем первый экран. Этот раздел подключим на следующем этапе.
+      </p>
+      <button class="preview-dialog__ok" type="button" id="preview-dialog-ok">
+        Понятно
+      </button>
+    </dialog>
+    <script src="site/scripts/main.js" defer></script>
+    <script src="site/scripts/hero-motion.js" defer></script>
+  </body>
+</html>
