@@ -5,6 +5,10 @@
   const html = document.documentElement;
   const hero = document.querySelector('.hero');
   const next = document.querySelector('.preview-next');
+  const backgroundImage = hero?.querySelector('.hero__background img');
+  const foreground = hero?.querySelector('.hero__foreground');
+  const titleWrap = hero?.querySelector('.hero__title-wrap');
+  const transitionFog = hero?.querySelector('.hero__transition-fog');
   if (!hero) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -14,6 +18,25 @@
   let completeTimer = null;
   let introToken = 0;
 
+  // Прогресс скролла больше не хранится в CSS-переменных.
+  // Изменяем только свойства соответствующих слоёв.
+  const applyScrollProgress = (progress) => {
+    if (!done || reducedMotion.matches) return;
+    if (backgroundImage) backgroundImage.style.transform = `scale(${(1 + progress * .025).toFixed(5)})`;
+    if (foreground) foreground.style.transform = `translate3d(0, ${(-30 * progress).toFixed(2)}px, 0) scale(${(1 - progress * .022).toFixed(5)})`;
+    if (titleWrap) {
+      titleWrap.style.transform = `translate3d(-50%, ${(-30 * progress).toFixed(2)}px, 0) scale(${(1 + progress * .04).toFixed(5)})`;
+      titleWrap.style.opacity = String(1 - progress * .75);
+    }
+    if (transitionFog) transitionFog.style.opacity = String(progress * .96);
+  };
+
+  const clearScrollStyles = () => {
+    for (const el of [backgroundImage, foreground, titleWrap]) el?.style.removeProperty('transform');
+    titleWrap?.style.removeProperty('opacity');
+    transitionFog?.style.removeProperty('opacity');
+  };
+
   const finishIntro = () => {
     if (done) return;
     done = true;
@@ -21,6 +44,7 @@
     introToken += 1;
     window.clearTimeout(completeTimer);
     html.classList.remove('hero-intro', 'hero-intro-playing');
+    applyScrollProgress(currentProgress);
     // Удаляем CSS-анимации и состояния, сохраняя итоговые стили v3.
   };
 
@@ -36,7 +60,7 @@
     }
     running = true;
     html.classList.add('hero-intro-playing');
-    completeTimer = window.setTimeout(finishIntro, 3020);
+    completeTimer = window.setTimeout(finishIntro, 4130);
   };
 
   if (!done) {
@@ -69,30 +93,49 @@
   reducedMotion.addEventListener('change', (event) => {
     if (event.matches) {
       finishIntro();
-      hero.style.removeProperty('--hero-scroll-progress');
+      clearScrollStyles();
       next?.classList.remove('is-reveal-enabled');
     } else {
       updateOnScroll();
     }
   });
 
+  // Параллакс не догоняет колесо скачками: плавная инерция ~180 мс при любом FPS.
   let rafPending = false;
+  let previousFrame = 0;
+  let currentProgress = 0;
+  let targetProgress = 0;
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  function animateScroll(frameTime) {
+    if (reducedMotion.matches) {
+      rafPending = false;
+      previousFrame = 0;
+      return;
+    }
+    const dt = previousFrame ? Math.min(frameTime - previousFrame, 64) : 16;
+    previousFrame = frameTime;
+    const smoothing = 1 - Math.exp(-dt / 180);
+    currentProgress += (targetProgress - currentProgress) * smoothing;
+    if (Math.abs(targetProgress - currentProgress) < .0005) {
+      currentProgress = targetProgress;
+      rafPending = false;
+      previousFrame = 0;
+    }
+    applyScrollProgress(currentProgress);
+    if (rafPending) requestAnimationFrame(animateScroll);
+  }
   function updateOnScroll() {
-    rafPending = false;
     if (reducedMotion.matches) return;
     const y = window.scrollY || window.pageYOffset;
     if (y > 24 && !done) finishIntro();
     const distance = Math.max(hero.offsetHeight * .85, 1);
-    const progress = clamp(y / distance, 0, 1);
-    hero.style.setProperty('--hero-scroll-progress', progress.toFixed(4));
-  }
-  function requestScrollUpdate() {
+    targetProgress = clamp(y / distance, 0, 1);
     if (!rafPending) {
       rafPending = true;
-      requestAnimationFrame(updateOnScroll);
+      requestAnimationFrame(animateScroll);
     }
   }
+  function requestScrollUpdate() { updateOnScroll(); }
   window.addEventListener('scroll', requestScrollUpdate, { passive: true });
   window.addEventListener('resize', requestScrollUpdate, { passive: true });
   window.addEventListener('pageshow', (event) => {
