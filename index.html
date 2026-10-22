@@ -193,16 +193,724 @@
         </p>
       </section>
 
-      <section class="preview-next" id="next" aria-labelledby="next-heading">
-        <span class="preview-next__eyebrow"
-          >Спортивный клуб «ИДЕАЛ» · Абакан</span
+      <!-- IDEAL / MONO — два новых блока. Существующий hero выше без изменений. -->
+      <div class="ideal-flow" data-ideal-flow>
+        <section
+          class="directions"
+          id="next"
+          aria-labelledby="directions-title"
         >
-        <h2 id="next-heading">БОЛЬШЕ, ЧЕМ<br />ТРЕНИРОВКИ</h2>
-        <p>
-          Здесь будет следующая секция главной страницы. Сейчас готов только
-          первый экран — hero.
-        </p>
-      </section>
+          <div class="directions__shell">
+            <div class="directions__intro">
+              <p class="directions__eyebrow">
+                <span>01</span><i aria-hidden="true"></i>Направления
+              </p>
+              <h2 class="directions__heading" id="directions-title">
+                ВЫБЕРИ<br /><strong>СВОЙ ПУТЬ</strong>
+              </h2>
+              <p class="directions__lead">
+                Разные форматы тренировок, одна цель — лучшая версия тебя.
+              </p>
+              <a class="directions__explore" href="#directions-cards"
+                ><span>Узнать больше<br />о направлениях</span></a
+              >
+              <p class="directions__count">
+                <strong>01</strong><span></span>02&nbsp;&nbsp;03
+              </p>
+            </div>
+            <div class="directions__cards" id="directions-cards">
+              <article class="direction-card">
+                <img
+                  src="site/img/direction-gym.webp"
+                  alt="Гантели и оборудование тренажёрного зала"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="direction-card__scrim" aria-hidden="true"></div>
+                <span class="direction-card__number"
+                  >01 <span aria-hidden="true"></span
+                ></span>
+                <div class="direction-card__content">
+                  <h3>ТРЕНАЖЁРНЫЙ<br />ЗАЛ</h3>
+                  <p>Силовые и кардиотренировки в твоём ритме.</p>
+                  <button
+                    type="button"
+                    data-preview="Тренажёрный зал"
+                    aria-label="Подробнее: тренажёрный зал"
+                  >
+                    <span>Подробнее</span>
+                  </button>
+                </div>
+              </article>
+              <article class="direction-card">
+                <img
+                  src="site/img/direction-group.webp"
+                  alt="Спортсменка во время групповой тренировки"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="direction-card__scrim" aria-hidden="true"></div>
+                <span class="direction-card__number"
+                  >02 <span aria-hidden="true"></span
+                ></span>
+                <div class="direction-card__content">
+                  <h3>ГРУППОВЫЕ<br />ЗАНЯТИЯ</h3>
+                  <p>HOT-IRON, Pilates, Stretching и Fitness MIX.</p>
+                  <a class="direction-card__details" href="#group-programs"
+                    >Расписание программ</a
+                  >
+                </div>
+              </article>
+              <article class="direction-card">
+                <img
+                  src="site/img/direction-personal.webp"
+                  alt="Тренер помогает спортсмену во время силового упражнения"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="direction-card__scrim" aria-hidden="true"></div>
+                <span class="direction-card__number"
+                  >03 <span aria-hidden="true"></span
+                ></span>
+                <div class="direction-card__content">
+                  <h3>ПЕРСОНАЛЬНЫЕ<br />ТРЕНИРОВКИ</h3>
+                  <p>Индивидуальный подход и внимание к технике.</p>
+                  <button
+                    type="button"
+                    data-preview="Персональные тренировки"
+                    aria-label="Подробнее: персональные тренировки"
+                  >
+                    <span>Подробнее</span>
+                  </button>
+                </div>
+              </article>
+            </div>
+            <div
+              class="directions__programs"
+              id="group-programs"
+              aria-labelledby="group-programs-heading"
+            >
+              <div class="directions__programs-head">
+                <span class="directions__programs-label"
+                  >ГРУППОВЫЕ ПРОГРАММЫ / РАСПИСАНИЕ</span
+                >
+                <h3 id="group-programs-heading">Движение по расписанию</h3>
+                <p>
+                  Проводятся HOT-IRON, Pilates, Pilates + Stretching и Fitness
+                  MIX.
+                </p>
+              </div>
+              <div class="directions__programs-days">
+                <div class="directions__programs-day">
+                  <strong>ПН · СР · ПТ</strong>
+                  <p><span>12:00</span> HOT-IRON</p>
+                </div>
+                <div class="directions__programs-day">
+                  <strong>ВТ · ЧТ</strong>
+                  <p><span>18:15</span> PILATES</p>
+                  <p><span>19:15</span> PILATES + Stretching</p>
+                  <p><span>18:30</span> Fitness MIX</p>
+                  <p><span>19:30</span> HOT-IRON</p>
+                </div>
+              </div>
+              <p class="directions__programs-foot">
+                Время указано по информации клуба. Актуальность и распределение
+                занятий по дням уточняйте перед записью.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="memberships"
+          id="memberships"
+          aria-labelledby="memberships-title"
+        >
+          <img
+            class="memberships__scene"
+            src="site/img/membership-scene.webp"
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
+          />
+          <div class="memberships__shell">
+            <div class="memberships__intro">
+              <p class="memberships__eyebrow">
+                <span>02</span><i aria-hidden="true"></i>Абонементы
+              </p>
+              <h2 class="memberships__heading" id="memberships-title">
+                БОЛЬШЕ<br />ВОЗМОЖНОСТЕЙ<br />ДЛЯ ТЕБЯ
+              </h2>
+              <p class="memberships__lead">
+                Выбери удобный формат и начни движение к своим целям уже
+                сегодня.
+              </p>
+              <a href="#plans" class="memberships__browse"
+                >Посмотреть<br />все абонементы</a
+              >
+            </div>
+            <div class="memberships__content" id="plans">
+              <div class="memberships__toolbar">
+                <div
+                  class="memberships__tabs"
+                  role="group"
+                  aria-label="Вид абонемента"
+                >
+                  <button
+                    type="button"
+                    data-plan-tab="gym"
+                    class="is-active"
+                    aria-pressed="true"
+                  >
+                    Тренажёрный зал
+                  </button>
+                  <button
+                    type="button"
+                    data-plan-tab="groups"
+                    aria-pressed="false"
+                  >
+                    Групповые занятия
+                  </button>
+                </div>
+                <div
+                  class="memberships__arrows"
+                  aria-label="Прокрутить карточки"
+                >
+                  <button
+                    type="button"
+                    data-plans-prev
+                    aria-label="Предыдущий абонемент"
+                  >
+                    Назад
+                  </button>
+                  <span
+                    class="memberships__counter"
+                    data-plans-counter
+                    aria-live="polite"
+                    >01 / 10</span
+                  >
+                  <button
+                    type="button"
+                    data-plans-next
+                    aria-label="Следующий абонемент"
+                  >
+                    Далее
+                  </button>
+                </div>
+              </div>
+              <div
+                class="memberships__plan-view"
+                data-plans-panel="gym"
+                id="plans-gym"
+              >
+                <div class="memberships__track" data-plans-track="gym">
+                  <article
+                    class="membership-card"
+                    aria-label="Абонемент Безлимит · Дневной, 2 600 ₽"
+                  >
+                    <div class="membership-card__top">
+                      <span class="membership-card__index">01 / IDEAL</span
+                      ><span
+                        class="membership-card__dash"
+                        aria-hidden="true"
+                      ></span>
+                    </div>
+                    <h3 class="membership-card__name">Безлимит · Дневной</h3>
+                    <p class="membership-card__times">08:00–16:00 · 1 месяц</p>
+                    <div class="membership-card__price">
+                      <strong>2 600 ₽</strong>
+                    </div>
+                    <p class="membership-card__description">
+                      Неограниченные посещения в дневное время.
+                    </p>
+                    <button
+                      class="membership-card__buy"
+                      type="button"
+                      data-buy-plan="Безлимит · Дневной"
+                      data-buy-price="2 600 ₽"
+                      data-buy-details="Неограниченные посещения в дневное время."
+                    >
+                      Купить
+                    </button>
+                  </article>
+                  <article
+                    class="membership-card membership-card--featured"
+                    aria-label="Абонемент Безлимит · Единый, 2 999 ₽"
+                  >
+                    <div class="membership-card__top">
+                      <span class="membership-card__index">02 / IDEAL</span
+                      ><span class="membership-card__tag">Безлимит</span>
+                    </div>
+                    <h3 class="membership-card__name">Безлимит · Единый</h3>
+                    <p class="membership-card__times">08:00–22:00 · 1 месяц</p>
+                    <div class="membership-card__price">
+                      <strong>2 999 ₽</strong>
+                    </div>
+                    <p class="membership-card__description">
+                      Неограниченные посещения в течение дня.
+                    </p>
+                    <button
+                      class="membership-card__buy"
+                      type="button"
+                      data-buy-plan="Безлимит · Единый"
+                      data-buy-price="2 999 ₽"
+                      data-buy-details="Неограниченные посещения в течение дня."
+                    >
+                      Купить
+                    </button>
+                  </article>
+                  <article
+                    class="membership-card"
+                    aria-label="Абонемент Дуэт, 2 800 ₽"
+                  >
+                    <div class="membership-card__top">
+                      <span class="membership-card__index">03 / IDEAL</span
+                      ><span
+                        class="membership-card__dash"
+                        aria-hidden="true"
+                      ></span>
+                    </div>
+                    <h3 class="membership-card__name">Дуэт</h3>
+                    <p class="membership-card__times">
+                      08:00–22:00 · за человека
+                    </p>
+                    <div class="membership-card__price">
+                      <strong>2 800 ₽</strong>
+                    </div>
+                    <p class="membership-card__description">
+                      Для двух человек. Оба абонемента оплачиваются вместе;
+                      общая стоимость 5 600 ₽.
+                    </p>
+                    <button
+                      class="membership-card__buy"
+                      type="button"
+                      data-buy-plan="Дуэт"
+                      data-buy-price="2 800 ₽"
+                      data-buy-details="Для двух человек. Оба абонемента оплачиваются вместе; общая стоимость 5 600 ₽."
+                    >
+                      Купить
+                    </button>
+                  </article>
+                  <article
+                    class="membership-card"
+                    aria-label="Абонемент Вт · Чт · Сб · Вс, 2 500 ₽"
+                  >
+                    <div class="membership-card__top">
+                      <span class="membership-card__index">04 / IDEAL</span
+                      ><span
+                        class="membership-card__dash"
+                        aria-hidden="true"
+                      ></span>
+                    </div>
+                    <h3 class="membership-card__name">Вт · Чт · Сб · Вс</h3>
+                    <p class="membership-card__times">
+                      08:00–22:00 · выбранные дни
+                    </p>
+                    <div class="membership-card__price">
+                      <strong>2 500 ₽</strong>
+                    </div>
+                    <p class="membership-card__description">
+                      Посещение по вторникам, четвергам, субботам и
+                      воскресеньям.
+                    </p>
+                    <button
+                      class="membership-card__buy"
+                      type="button"
+                      data-buy-plan="Вт · Чт · Сб · Вс"
+                      data-buy-price="2 500 ₽"
+                      data-buy-details="Посещение по вторникам, четвергам, субботам и воскресеньям."
+                    >
+                      Купить
+                    </button>
+                  </article>
+                  <article
+                    class="membership-card"
+                    aria-label="Абонемент Студенческий, 2 300 ₽"
+                  >
+                    <div class="membership-card__top">
+                      <span class="membership-card__index">05 / IDEAL</span
+                      ><span
+                        class="membership-card__dash"
+                        aria-hidden="true"
+                      ></span>
+                    </div>
+                    <h3 class="membership-card__name">Студенческий</h3>
+                    <p class="membership-card__times">
+                      Дневной тариф · 08:00–16:00
+                    </p>
+                    <div class="membership-card__price">
+                      <strong>2 300 ₽</strong>
+                    </div>
+                    <p class="membership-card__description">
+                      Специальный тариф для студентов.
+                    </p>
+                    <button
+                      class="membership-card__buy"
+                      type="button"
+                      data-buy-plan="Студенческий"
+                      data-buy-price="2 300 ₽"
+                      data-buy-details="Специальный тариф для студентов."
+                    >
+                      Купить
+                    </button>
+                  </article>
+                  <article
+                    class="membership-card"
+                    aria-label="Абонемент Социальный, 2 300 ₽"
+                  >
+                    <div class="membership-card__top">
+                      <span class="membership-card__index">06 / IDEAL</span
+                      ><span
+                        class="membership-card__dash"
+                        aria-hidden="true"
+                      ></span>
+                    </div>
+                    <h3 class="membership-card__name">Социальный</h3>
+                    <p class="membership-card__times">
+                      Дневной тариф · 08:00–16:00
+                    </p>
+                    <div class="membership-card__price">
+                      <strong>2 300 ₽</strong>
+                    </div>
+                    <p class="membership-card__description">
+                      Социальный тариф; условия предоставления уточняются.
+                    </p>
+                    <button
+                      class="membership-card__buy"
+                      type="button"
+                      data-buy-plan="Социальный"
+                      data-buy-price="2 300 ₽"
+                      data-buy-details="Социальный тариф; условия предоставления уточняются."
+                    >
+                      Купить
+                    </button>
+                  </article>
+                  <article
+                    class="membership-card"
+                    aria-label="Абонемент Утро, 2 300 ₽"
+                  >
+                    <div class="membership-card__top">
+                      <span class="membership-card__index">07 / IDEAL</span
+                      ><span
+                        class="membership-card__dash"
+                        aria-hidden="true"
+                      ></span>
+                    </div>
+                    <h3 class="membership-card__name">Утро</h3>
+                    <p class="membership-card__times">08:00–10:00</p>
+                    <div class="membership-card__price">
+                      <strong>2 300 ₽</strong>
+                    </div>
+                    <p class="membership-card__description">
+                      Занятия в утренние часы.
+                    </p>
+                    <button
+                      class="membership-card__buy"
+                      type="button"
+                      data-buy-plan="Утро"
+                      data-buy-price="2 300 ₽"
+                      data-buy-details="Занятия в утренние часы."
+                    >
+                      Купить
+                    </button>
+                  </article>
+                  <article
+                    class="membership-card"
+                    aria-label="Абонемент Разовое · День, 300 ₽"
+                  >
+                    <div class="membership-card__top">
+                      <span class="membership-card__index">08 / IDEAL</span
+                      ><span
+                        class="membership-card__dash"
+                        aria-hidden="true"
+                      ></span>
+                    </div>
+                    <h3 class="membership-card__name">Разовое · День</h3>
+                    <p class="membership-card__times">
+                      08:00–16:00 · 1 посещение
+                    </p>
+                    <div class="membership-card__price">
+                      <strong>300 ₽</strong>
+                    </div>
+                    <p class="membership-card__description">
+                      Разовое посещение тренажёрного зала.
+                    </p>
+                    <button
+                      class="membership-card__buy"
+                      type="button"
+                      data-buy-plan="Разовое · День"
+                      data-buy-price="300 ₽"
+                      data-buy-details="Разовое посещение тренажёрного зала."
+                    >
+                      Купить
+                    </button>
+                  </article>
+                  <article
+                    class="membership-card"
+                    aria-label="Абонемент Разовое · Вечер, 400 ₽"
+                  >
+                    <div class="membership-card__top">
+                      <span class="membership-card__index">09 / IDEAL</span
+                      ><span
+                        class="membership-card__dash"
+                        aria-hidden="true"
+                      ></span>
+                    </div>
+                    <h3 class="membership-card__name">Разовое · Вечер</h3>
+                    <p class="membership-card__times">С 16:00 · 1 посещение</p>
+                    <div class="membership-card__price">
+                      <strong>400 ₽</strong>
+                    </div>
+                    <p class="membership-card__description">
+                      Разовое посещение в вечернее время.
+                    </p>
+                    <button
+                      class="membership-card__buy"
+                      type="button"
+                      data-buy-plan="Разовое · Вечер"
+                      data-buy-price="400 ₽"
+                      data-buy-details="Разовое посещение в вечернее время."
+                    >
+                      Купить
+                    </button>
+                  </article>
+                  <article
+                    class="membership-card"
+                    aria-label="Абонемент Выгодный · День, 7 000 ₽"
+                  >
+                    <div class="membership-card__top">
+                      <span class="membership-card__index">10 / IDEAL</span
+                      ><span
+                        class="membership-card__dash"
+                        aria-hidden="true"
+                      ></span>
+                    </div>
+                    <h3 class="membership-card__name">Выгодный · День</h3>
+                    <p class="membership-card__times">
+                      Дневное посещение 08:00–16:00
+                    </p>
+                    <div class="membership-card__price">
+                      <strong>7 000 ₽</strong>
+                    </div>
+                    <p class="membership-card__description">
+                      Срок действия тарифа уточняется в клубе.
+                    </p>
+                    <button
+                      class="membership-card__buy"
+                      type="button"
+                      data-buy-plan="Выгодный · День"
+                      data-buy-price="7 000 ₽"
+                      data-buy-details="Срок действия тарифа уточняется в клубе."
+                    >
+                      Купить
+                    </button>
+                  </article>
+                  <article
+                    class="membership-card"
+                    aria-label="Абонемент Выгодный · Единый, 8 000 ₽"
+                  >
+                    <div class="membership-card__top">
+                      <span class="membership-card__index">11 / IDEAL</span
+                      ><span
+                        class="membership-card__dash"
+                        aria-hidden="true"
+                      ></span>
+                    </div>
+                    <h3 class="membership-card__name">Выгодный · Единый</h3>
+                    <p class="membership-card__times">08:00–22:00</p>
+                    <div class="membership-card__price">
+                      <strong>8 000 ₽</strong>
+                    </div>
+                    <p class="membership-card__description">
+                      Срок действия тарифа уточняется в клубе.
+                    </p>
+                    <button
+                      class="membership-card__buy"
+                      type="button"
+                      data-buy-plan="Выгодный · Единый"
+                      data-buy-price="8 000 ₽"
+                      data-buy-details="Срок действия тарифа уточняется в клубе."
+                    >
+                      Купить
+                    </button>
+                  </article>
+                </div>
+              </div>
+              <div
+                class="memberships__plan-view"
+                data-plans-panel="groups"
+                id="plans-groups"
+                hidden
+              >
+                <div class="memberships__track" data-plans-track="groups">
+                  <article
+                    class="membership-card"
+                    aria-label="Абонемент 8 занятий, 3 200 ₽"
+                  >
+                    <div class="membership-card__top">
+                      <span class="membership-card__index">01 / IDEAL</span
+                      ><span
+                        class="membership-card__dash"
+                        aria-hidden="true"
+                      ></span>
+                    </div>
+                    <h3 class="membership-card__name">8 занятий</h3>
+                    <p class="membership-card__times">8 посещений · 1 месяц</p>
+                    <div class="membership-card__price">
+                      <strong>3 200 ₽</strong>
+                    </div>
+                    <p class="membership-card__description">
+                      В подарок — посещение тренажёрного зала.
+                    </p>
+                    <button
+                      class="membership-card__buy"
+                      type="button"
+                      data-buy-plan="8 занятий"
+                      data-buy-price="3 200 ₽"
+                      data-buy-details="В подарок — посещение тренажёрного зала."
+                    >
+                      Купить
+                    </button>
+                  </article>
+                  <article
+                    class="membership-card"
+                    aria-label="Абонемент 12 занятий, 3 600 ₽"
+                  >
+                    <div class="membership-card__top">
+                      <span class="membership-card__index">02 / IDEAL</span
+                      ><span
+                        class="membership-card__dash"
+                        aria-hidden="true"
+                      ></span>
+                    </div>
+                    <h3 class="membership-card__name">12 занятий</h3>
+                    <p class="membership-card__times">12 посещений · 1 месяц</p>
+                    <div class="membership-card__price">
+                      <strong>3 600 ₽</strong>
+                    </div>
+                    <p class="membership-card__description">
+                      В подарок — посещение тренажёрного зала.
+                    </p>
+                    <button
+                      class="membership-card__buy"
+                      type="button"
+                      data-buy-plan="12 занятий"
+                      data-buy-price="3 600 ₽"
+                      data-buy-details="В подарок — посещение тренажёрного зала."
+                    >
+                      Купить
+                    </button>
+                  </article>
+                  <article
+                    class="membership-card"
+                    aria-label="Абонемент Разовое занятие, 500 ₽"
+                  >
+                    <div class="membership-card__top">
+                      <span class="membership-card__index">03 / IDEAL</span
+                      ><span
+                        class="membership-card__dash"
+                        aria-hidden="true"
+                      ></span>
+                    </div>
+                    <h3 class="membership-card__name">Разовое занятие</h3>
+                    <p class="membership-card__times">1 групповое занятие</p>
+                    <div class="membership-card__price">
+                      <strong>500 ₽</strong>
+                    </div>
+                    <p class="membership-card__description">
+                      Ознакомительное посещение групповой программы.
+                    </p>
+                    <button
+                      class="membership-card__buy"
+                      type="button"
+                      data-buy-plan="Разовое занятие"
+                      data-buy-price="500 ₽"
+                      data-buy-details="Ознакомительное посещение групповой программы."
+                    >
+                      Купить
+                    </button>
+                  </article>
+                </div>
+              </div>
+              <div class="memberships__extras" data-plans-extra="gym">
+                <span>Дополнительно</span
+                ><span>Замена клубной карты — 50 ₽</span>
+              </div>
+              <div class="memberships__extras" data-plans-extra="groups" hidden>
+                <span>Групповые занятия</span
+                ><span
+                  >Абонемент можно оформить на 2 недели — условия
+                  уточняются</span
+                ><span>Посещение тренажёрного зала в подарок</span>
+              </div>
+              <p class="memberships__note">
+                Цены и расписание — по предоставленному прайсу клуба. Перед
+                оплатой уточняйте доступность, сроки действия и специальные
+                условия.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Спортивное питание. Концепты упаковок и категории заменяются реальными товарами. -->
+        <section class="nutrition" id="nutrition" aria-labelledby="nutrition-title">
+          <div class="nutrition__shell">
+            <div class="nutrition__eyebrow"><span>03 / СПОРТИВНОЕ ПИТАНИЕ</span><span>IDEAL / MONO</span></div>
+            <div class="nutrition__intro">
+              <h2 class="nutrition__heading" id="nutrition-title">ЭНЕРГИЯ<br />ДЛЯ БОЛЬШЕГО.</h2>
+              <p class="nutrition__lead">Спортивное питание для твоих целей. Всё необходимое для тренировок и восстановления.</p>
+            </div>
+            <div class="nutrition__gallery" tabindex="0" role="region" aria-roledescription="карусель" aria-label="Спортивное питание: используйте стрелки влево и вправо" aria-describedby="nutrition-gesture">
+              <div class="nutrition__stage">
+                <article class="nutrition-card nutrition-card--protein" data-nutrition-card data-name="Протеин" data-category="Белковые смеси" data-description="Протеин и белковые смеси. Вкусы, фасовки и состав появятся после наполнения каталога." data-price="" role="group" aria-roledescription="слайд" aria-label="1 из 5: Протеин">
+                  <div class="nutrition-card__top"><span>IDEAL / MONO</span><span>01</span></div>
+                  <img class="nutrition-card__image" src="site/img/nutrition/protein.svg" alt="Изображение упаковки: протеин" width="600" height="760" loading="lazy" draggable="false" />
+                  <div class="nutrition-card__bottom"><span>PROTEIN</span><span>СПОРТ / ПИТАНИЕ</span></div>
+                </article>
+                <article class="nutrition-card nutrition-card--creatine" data-nutrition-card data-name="Креатин" data-category="Для тренировок" data-description="Креатин для спортивного рациона. Конкретные товары и характеристики появятся в каталоге." data-price="" role="group" aria-roledescription="слайд" aria-label="2 из 5: Креатин">
+                  <div class="nutrition-card__top"><span>IDEAL / MONO</span><span>02</span></div>
+                  <img class="nutrition-card__image" src="site/img/nutrition/creatine.svg" alt="Изображение упаковки: креатин" width="600" height="760" loading="lazy" draggable="false" />
+                  <div class="nutrition-card__bottom"><span>CREATINE</span><span>СПОРТ / ПИТАНИЕ</span></div>
+                </article>
+                <article class="nutrition-card nutrition-card--bcaa" data-nutrition-card data-name="BCAA" data-category="Аминокислотные комплексы" data-description="Аминокислотные комплексы BCAA. Составы и рекомендации производителя уточняются." data-price="" role="group" aria-roledescription="слайд" aria-label="3 из 5: BCAA">
+                  <div class="nutrition-card__top"><span>IDEAL / MONO</span><span>03</span></div>
+                  <img class="nutrition-card__image" src="site/img/nutrition/bcaa.svg" alt="Изображение упаковки: bcaa" width="600" height="760" loading="lazy" draggable="false" />
+                  <div class="nutrition-card__bottom"><span>BCAA</span><span>СПОРТ / ПИТАНИЕ</span></div>
+                </article>
+                <article class="nutrition-card nutrition-card--preworkout" data-nutrition-card data-name="Предтренировочный комплекс" data-category="Перед тренировкой" data-description="Предтренировочные комплексы. Информацию о составе и применении уточним для каждого товара." data-price="" role="group" aria-roledescription="слайд" aria-label="4 из 5: Предтренировочный комплекс">
+                  <div class="nutrition-card__top"><span>IDEAL / MONO</span><span>04</span></div>
+                  <img class="nutrition-card__image" src="site/img/nutrition/preworkout.svg" alt="Изображение упаковки: предтренировочный комплекс" width="600" height="760" loading="lazy" draggable="false" />
+                  <div class="nutrition-card__bottom"><span>PRE / WORK</span><span>СПОРТ / ПИТАНИЕ</span></div>
+                </article>
+                <article class="nutrition-card nutrition-card--amino" data-nutrition-card data-name="Аминокислоты" data-category="Для спортивного рациона" data-description="Аминокислоты для спортивного рациона. Ассортимент и характеристики уточняются." data-price="" role="group" aria-roledescription="слайд" aria-label="5 из 5: Аминокислоты">
+                  <div class="nutrition-card__top"><span>IDEAL / MONO</span><span>05</span></div>
+                  <img class="nutrition-card__image" src="site/img/nutrition/amino.svg" alt="Изображение упаковки: аминокислоты" width="600" height="760" loading="lazy" draggable="false" />
+                  <div class="nutrition-card__bottom"><span>AMINO</span><span>СПОРТ / ПИТАНИЕ</span></div>
+                </article>
+              </div>
+            </div>
+            <div class="nutrition__navigation">
+              <p class="nutrition__gesture" id="nutrition-gesture">Перетаскивай, чтобы выбрать</p>
+              <div class="nutrition__controls">
+                <button class="nutrition__nav" type="button" data-nutrition-prev aria-label="Предыдущий товар">Назад</button>
+                <span class="nutrition__counter" data-nutrition-counter>01 / 05</span>
+                <button class="nutrition__nav" type="button" data-nutrition-next aria-label="Следующий товар">Далее</button>
+              </div>
+            </div>
+            <div class="nutrition__details">
+              <div class="nutrition__identity"><p class="nutrition__category" data-nutrition-category>Белковые смеси</p><h3 class="nutrition__name" data-nutrition-name>Протеин</h3></div>
+              <p class="nutrition__description" data-nutrition-description>Протеин и белковые смеси. Вкусы, фасовки и состав появятся после наполнения каталога.</p>
+              <div class="nutrition__purchase"><p class="nutrition__price" data-nutrition-price>Цена пока не указана</p><button class="nutrition__buy" type="button" data-nutrition-buy>В корзину</button></div>
+            </div>
+            <div class="nutrition__footer">
+              <p>Ассортимент и цены уточняются.<br />Оформление заказов пока недоступно.</p>
+              <a class="nutrition__store" href="#nutrition-store" data-nutrition-store>Перейти в магазин</a>
+            </div>
+            <p class="nutrition__status" role="status" aria-live="polite" aria-atomic="true" data-nutrition-status></p>
+          </div>
+        </section>
+      </div>
     </main>
 
     <div class="menu-panel" id="mobile-menu" hidden aria-hidden="true">
@@ -266,7 +974,49 @@
         Понятно
       </button>
     </dialog>
+
+    <dialog
+      class="purchase-dialog"
+      id="purchase-dialog"
+      aria-labelledby="purchase-title"
+    >
+      <button
+        type="button"
+        class="purchase-dialog__close"
+        data-purchase-close
+        aria-label="Закрыть"
+      >
+        ×
+      </button>
+      <span class="purchase-dialog__eyebrow">IDEAL / АБОНЕМЕНТ</span>
+      <h2 id="purchase-title">Ваш выбор</h2>
+      <p class="purchase-dialog__plan" data-purchase-name>Единый</p>
+      <p class="purchase-dialog__price" data-purchase-price>2 999 ₽</p>
+      <p class="purchase-dialog__terms" data-purchase-terms></p>
+      <p class="purchase-dialog__note">
+        Оформление и приём оплаты подключим на следующем этапе. Сейчас покупка
+        не совершается и деньги не списываются.
+      </p>
+      <button type="button" class="purchase-dialog__button" data-purchase-close>
+        Понятно
+      </button>
+    </dialog>
+
+    <dialog class="nutrition-dialog" id="nutrition-store" aria-labelledby="nutrition-store-title" aria-describedby="nutrition-store-note">
+      <div class="nutrition-dialog__top"><span>IDEAL / MONO</span><button type="button" data-nutrition-close>Закрыть</button></div>
+      <p class="nutrition-dialog__eyebrow">СПОРТИВНОЕ ПИТАНИЕ</p>
+      <h2 id="nutrition-store-title">Магазин готовится<br />к запуску.</h2>
+      <p id="nutrition-store-note">Каталог готовится к запуску. Товары можно добавить в корзину для предварительного просмотра, но заказ пока не оформляется и оплата недоступна.</p>
+      <h3>Корзина</h3>
+      <ul class="nutrition-dialog__items" data-nutrition-cart></ul>
+      <p class="nutrition-dialog__empty" data-nutrition-empty>Пока пусто. Выбери категорию в галерее.</p>
+      <button class="nutrition-dialog__clear" type="button" data-nutrition-clear hidden>Очистить корзину</button>
+      <p class="nutrition-dialog__note">Состояние хранится только до перезагрузки страницы.</p>
+    </dialog>
+
     <script src="site/scripts/main.js" defer></script>
     <script src="site/scripts/hero-motion.js" defer></script>
+    <script src="site/scripts/sections.js" defer></script>
+    <script src="site/scripts/nutrition.js" defer></script>
   </body>
 </html>

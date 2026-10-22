@@ -53,10 +53,10 @@ function openPreview(name, opener) {
   const isMembership = name === 'Абонементы';
   previewTitle.textContent = isBooking ? 'Запись в клуб' : isMembership ? 'Абонементы' : name;
   previewText.textContent = isBooking
-    ? 'Интерфейс записи подготовим вместе со страницей тренировок. Сейчас это демонстрация hero: заявки ещё не отправляются.'
+    ? 'Интерфейс записи подготовим вместе со страницей тренировок. Запись пока недоступна: заявки ещё не отправляются.'
     : isMembership
       ? 'Здесь откроются тарифы клуба и выбор абонемента. На этом этапе доступен только первый экран сайта.'
-      : `Раздел «${name}» добавим на следующем этапе. Сейчас доступна интерактивная демонстрация первого экрана.`;
+      : `Раздел «${name}» добавим на следующем этапе. Сейчас доступны готовые разделы главной страницы.`;
   clearTimeout(modalCloseTimer);
   previewDialog.showModal();
   requestAnimationFrame(() => previewDialog.classList.add('is-visible'));

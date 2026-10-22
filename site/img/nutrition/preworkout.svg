@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="760" viewBox="0 0 600 760" fill="none">
+<defs><linearGradient id="body" x1="145" y1="0" x2="455" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#fbfbf8"/><stop offset=".24" stop-color="#e1e3e2"/><stop offset=".7" stop-color="#a6aaad"/><stop offset="1" stop-color="#fbfbf8"/></linearGradient><linearGradient id="lid"><stop stop-color="#1b1e20"/><stop offset=".3" stop-color="#64696c"/><stop offset=".65" stop-color="#262a2c"/><stop offset="1" stop-color="#0e1011"/></linearGradient><radialGradient id="shadow"><stop stop-color="#111315" stop-opacity=".27"/><stop offset="1" stop-color="#111315" stop-opacity="0"/></radialGradient></defs>
+<ellipse cx="300" cy="646" rx="197" ry="40" fill="url(#shadow)"/>
+<path d="M155 229Q155 205 180 201H420Q445 205 445 229V574Q445 617 300 620Q155 617 155 574Z" fill="url(#body)"/>
+<ellipse cx="300" cy="572" rx="144" ry="32" stroke="#24282a" stroke-opacity=".12"/>
+<rect x="148" y="170" width="304" height="76" rx="18" fill="url(#lid)"/>
+<ellipse cx="300" cy="173" rx="147" ry="21" fill="#3d4245"/>
+<ellipse cx="300" cy="169" rx="136" ry="14" fill="#25292b"/>
+<path d="M160 201H440M160 210H440M160 219H440M160 228H440" stroke="#aeb3b5" stroke-opacity=".16"/>
+<text x="187" y="296" fill="#24282a" font-family="Arial,sans-serif" font-size="14" letter-spacing="5">IDEAL / MONO</text>
+<path d="M185 320H415" stroke="#24282a" stroke-opacity=".4"/>
+<text x="184" y="386" fill="#24282a" font-family="Arial,sans-serif" font-weight="700" font-size="27" letter-spacing="-1">PRE / WORK</text>
+<text x="187" y="414" fill="#24282a" opacity=".6" font-family="Arial,sans-serif" font-size="10" letter-spacing="2">SPORT NUTRITION / CONCEPT</text>
+<path d="M185 461L256 438L326 461L397 438M185 475L256 452L326 475L397 452M185 489L256 466L326 489L397 466" stroke="#24282a" stroke-opacity=".45" stroke-width="2"/>
+<text x="187" y="557" fill="#24282a" opacity=".7" font-family="Arial,sans-serif" font-size="10" letter-spacing="2">IDEAL — 04</text><circle cx="402" cy="552" r="8" stroke="#24282a" stroke-opacity=".65"/>
+</svg>
