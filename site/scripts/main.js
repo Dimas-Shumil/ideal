@@ -125,8 +125,8 @@ document.addEventListener('keydown', (event) => {
 menuPanel.addEventListener('click', event => {
   if (event.target.closest('a[href]')) setMenuState(false);
 });
-document.querySelectorAll('a[href="/trainers.html"]').forEach(link => {
-  if (location.pathname.endsWith('/trainers.html')) link.setAttribute('aria-current', 'page');
+document.querySelectorAll('a[href="/trainers.html"], a[href="/about.html"]').forEach(link => {
+  if (location.pathname.endsWith(link.getAttribute('href'))) link.setAttribute('aria-current', 'page');
 });
 // Do not keep the desktop page locked after a responsive menu breakpoint change.
 window.matchMedia('(min-width: 1181px)').addEventListener('change', event => {
