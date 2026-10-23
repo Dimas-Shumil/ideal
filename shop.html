@@ -72,19 +72,19 @@
     </section>
     <section class="shop__catalog" aria-labelledby="shop-catalog-title">
       <div class="shop__catalog-head"><h2 id="shop-catalog-title">Каталог питания</h2><span>ПРЕДПРОСМОТР / 05</span></div>
-      <div class="shop__notice"><p>Это демонстрация каталога, а не реальный ассортимент клуба. Иллюстрации — концепты упаковок. Бренды, фасовки, цены и наличие пока не указаны.</p><p id="shop-availability">Страницы товаров и корзина пока недоступны. Покупки и заявки не оформляются.</p></div>
+      <div class="shop__notice"><p>Это демонстрация каталога, а не реальный ассортимент клуба. Иллюстрации — концепты упаковок. Бренды, фасовки, цены и наличие пока не указаны.</p><p id="shop-availability">Доступны демо-страницы товаров и корзина. Покупки и заявки не оформляются. <a href="/cart.html">Открыть демо-корзину</a></p></div>
       <div class="shop__tools" data-shop-tools hidden>
         <p class="shop__filter-label" id="shop-filter-label">Предварительные категории — клубом не подтверждены</p>
         <div class="shop__filters" role="group" aria-labelledby="shop-filter-label"><button type="button" class="shop__filter" data-shop-filter="all" aria-pressed="true">Все примеры</button><button type="button" class="shop__filter" data-shop-filter="protein" aria-pressed="false">Протеин</button><button type="button" class="shop__filter" data-shop-filter="creatine" aria-pressed="false">Креатин</button><button type="button" class="shop__filter" data-shop-filter="amino" aria-pressed="false">Аминокислоты</button><button type="button" class="shop__filter" data-shop-filter="preworkout" aria-pressed="false">Предтренировочные комплексы</button><button type="button" class="shop__filter" data-shop-filter="vitamins" aria-pressed="false">Витамины</button></div>
         <div class="shop__results"><p data-shop-count role="status" aria-live="polite" aria-atomic="true">Показано демо-карточек: 5 из 5</p><button class="shop__reset" type="button" data-shop-reset disabled>Сбросить выбор</button></div>
       </div>
       <noscript><p class="shop__notice">Показаны все пять демо-карточек. Переключение категорий и диалоги доступны с JavaScript. Основные ссылки работают без него.</p></noscript>
-      <ul class="shop__grid">      <li class="shop-card" data-shop-item="demo-01" data-category="protein" data-demo="true" data-shop-reveal>
+      <p data-cart-feedback role="status" aria-live="polite"></p><p data-cart-storage role="status"></p><ul class="shop__grid">      <li class="shop-card" data-shop-item="demo-01" data-category="protein" data-demo="true" data-shop-reveal>
         <article aria-labelledby="shop-item-1">
           <div class="shop-card__visual"><span class="shop-card__badge">ДЕМО / 01</span><img src="site/img/nutrition/protein.svg" alt="Концепт упаковки: Протеин. Не фотография товара клуба." width="600" height="760" loading="lazy" decoding="async" data-shop-field="image" /><span class="shop-card__caption">КОНЦЕПТ УПАКОВКИ</span></div>
           <div class="shop-card__body"><p class="shop-card__category" data-shop-field="category">Протеин / предварительно</p><h3 id="shop-item-1" data-shop-field="name">Протеин</h3><p class="shop-card__demo">Демонстрационный товар</p>
           <dl class="shop-card__facts"><div><dt>Фасовка</dt><dd data-shop-field="packaging">Не указана</dd></div><div><dt>Стоимость</dt><dd data-shop-field="price">Не указана</dd></div></dl>
-          <button class="shop-card__action" type="button" data-preview="Демо-товар" disabled aria-describedby="shop-availability">О демо-товаре</button></div>
+          <a class="shop-card__action" href="/product.html?id=demo-01">О демо-товаре</a><button class="shop-card__action" type="button" data-demo-add="demo-01" disabled>Добавить демо-пример</button></div>
         </article>
       </li>
       <li class="shop-card" data-shop-item="demo-02" data-category="creatine" data-demo="true" data-shop-reveal>
@@ -92,7 +92,7 @@
           <div class="shop-card__visual"><span class="shop-card__badge">ДЕМО / 02</span><img src="site/img/nutrition/creatine.svg" alt="Концепт упаковки: Креатин. Не фотография товара клуба." width="600" height="760" loading="lazy" decoding="async" data-shop-field="image" /><span class="shop-card__caption">КОНЦЕПТ УПАКОВКИ</span></div>
           <div class="shop-card__body"><p class="shop-card__category" data-shop-field="category">Креатин / предварительно</p><h3 id="shop-item-2" data-shop-field="name">Креатин</h3><p class="shop-card__demo">Демонстрационный товар</p>
           <dl class="shop-card__facts"><div><dt>Фасовка</dt><dd data-shop-field="packaging">Не указана</dd></div><div><dt>Стоимость</dt><dd data-shop-field="price">Не указана</dd></div></dl>
-          <button class="shop-card__action" type="button" data-preview="Демо-товар" disabled aria-describedby="shop-availability">О демо-товаре</button></div>
+          <a class="shop-card__action" href="/product.html?id=demo-02">О демо-товаре</a><button class="shop-card__action" type="button" data-demo-add="demo-02" disabled>Добавить демо-пример</button></div>
         </article>
       </li>
       <li class="shop-card" data-shop-item="demo-03" data-category="amino" data-demo="true" data-shop-reveal>
@@ -100,7 +100,7 @@
           <div class="shop-card__visual"><span class="shop-card__badge">ДЕМО / 03</span><img src="site/img/nutrition/bcaa.svg" alt="Концепт упаковки: BCAA. Не фотография товара клуба." width="600" height="760" loading="lazy" decoding="async" data-shop-field="image" /><span class="shop-card__caption">КОНЦЕПТ УПАКОВКИ</span></div>
           <div class="shop-card__body"><p class="shop-card__category" data-shop-field="category">Аминокислоты / предварительно</p><h3 id="shop-item-3" data-shop-field="name">BCAA</h3><p class="shop-card__demo">Демонстрационный товар</p>
           <dl class="shop-card__facts"><div><dt>Фасовка</dt><dd data-shop-field="packaging">Не указана</dd></div><div><dt>Стоимость</dt><dd data-shop-field="price">Не указана</dd></div></dl>
-          <button class="shop-card__action" type="button" data-preview="Демо-товар" disabled aria-describedby="shop-availability">О демо-товаре</button></div>
+          <a class="shop-card__action" href="/product.html?id=demo-03">О демо-товаре</a><button class="shop-card__action" type="button" data-demo-add="demo-03" disabled>Добавить демо-пример</button></div>
         </article>
       </li>
       <li class="shop-card" data-shop-item="demo-04" data-category="preworkout" data-demo="true" data-shop-reveal>
@@ -108,7 +108,7 @@
           <div class="shop-card__visual"><span class="shop-card__badge">ДЕМО / 04</span><img src="site/img/nutrition/preworkout.svg" alt="Концепт упаковки: Предтренировочный комплекс. Не фотография товара клуба." width="600" height="760" loading="lazy" decoding="async" data-shop-field="image" /><span class="shop-card__caption">КОНЦЕПТ УПАКОВКИ</span></div>
           <div class="shop-card__body"><p class="shop-card__category" data-shop-field="category">Предтренировочные комплексы / предварительно</p><h3 id="shop-item-4" data-shop-field="name">Предтренировочный комплекс</h3><p class="shop-card__demo">Демонстрационный товар</p>
           <dl class="shop-card__facts"><div><dt>Фасовка</dt><dd data-shop-field="packaging">Не указана</dd></div><div><dt>Стоимость</dt><dd data-shop-field="price">Не указана</dd></div></dl>
-          <button class="shop-card__action" type="button" data-preview="Демо-товар" disabled aria-describedby="shop-availability">О демо-товаре</button></div>
+          <a class="shop-card__action" href="/product.html?id=demo-04">О демо-товаре</a><button class="shop-card__action" type="button" data-demo-add="demo-04" disabled>Добавить демо-пример</button></div>
         </article>
       </li>
       <li class="shop-card" data-shop-item="demo-05" data-category="amino" data-demo="true" data-shop-reveal>
@@ -116,7 +116,7 @@
           <div class="shop-card__visual"><span class="shop-card__badge">ДЕМО / 05</span><img src="site/img/nutrition/amino.svg" alt="Концепт упаковки: Аминокислоты. Не фотография товара клуба." width="600" height="760" loading="lazy" decoding="async" data-shop-field="image" /><span class="shop-card__caption">КОНЦЕПТ УПАКОВКИ</span></div>
           <div class="shop-card__body"><p class="shop-card__category" data-shop-field="category">Аминокислоты / предварительно</p><h3 id="shop-item-5" data-shop-field="name">Аминокислоты</h3><p class="shop-card__demo">Демонстрационный товар</p>
           <dl class="shop-card__facts"><div><dt>Фасовка</dt><dd data-shop-field="packaging">Не указана</dd></div><div><dt>Стоимость</dt><dd data-shop-field="price">Не указана</dd></div></dl>
-          <button class="shop-card__action" type="button" data-preview="Демо-товар" disabled aria-describedby="shop-availability">О демо-товаре</button></div>
+          <a class="shop-card__action" href="/product.html?id=demo-05">О демо-товаре</a><button class="shop-card__action" type="button" data-demo-add="demo-05" disabled>Добавить демо-пример</button></div>
         </article>
       </li>
 </ul>
@@ -222,6 +222,6 @@
       </button>
     </dialog>
     <!-- component:preview:end -->
-<script src="site/scripts/main.js" defer></script><script src="site/scripts/shop.js" defer></script>
+<script src="site/scripts/main.js" defer></script><script src="site/scripts/demo-products.js" defer></script><script src="site/scripts/demo-cart.js" defer></script><script src="site/scripts/shop.js" defer></script>
 </body>
 </html>

@@ -88,3 +88,8 @@
   .shop-page button, .shop__closing a, .shop__breadcrumb a, .shop-card__visual img { transition: none; }
   .shop-card:hover img, .shop-card:focus-within img { transform: none; }
 }
+
+.shop-card a.shop-card__action { text-align: center; margin-bottom: 10px; transition: transform 750ms ease, background-color 750ms ease; }
+.shop-card a.shop-card__action:hover { background: #464b4e; }
+.shop-card a.shop-card__action:active { transform: scale(.98); }
+@media (prefers-reduced-motion: reduce) { .shop-card a.shop-card__action { transition: none; } }

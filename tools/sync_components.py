@@ -4,7 +4,7 @@ Go Live needs only the already generated HTML/CSS, not Python.
 from pathlib import Path
 import re
 root = Path(__file__).resolve().parents[1]
-for filename in ('index.html', 'trainers.html', 'about.html', 'trainer.html', 'shop.html'):
+for filename in ('index.html', 'trainers.html', 'about.html', 'trainer.html', 'shop.html', 'product.html', 'cart.html'):
     page = root / filename
     text = page.read_text(encoding='utf-8')
     for name in ('header', 'footer', 'menu', 'preview'):

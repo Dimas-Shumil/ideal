@@ -38,9 +38,9 @@
   }
   function syncInfo(announce = true) {
     active = modulo(Math.round(target));
-    const data = cards[active].dataset;
+    const data = window.IdealProducts[active];
     fields.forEach(([key, element]) => {
-      element.textContent = key === 'price' ? data.price || 'Цена пока не указана' : data[key];
+      element.textContent = key === 'price' ? 'Стоимость не указана' : data[key];
     });
     counter.textContent = `${String(active + 1).padStart(2, '0')} / ${String(count).padStart(2, '0')}`;
     cards.forEach((card, index) => card.setAttribute('aria-hidden', String(index !== active)));
@@ -141,41 +141,13 @@
   if ('ResizeObserver' in window) new ResizeObserver(resize).observe(gallery);
   else window.addEventListener('resize', resize, {passive: true});
   reduced.addEventListener('change', () => { cancelAnimationFrame(frame); position = target; render(); });
+  section.querySelector('[data-nutrition-prev]').disabled = false;
+  section.querySelector('[data-nutrition-next]').disabled = false;
   resize(); syncInfo(false);
 
-  // Temporary in-memory basket. No order, payment, network call or persistence.
-  const basket = new Map();
-  const dialog = document.getElementById('nutrition-store');
-  const list = dialog.querySelector('[data-nutrition-cart]');
-  const empty = dialog.querySelector('[data-nutrition-empty]');
-  const clear = dialog.querySelector('[data-nutrition-clear]');
-  let opener = null;
-  function renderBasket() {
-    list.replaceChildren();
-    basket.forEach((quantity, index) => {
-      const item = document.createElement('li');
-      const name = document.createElement('span'), amount = document.createElement('span');
-      name.textContent = cards[index].dataset.name;
-      amount.textContent = `${quantity} шт.`;
-      item.append(name, amount); list.append(item);
-    });
-    empty.hidden = basket.size > 0; clear.hidden = basket.size === 0;
-  }
-  function showStore(control) { opener = control; renderBasket(); dialog.showModal(); }
-  section.querySelector('[data-nutrition-buy]').addEventListener('click', event => {
-    basket.set(active, (basket.get(active) || 0) + 1);
-    status.textContent = `${cards[active].dataset.name}: добавлено в корзину. Оформление заказа пока недоступно.`;
-    showStore(event.currentTarget);
-  });
-  section.querySelector('[data-nutrition-store]')?.addEventListener('click', event => {
-    event.preventDefault(); showStore(event.currentTarget);
-  });
-  dialog.querySelector('[data-nutrition-close]').addEventListener('click', () => dialog.close());
-  clear.addEventListener('click', () => { basket.clear(); renderBasket(); dialog.querySelector('[data-nutrition-close]').focus(); });
-  dialog.addEventListener('close', () => opener?.focus({preventScroll: true}));
-  dialog.addEventListener('click', event => {
-    if (event.target !== dialog) return;
-    const r = dialog.getBoundingClientRect();
-    if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) dialog.close();
+  const buy = section.querySelector('[data-nutrition-buy]');
+  buy.disabled = false;
+  buy.addEventListener('click', () => {
+    window.IdealCart.add(window.IdealProducts[active].id, 1);
   });
 })();
