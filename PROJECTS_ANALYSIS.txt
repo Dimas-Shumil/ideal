@@ -1,128 +1,306 @@
-IDEAL — анализ исходников / этап 7 / 23.10.2026
+IDEAL — фактическое сравнение исходников, этап 7 / 23.10.2026
 
-1. МАТЕРИАЛЫ И ПРЕДЕЛЫ ВЫВОДОВ
-Получен только IDEAL — копия(4).zip, 62 файла, без .git.
-Архивов Содружества, Transfer19 и Своих перевозок в текущей загрузке нет.
-Их сервер, БД, миграции, роли, маршруты, интерфейсы, push, PWA, загрузки,
-валидация, резервирование и деплой НЕ изучены. Описывать их устройство по
-прошлым чатам как проверенный факт нельзя. Уязвимости этим проектам не приписаны.
-Этап 7 завершён частично: анализ IDEAL и проект архитектуры подготовлены,
-сравнение источников и окончательное решение о переносе остаются открытыми.
+1. ОСНОВАНИЕ И ГРАНИЦЫ
+Изучены четыре переданных ZIP: IDEAL — копия(5), Kickboxing-Abakan-Boxing —
+копия, transfer19 — копия, PEREVOZKI — копия. Пути ниже относительно корня
+соответствующего проекта. Kickboxing идентифицирован как «Содружество» по
+package.json (sodruzhestvo-control), README.md и server.js; имя ZIP не является
+названием иной системы. PEREVOZKI — транспортная CRM «Свои перевозки»;
+в package.json и части файлов сохранено прежнее имя svoi-gruzi.
+8c2e059, чистый main и push — сведения пользователя, не проверка его Git.
 
-2. КАК РЕАЛЬНО УСТРОЕН IDEAL
-Семь публичных HTML: index, about, trainers, trainer, shop, product, cart.
-SCSS — семь страниц; готовые CSS — десять файлов, main.css общий для всех.
-Десять JS: main.js — меню и preview-dialog; hero-motion.js — intro/параллакс;
-sections.js — смена фона, карусель абонементов и purchase-dialog;
-nutrition.js — непрерывный Coverflow, drag, клавиши, сведения выбранного примера;
-about.js/trainers.js/trainer.js — reveal; shop.js — DOM-фильтрация и reveal;
-demo-products.js — пять замороженных объектов; demo-cart.js — локальная корзина
-и вывод product.html по единственному query id, без API.
+Сравнение доступного кода завершено. Это статический архитектурный анализ,
+не полный security audit, не подтверждение production и не согласование бизнеса.
+Не читались .env, ключи, рабочие базы и их содержимое. Они не нужны для выводов.
+Зависимости не устанавливались, приложения и их npm-тесты не запускались.
+Не делается вывод о безопасности по одному наличию Helmet/Argon2/тестов.
 
-Четыре components/*.html встроены в страницы; tools/sync_components.py
-обновляет маркерные блоки семи страниц. Runtime fetch компонентов нет.
-Порядок на главной: main → hero-motion → sections → demo-products → demo-cart
-→ nutrition. На shop: main → demo-products → demo-cart → shop.
-main.js использует глобальные функции/const и ожидает наличие общих элементов.
-Это контракт текущих страниц, не самостоятельный модуль любой будущей панели.
+2. IDEAL — ФАКТИЧЕСКАЯ ОСНОВА
+index.html, about.html, trainers.html, trainer.html, shop.html, product.html,
+cart.html — семь статических публичных страниц. Backend, auth, БД, миграций,
+приватной панели, загрузок, manifest и SW нет. package.json не требуется Go Live.
+components/header.html, footer.html, menu.html, preview.html встроены в HTML;
+tools/sync_components.py синхронизирует маркерные блоки семи страниц и не нужен
+для просмотра. site/sass содержит исходники, site/css — готовые стили.
+site/scripts/main.js — меню/общий диалог; hero-motion.js — hero;
+sections.js — фон, галереи/абонементы; nutrition.js — Coverflow, drag, клавиши;
+about.js, trainers.js, trainer.js — reveal; shop.js — фильтры DOM.
+demo-products.js — пять демо-объектов; demo-cart.js — общая локальная корзина,
+только ID/quantity, предел 99, обработка ошибок storage, синхронизация вкладок.
+Нет денежных итогов, оформления, оплаты и сбора персональных данных.
+Четыре карточки тренеров ведут на один демо-профиль. Расписание и абонементы
+главной — контент, не учёт посещений или доступных мест.
+Прочитаны все пять архитектурных/статусных документов и CTA_NOTES,
+ABOUT_NOTES, TRAINERS_NOTES, SHOP_NOTES, PRODUCT_CART_NOTES. Их прежние
+браузерные ограничения остаются; исторические NEXT_STAGE не задают новый этап.
 
-Главная содержит статические расписание и прайс абонементов с оговорками;
-это не TrainingSession, не остаток посещений и не механизм продажи.
-О клубе — пять мест под фотографии; trainers — четыре ссылки на общий trainer.html.
-shop — пять статических карточек с дублированием сведений справочника для no-JS.
-product без JS не определяет query ID, честно показывает общий шаблон.
-cart без JS не читает хранилище, сообщает об ограничении.
-Корзина хранит только {id, quantity}, нормализует/объединяет строки, обрабатывает
-ошибки хранилища, использует предел 99 и storage event. Память при запрете
-хранилища ограничена страницей. Конкуренция вкладок: последняя запись побеждает.
-Ни цены, ни заказы, ни персональные данные туда не пишутся.
-Backend, БД, миграций, auth, приватной панели, SW/manifest, загрузок и ops нет.
-Отсутствие защиты backend не является уязвимостью несуществующего backend.
+3. СОДРУЖЕСТВО — ФАКТЫ
+server.js: CommonJS, Express 5.1.0, compression, Helmet/CSP, лимиты body и IP,
+express-session 1.18.2. package.json: Prisma/client 6.19.0, argon2 0.45.1,
+web-push 3.6.7, Zod 4.1.11; собственная валидация в lib/validation.js.
+Это версии архива, не рекомендация брать их как актуальные для IDEAL.
+prisma/schema.prisma — SQLite. Одна baseline-миграция
+prisma/migrations/20260919130000_production_baseline/migration.sql создаёт
+User, Session, Athlete, TrainingGroup, GroupCoach, GroupMembership,
+GroupTraining, Attendance, GroupPayment, PersonalClient, PersonalTraining,
+ClubTask, ExpenseCategory, Expense, PushSubscription, AuditLog.
+GroupMembership — участие в группе, НЕ оплаченный абонемент с балансом.
 
-Прочитаны ROADMAP, SHOP_NOTES, PRODUCT_CART_NOTES, TRAINERS_NOTES,
-ABOUT_NOTES, CTA_NOTES, NEXT_STAGE. Старые заметки описывают прошлые этапы;
-актуальный статус задают ROADMAP и документы этапа 7, не исторические обещания.
+Авторизация: routes/auth.routes.js проверяет пароль Argon2, active и OWNER,
+регенерирует сессию; /me и POST logout. middleware/require-auth.js повторно
+читает активного OWNER из БД. Иных действующих ролей здесь нет; role — String.
+services/prisma-session-store.js реализует get/set/touch/destroy/clearExpired,
+данные сессии JSON в SQLite; userId отдельной FK в Session нет.
+config/security.js: отдельное имя cookie, __Host- в production, HttpOnly,
+Secure в production, SameSite strict, rolling срок по SESSION_DAYS (по умолчанию 7).
+middleware/require-csrf.js проверяет заголовок по сессионному токену;
+validate-origin.js проверяет присутствующий Origin/Fetch Metadata, но не требует
+наличия Origin. Вход защищён Origin-проверкой и limiter, без requireCsrf.
 
-3. ТАБЛИЦА ПЕРЕИСПОЛЬЗОВАНИЯ
-Механизм | Проект-источник | Решение | Причина
-Публичная вёрстка, BEM, CSS | IDEAL HTML и site/sass | Можно переиспользовать | Утверждённая основа, DOM сохранить
-Hero и смена фона | IDEAL hero-motion.js, sections.js | Можно переиспользовать | Не связаны с серверной моделью
-Coverflow и drag | IDEAL nutrition.js | Нужно адаптировать | Данные сейчас сопоставляются по индексу
-Общие компоненты | IDEAL components, sync_components.py | Нужно адаптировать | Позже серверные partials без двойного источника
-Демо-справочник и корзина | IDEAL demo-products.js, demo-cart.js | Нужно адаптировать только UI | Реальную модель/валидацию разработать заново; demo-ID не мигрировать
-Фильтры магазина | IDEAL shop.js | Нужно адаптировать | Работают по статическому DOM, будущая коллекция и категории реальные
-Разметка профиля | IDEAL trainer.html | Можно переиспользовать | Поля контента не являются схемой доступа
-Авторизация, сессии, RBAC | Содружество / Transfer19 / Свои перевозки | Не оценено | Исходники отсутствуют, перенос не разрешён анализом
-Изоляция клиентов и персоналки | Содружество | Не оценено | Нужны фактические запросы/схема/тесты
-Панель и мобильная навигация | Все три | Не оценено | Нужны HTML/CSS/JS и маршруты
-Заявки и клиенты | Все три | Не оценено | Неизвестны поля, права и жизненный цикл
-Web Push и очереди | Все три | Не оценено | Нужны подписки, worker, ретраи, очистка, scope получателя
-PWA | Все три | Не оценено | Нужны manifest/SW и правила кэша
-Загрузки/валидация/ошибки | Все три | Не оценено | Нельзя заключать о защите по названию проекта
-Миграции/деплой/backup | Все три | Не оценено | Нужны обезличенные конфиги и restore-инструкции
-Правила абонементов/записи IDEAL | Источник пока не выбран | Лучше разработать заново | Это бизнес клуба, не механическое копирование CRM
+routes/control.routes.js подключает все доменные API после общей защиты
+в server.js. routes/athletes, groups, trainings, payments, expenses, tasks,
+statistics работают с общей клубной частью. routes/personal.routes.js:
+списки, карточки, статистика персоналок фильтруются ownerId из сессии;
+создание тренировки проверяет принадлежность и неархивность PersonalClient.
+Обновление сначала находит scoped объект, затем обновляет по id; ownerId
+не берётся из body. Два OWNER разделяют персоналки, но общие спортсмены,
+групповые оплаты, расходы и задачи доступны обоим — это бизнес этой системы.
+В БД два FK PersonalTraining.ownerId/clientId не обеспечивают совпадение
+владельца клиента: правило сейчас находится в маршрутах.
 
-«Не оценено» намеренно отдельное состояние: отсутствие архива не доказывает,
-что механизм можно копировать, нужно адаптировать или следует заменить.
-После получения исходников для каждого механизма выбрать одну из трёх оценок
-и указать фактические пути; текущая таблица не выдаёт предположение за проверку.
+routes/trainings.routes.js: экземпляр группы на дату, unique groupId/date;
+посещения upsert по trainingId/athleteId в транзакции; участник должен состоять
+в активной группе. Нет бронирования мест, склада посещений, ledger абонемента.
+routes/public.routes.js: read-only config/schedule, allowlist публичных полей.
+Публичной формы заявки нет. calendar.routes.js объединяет календарные данные;
+dashboard/statistics разделяют общие деньги и персональные доходы.
 
-4. ПОДТВЕРЖДЁННЫЕ ОГРАНИЧЕНИЯ / НЕ ВЫДУМАННЫЕ УЯЗВИМОСТИ
-— nutrition.js: syncInfo читает IdealProducts[active], а карточки берёт из DOM.
-  Перестановка только одной коллекции рассогласует описание и изображение.
-  При реальном каталоге связывать по ID; сейчас порядок согласован визуально
-  по исходным данным, браузерная работа здесь не проверялась.
-— demo-cart.js: read/persist запускаются при загрузке; state вкладок разрешается
-  через storage event без транзакций. Это демо, не механизм серверного резерва.
-  normalize обрабатывает не более 500 входных строк; это техническая защита,
-  не бизнес-лимит заказа. Нельзя переносить её в учёт склада.
-— demo-products.js, shop.html и подписи index.html: несколько мест одного контента.
-  Пока нужны для Go Live/no-JS; при серверном рендеринге один источник.
-— main.js: жёсткие зависимости от header/menu/dialog, глобальная openPreview.
-  Не подключать вслепую на будущую страницу входа без этих элементов.
-— index.html: inline script hero-intro в head; JS устанавливает style-свойства
-  в hero-motion.js/sections.js/nutrition.js. Будущий CSP проверить на этих
-  механизмах, вынести inline script или применить nonce/hash. Наличие inline
-  само по себе не доказательство XSS. Не включать unsafe-inline для scripts
-  только ради того, чтобы перестала ломаться анимация.
-— main.scss: остались неиспользуемые .nutrition-dialog; ранее это отмечено
-  SHOP_NOTES. Удалять сейчас не требуется, это долг стилей, не второй runtime.
-— index.html: статический счётчик 01 / 10 при 11 gym-карточках; sections.js
-  исправляет число после запуска. Без JS подпись неточна. Зафиксировано,
-  frontend не исправлялся в документационном патче.
-— components/preview.html, main.js и purchase-dialog в index.html: сохранились
-  тексты «первый экран»/«на следующем этапе» и обещание оплаты следующей стадией.
-  Исторические UI-тексты не меняют ROADMAP: оплаты на этапе 8 не будет.
-— NEXT_STAGE.txt в исходнике направлял на уже пройденный этап 4; обновлён.
-  CTA_NOTES содержит историческое «страница ещё не создана», TRAINERS_NOTES
-  заканчивается переходом к этапу 5. Считать это историей, не текущим заданием.
-— Реальных фотографий/тренеров/товаров нет; noindex на внутренних демо-страницах
-  не является защитой доступа. Публикация контента требует отдельной приёмки.
-— Адаптив, overflow, фокус и отсутствие визуальных регрессий не подтверждены
-  браузером. Старые Node VM/HTMLParser проверки не объявляются браузерными.
+admin-pages/*.html, site/scripts/admin/control.js и site/styles/admin/admin.scss:
+многостраничная панель, нижняя мобильная навигация и раскрываемое меню.
+server.js ADMIN_PAGES и frontend ENABLED_ROUTES оставляют dashboard, athletes,
+personal, settings. Скрытые группы/посещения/платежи/задачи всё ещё подключены
+к API: UI-флаг НЕ серверная граница функциональности.
 
-5. ЧТО НУЖНО ДЛЯ ЗАВЕРШЕНИЯ СРАВНЕНИЯ
-Три актуальных ZIP: Содружество, Transfer19, Свои перевозки, с указанием
-ревизии/даты и связи имён проектов с архивами. Не нужны .git/node_modules,
-.env, ключи, сертификаты, рабочие БД, uploads клиентов и production-логи.
-Нужны package.json + lock; сервер/маршруты/middleware/services; схема БД и
-все миграции; auth/session/roles/доступ; обезличенные seed/fixtures и тесты;
-исходники панелей и мобильного меню; push worker/routes/service-worker;
-manifest/offline; загрузки; конфиги запуска, пример окружения только с именами
-параметров; обезличенные nginx/PM2/backup/restore/monitoring инструкции.
-Если код содержит секреты/персональные данные, предварительно обезличить,
-сохранив структуру. Отсутствие отдельных подсистем тоже зафиксировать.
+services/push.service.js: подписки по ownerId, удаление 404/410; server.js
+запускает runReminderCycle сразу и раз в минуту. Выбираются неотправленные
+персоналки/задачи; reminderSentAt ставится после хотя бы одной удачной отправки.
+В персоналках допустимы 120/1440 минут. Это не два независимых напоминания:
+одно поле reminderMinutes. Долговечной очереди, захвата задания и backoff нет.
+routes/settings.routes.js — подписка/отписка/тест/аудит. service-worker.js:
+static cache /site, network-first admin assets, прочие /site cache-first;
+HTML панели и API fetch-handler не кэширует. manifest.webmanifest — установка.
 
-После получения: инвентаризация → цепочки route/middleware/service/query →
-сопоставление с FK/миграциями → отрицательные сценарии прав/валидации →
-push/PWA/cache/uploads → эксплуатация → точная таблица переноса с путями.
-Пока сторонние проекты не запускались, зависимости не устанавливались,
-рабочие БД и секреты не читались. Сравнение на этом месте остаётся открытым.
+Загрузчика пользовательских файлов в маршрутах нет. lib/validation.js — поля,
+ID, суммы, даты; server.js маппит P2025/P2002 в 404/409, скрывает 500-сообщение.
+services/audit.service.js пишет best-effort, отдельно от бизнес-транзакции.
+README.md, ecosystem.config.cjs, nginx.sodruzhestvo.example.conf — инструкции
+deploy, PM2 fork 1, TLS reverse proxy. server.js health делает SELECT 1,
+очистка сессий раз в час, graceful shutdown. Скрипта backup/restore и проверенной
+процедуры восстановления в переданном дереве нет.
+tests/security.test.js содержит сценарии общей части, изоляции персоналок,
+удалённого владельца, CSRF, static; scripts/run-tests.js готовит отдельную
+test SQLite. Наличие этих сценариев не означает, что они выполнены здесь.
 
-6. ПРОВЕРКИ ЭТОГО ПАТЧА
-Повторно выполнен node --check для всех 10 существующих JS: PASS.
-Документы прочитаны как UTF-8, проверены имена/состав ZIP и целостность CRC.
-Патч содержит ровно пять документов; исходные 62 файла побайтно совпадают
-с входным архивом, frontend не изменён, удалений нет.
-HTMLParser/Node VM прошлого этапа в этом запуске не повторялись; это история,
-а не новые результаты. Браузер не запускался, визуальная приёмка не выполнена.
+4. TRANSFER19 — ФАКТЫ
+server.js, src/config/env.js, src/lib/prisma.js: CommonJS Express 5.1.0,
+Prisma/client 6.12.0, SQLite; cookie-parser, Helmet, IP rate limits,
+Argon2id, web-push (package.json). Node заявлен >=22, Tabler 3.49.0.
+Модульная структура src/routes + src/services + middleware/lib, один процесс.
+prisma/schema.prisma: User OWNER/STAFF, Session с tokenHash/userId FK,
+Client с soft delete, Carrier, Vehicle/VehicleImage, Order, Task, Expense,
+Activity, PushSubscription. createdById — автор действия, НЕ изоляция клиента.
+Клиенты и заявки общие для допущенных владельцев; тренеров/посещений нет.
+
+src/routes/auth.routes.js создаёт случайный токен, хранит SHA-256 в Session,
+cookie содержит raw token; создание сессии/lastLogin/очистка expired в транзакции.
+src/middleware/auth.js загружает Session+User, проверяет isActive, absolute и
+idle сроки, обновляет lastSeenAt не чаще минуты. env.js: по умолчанию 14 суток
+absolute и 15 минут idle; это параметры источника, не правила IDEAL.
+src/lib/security.js: Argon2id, безопасное сравнение Buffer, HMAC CSRF от токена,
+HttpOnly/Secure/strict cookie. Имя осталось sg_session/__Host-sg_session.
+src/middleware/origin.js требует допустимый Origin или origin из Referer;
+src/routes/control.routes.js после /auth требует requireAuth+requireOwner
+и CSRF мутаций. STAFF есть в enum, но не получает бизнес-API.
+HTML /control/app.html в server.js проверяет req.user, а не OWNER: активный
+STAFF может получить оболочку, однако API не разрешит операции.
+
+src/routes/public-orders.routes.js: honeypot, имя/телефон/маршрут, дата+время
+по +07:00, пассажиры/багаж; проверка опубликованной доступной машины и мест;
+клиент+NEW заявка в транзакции. Это заявка на подтверждение, не резерв интервала.
+src/services/order.service.js — отдельные create/update, деньги копейками,
+статусы и проверки вместимости; src/services/client.service.js — нормализация
+телефона/upsert. src/routes/clients.routes.js — общий поиск, суммы/долги,
+soft delete. orders/tasks/finances/dashboard — операторские маршруты.
+Системы бронирования занятий, Attendance и Membership нет.
+
+control/app.html, control/assets/control.js, site/sass/control.scss:
+одна HTML-оболочка, hash-навигация, renderMore «Ещё», нижняя мобильная панель;
+внутренние экраны строятся JS и получают JSON. Переносить оболочку целиком
+в публичные страницы IDEAL нельзя: это другой контракт и зависимость от JS.
+src/services/seo.service.js и server.js серверно формируют публичный каталог,
+карточку и метатеги опубликованных автомобилей с экранированием; полезен
+принцип HTML-first, не строковые бизнес-шаблоны транспорта.
+
+src/routes/push.routes.js: allowlist HTTPS push-провайдеров, формат ключей,
+запрет привязки чужого endpoint, лимит 15 устройств, scoped удаление.
+src/services/push.service.js: активные OWNER, Promise.allSettled, timeout 7 s,
+TTL, удаление 404/410; сообщение без телефона/адреса. Вызов после commit
+без await в public-orders.routes.js — нет устойчивой очереди/повторов.
+control/push-sw.js — push/click с allowlist локального адреса, без fetch/cache.
+pwa-sw.js — navigation network-first, fallback только offline.html;
+исключены /control и /api, кешируется только offline.html. Разные scope worker.
+
+src/routes/uploads.routes.js: защищённый raw upload до 5 MiB, JPG/PNG/WebP,
+сигнатура, случайное имя, write wx, публичный site/img/uploads.
+Полного декодирования, лимитов пикселей и перекодирования нет; это загрузчик
+публичных фото машины, не приватных документов. validation.js проверяет поля,
+даты, enum; middleware/error-handler.js скрывает текст 500, но details выводит
+если задан: будущий IDEAL должен явно фильтровать details.
+
+Миграции: первые три 20260905/20260918 SQL пусты; baseline
+20261011100000_init_svoi_gruzi_platform, затем request_statuses_vehicle_content,
+add_web_push, transfer19_passenger_fields, vehicle_seo_metadata.
+Cargo-поля сохранены в схеме как legacy; нет оснований переносить их в IDEAL.
+deploy/nginx-transfer19.conf.example, ecosystem.config.cjs — TLS proxy, loopback,
+fork 1, отдельный upload limit; server.js health SELECT 1 и shutdown с timeout.
+scripts/backup-database.js только fs.copyFile SQLite в backups с timestamp.
+Ни восстановление, ни offsite/проверка snapshot этим скриптом не реализованы.
+tests/security, seo-push, seo-aeo-geo, transfer19-passenger — существующие тесты;
+часть — проверки текста/рендера, не авторизованные end-to-end сценарии.
+
+5. СВОИ ПЕРЕВОЗКИ — ФАКТЫ И ОТЛИЧИЯ
+server.js, package.json, prisma/schema.prisma и src/* подтверждают ту же
+CommonJS Express 5.1.0/Prisma 6.12.0/SQLite основу. Tabler 3.46.0.
+Auth, middleware/auth.js, security.js, origin.js, clients.routes.js,
+uploads.routes.js совпадают с Transfer19 по содержимому в этих архивах.
+control.routes.js имеет ту же OWNER-границу и CSRF; STAFF enum не означает
+оператора с ограниченными правами. Нет ownerId-изоляции общих клиентов,
+персональных тренировок, расписания клуба или посещений.
+
+src/routes/public-orders.routes.js: груз, грузчики, необязательная дата,
+выбор опубликованной машины, client+NEW Order транзакцией; транспортные
+поля cargoType/loadersRequired вместо пассажиров/багажа. При неизвестном slug
+vehicle остаётся null; проверка AVAILABLE/пассажирских мест Transfer19 здесь
+не применяется. src/services/order.service.js — грузовая операторская модель.
+src/services/seo.service.js — SSR машины/sitemap; server.js явно раздаёт
+публичные HTML. control/app.html/control/assets/control.js — hash-панель,
+нижняя навигация/renderMore; это не отдельный кабинет клиента.
+
+Push: src/routes/push.routes.js и services/push.service.js имеют тот же принцип
+allowlist/OWNER/timeout/404-410, сообщение содержит категорию груза без телефона
+и адреса. Нет durable queue, reminders/планировщика для заявок нет.
+control/push-sw.js — только уведомления; pwa-sw.js не создаёт static cache,
+для public navigation при сетевой ошибке генерирует offline Response 503;
+исключает control/API. manifest и site/scripts/pwa.js — установка по действию.
+Upload/validation/error ограничения такие же, как у Transfer19.
+
+prisma/migrations: три пустых исторических SQL, baseline 20261011100000,
+request_statuses_vehicle_content, add_web_push; пассажирских/SEO-миграций нет.
+В архиве lock лежит prisma/migration_lock.toml, а не внутри migrations, как
+в Transfer19. SQL replay не доказывает корректность prisma migrate deploy;
+до использования нужен отдельный прогон CLI с lock и проверкой drift.
+scripts/backup-database.js — copyFile без согласованного online snapshot.
+src/config/env.js объявляет backupRetentionDays, скрипт его не использует.
+DEPLOY_SEO_PUSH_2026.md, deploy/nginx-svoi-gruzi.conf.example,
+ecosystem.config.cjs описывают миграции, PM2 fork 1 и TLS/loopback.
+Полноценного restore runbook, offsite и расписания backup в архиве нет.
+tests/security.test.js, seo-push.test.js, navigation-links.test.js существуют;
+их успешное выполнение в этой сессии не заявляется.
+
+6. РЕШЕНИЯ О ПЕРЕИСПОЛЬЗОВАНИИ
+Механизм | Источник и файлы | Решение | Причина
+Публичная вёрстка/анимации | IDEAL HTML, site/sass, hero-motion.js, sections.js | Переиспользовать | Утверждённый DOM и дизайн
+Coverflow/магазин UI | IDEAL nutrition.js, shop.js | Адаптировать | Связь по реальному ID вместо индекса/статического DOM
+Компоненты | IDEAL components, tools/sync_components.py | Адаптировать постепенно | При SSR один источник partials, Go Live пока сохранить
+Демо-корзина | IDEAL demo-cart.js | Переиспользовать только как демо | Реальные ID/остатки/заказ разработать заново
+HTTP-модули | Transfer19 src/routes, middleware, services | Адаптировать | Явные границы удобны, транспортные правила исключить
+Пароли/cookie/Origin | Transfer19 и Перевозки security.js, origin.js | Адаптировать | Отдельное имя IDEAL, строгий login CSRF, лимиты и no-JS
+Сессии | Содружество services/prisma-session-store.js | Адаптировать | Express-session lifecycle, добавить FK userId, отзыв/absolute срок
+Raw-token Session | Transfer19 middleware/auth.js | Адаптировать отдельные идеи | Полезны FK/idle/absolute, не переносить весь самописный lifecycle
+Роли и объектная политика | Все три middleware/auth + Содружество personal.routes.js | Разработать заново | Ни один не реализует TRAINER и назначения клиента
+Scoped запросы | Содружество routes/personal.routes.js | Адаптировать | Полезный серверный scope, ownerId не соответствует данным IDEAL
+Панель/mobile «Ещё» | Все три control.js и HTML/SCSS | Адаптировать | Повторить навигационный принцип, не копировать полномочия/экраны
+Публичный HTML из БД | Transfer19 seo.service.js/server.js | Адаптировать | Опубликованный контент и экранирование без потери no-JS
+Заявка после валидации | Транспортные public-orders.routes.js | Адаптировать при согласовании | Заявка не подтверждённая запись, поля спорта другие
+Посещения upsert | Содружество trainings.routes.js | Адаптировать | Уникальность полезна, списание абонемента отсутствует
+Абонемент/места/ledger | Нет подходящего источника | Разработать заново | GroupMembership и транспортный Order не решают задачу
+Подписки/доставка Push | Transfer19 push.routes.js/push.service.js | Адаптировать на этапе 13 | Валидация endpoint, scope, TTL, очистка; TRAINER-права новые
+Очередь/ретраи/напоминания | Нет готового источника | Разработать заново | Таймер и fire-and-forget не переживают все сбои
+PWA/cache | Transfer19 pwa-sw.js/control/push-sw.js | Адаптировать на этапе 15 | Узкий public fallback и отсутствие приватного кэша
+Загрузки | Transfer19/Перевозки uploads.routes.js | Адаптировать | Добавить декодирование/квоты, приватные файлы отделить
+Валидация/ошибки | lib/validation.js, middleware/error-handler.js источников | Адаптировать | Строгие типы/DTO и безопасные details вместо слепой копии
+Аудит | Содружество audit.service.js, транспортные lib/activity.js | Адаптировать | Критичные события в транзакции; безопасные поля и просмотр OWNER
+PM2/TLS/health | ecosystem, nginx examples, server.js всех трёх | Адаптировать | Свой домен/порт/прокси, PostgreSQL вместо SQLite
+Backup/restore | copyFile-скрипты транспорта | Разработать заново | PostgreSQL dump, uploads, offsite, retention и restore drill
+
+7. ПОДТВЕРЖДЁННЫЕ ОГРАНИЧЕНИЯ И УСЛОВИЯ ПРОЯВЛЕНИЯ
+Это наблюдения по коду, не утверждение об эксплуатации уязвимостей.
+— Содружество server.js/control.js: часть модулей выключена только для страниц,
+  но API подключены. Не использовать ENABLED_ROUTES как разграничение прав.
+— Содружество push.service.js/server.js: select → send → update без claim;
+  два цикла или остановка после send до update допускают повтор. Один удачный
+  device помечает всё напоминание: неуспешные устройства не повторяются отдельно.
+  sendToOwner не перепроверяет active; персональный цикл тоже не фильтрует owner.active.
+— Транспортные public-orders.routes.js/push.service.js: после commit нет job;
+  остановка процесса теряет отправку, временные ошибки не получают durable retry.
+— Содружество settings.routes.js: subscribe upsert меняет ownerId существующего
+  endpoint; нет conflict-проверки другого аккаунта, как у транспортных CRM.
+  Endpoint проверяется как текст, без allowlist провайдеров.
+— Содружество prisma-session-store.js/create-owner.js: отзыв по JSON contains
+  строки id, а не FK userId; возможны избыточные совпадения префиксов ID.
+  Это не готовый точный механизм отзыва всех сессий IDEAL.
+— Содружество require-csrf.js: сравнивается длина JS-строк перед timingSafeEqual
+  Buffer; равная длина строк не гарантирует равную длину байтов. Некорректный
+  Unicode-заголовок может дать ошибку вместо контролируемого 403. Код транспорта
+  safeEqual сравнивает длины Buffer — более подходящий образец.
+— Транспортные scripts/create-owner.js: пароль readline вводится с обычным
+  echo; повторный upsert меняет пароль/роль, но не отзывает Session. IDEAL нужен
+  скрытый ввод, явный reset и атомарный отзыв. Logout auth.routes.js подавляет
+  ошибку удаления Session: очистка cookie сама по себе не доказывает серверный отзыв.
+— Все три: вход не требует pre-login CSRF token, использует Origin-механизм;
+  IDEAL предложен более строгий протокол login token+Origin. Это различие
+  требований, не заявление о доказанном обходе браузерной защиты.
+— Транспортные control.routes.js/server.js: OWNER-only бизнес-API при enum STAFF
+  и auth-only HTML. Готовой матрицы тренера/оператора здесь нет.
+— Транспортные uploads.routes.js: проверка начала файла без decode/pixel limit,
+  публичная запись сразу в /site/img/uploads. Не годится для приватного вложения.
+— Транспортные backup-database.js: copyFile без остановки/backup API, WAL и
+  проверок целостности. При конкурентной записи консистентность не обеспечена
+  этим кодом; повреждение конкретного backup не проверялось и не утверждается.
+— Содружество audit.service.js и транспортные routes/carriers.control.routes.js + lib/activity.js:
+  бизнес-запись и аудит раздельны; не эквивалентны атомарному журналу изменений.
+— Содружество schema.prisma: unique groupId/trainingDate запрещает два занятия
+  одной группы в один день. Для IDEAL решать по реальному расписанию.
+— Содружество lib/validation.js dateOnly проверяет формат, не календарь:
+  невозможная дата может нормализоваться Date. Не переносить как строгий parser.
+— IDEAL nutrition.js syncInfo: IdealProducts[active] зависит от порядка DOM.
+  demo-products.js/shop.html/index.html дублируют статический контент для no-JS.
+— IDEAL demo-cart.js: запись localStorage не транзакционная, last-write-wins;
+  normalize ограничивает вход 500 строками, quantity 99 — технические ограничения.
+— IDEAL main.js требует общий DOM; не подключать целиком на login автоматически.
+  index.html inline hero script требует отдельного CSP-решения и проверки анимаций.
+— IDEAL index.html: 01/10 при 11 gym-карточках, JS исправляет счётчик; остались
+  исторические обещания в preview/purchase-dialog. На документационном этапе
+  frontend не исправлялся; они не согласуют оплату/заказ на этапе 8.
+
+8. ПРОБЕЛЫ И ПРИЁМКА
+Все четыре основных архива доступны; сравнение исходников не заблокировано.
+Не представлены: restore runbooks/доказательства восстановления всех трёх,
+backup automation Содружества, история исходных Git-ревизий и реальные
+production-конфигурации/состояние. Не требуются секреты или рабочие БД.
+Отсутствующие механизмы в полном дереве отмечены как отсутствующие в архиве,
+а не как неизвестное содержимое вырезанных серверных папок. Для эксплуатационной
+приёмки нужны обезличенные инструкции/результаты restore drill; сравнение кода
+завершено, эксплуатационная проверка остаётся открытой и не объявляется завершённой.
+
+Фактически выполнено здесь:
+— node --check 10 JS IDEAL: PASS;
+— SQL всех миграций каждого источника по порядку в отдельной SQLite :memory::
+  PASS, 17 таблиц Содружества/12 каждой транспортной базы с sqlite_sequence;
+  foreign_key_check пуст на пустых БД. Это не Prisma migrate deploy, не проверка
+  заполненных данных, drift, гонок или бизнес-инвариантов;
+— финальная проверка UTF-8, состава ZIP, CRC и отличий пяти файлов от входа;
+  нет изменений frontend, удалений, package.json, VS Code configs и исходников доноров.
+Не выполнялись npm install/ci/test/audit, browser/visual/mobile проверки,
+доставка Push, установка PWA, TLS/Nginx/PM2, backup/restore и проверки рабочих БД.
+Старые HTMLParser/Node VM проверки этапа 6 здесь не повторялись.
