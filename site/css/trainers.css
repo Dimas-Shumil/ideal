@@ -366,3 +366,5 @@
     transform: none;
   }
 }
+
+.trainer-card__profile { text-decoration: none; }

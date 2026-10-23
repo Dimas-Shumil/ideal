@@ -72,3 +72,6 @@
   .trainer-card__visual img, .trainer-card__profile, .trainers__closing a { transition: none; }
   .trainer-card:hover img, .trainer-card:focus-within img { transform: none; }
 }
+
+/* Catalog links now open the shared demonstration template. */
+.trainer-card__profile { text-decoration: none; }
