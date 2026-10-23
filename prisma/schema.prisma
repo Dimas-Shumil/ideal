@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+}
+enum Role {
+  OWNER
+  ADMIN
+  TRAINER
+}
+model User {
+  id String @id @default(uuid()) @db.Uuid
+  login String @unique @db.VarChar(64)
+  displayName String @db.VarChar(100)
+  passwordHash String
+  role Role
+  active Boolean @default(true)
+  authVersion Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  sessions AuthSession[]
+  audit AuditEvent[]
+}
+model AuthSession {
+  sid String @id @db.VarChar(128)
+  sess Json @db.Json
+  expire DateTime @db.Timestamptz(3)
+  absoluteAt DateTime @db.Timestamptz(3)
+  userId String? @db.Uuid
+  authVersion Int?
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([expire])
+}
+model AuditEvent {
+  id String @id @default(uuid()) @db.Uuid
+  actorId String? @db.Uuid
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action String @db.VarChar(64)
+  targetId String? @db.Uuid
+  requestId String? @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([createdAt])
+}

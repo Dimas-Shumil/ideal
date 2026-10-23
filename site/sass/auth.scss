@@ -1,0 +1,108 @@
+$ink: #191c1e;
+$paper: #f7f7f5;
+* {
+  box-sizing: border-box;
+}
+.auth {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  padding: 64px 32px;
+  background: $paper;
+  color: $ink;
+  font-family: "Segoe UI", Arial, sans-serif;
+  display: grid;
+  place-items: center;
+}
+.auth__card {
+  width: 100%;
+  max-width: 500px;
+  padding: 40px;
+  border: 1px solid #c4c6c5;
+  background: #fff;
+}
+.auth__brand {
+  font-size: 30px;
+  font-weight: 800;
+  text-decoration: none;
+  letter-spacing: -0.05em;
+}
+.auth__title {
+  margin: 32px 0 20px;
+  font-size: clamp(26px, 5vw, 36px);
+  line-height: 1.1;
+}
+.auth__form {
+  display: grid;
+  gap: 12px;
+  margin: 28px 0;
+}
+.auth input:not([type="hidden"]) {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px;
+  border: 1px solid #737775;
+  border-radius: 0;
+  font: inherit;
+  background: #fff;
+  color: $ink;
+}
+.auth__button {
+  width: 100%;
+  min-height: 48px;
+  margin: 12px 0;
+  padding: 12px 20px;
+  border: 1px solid $ink;
+  background: $ink;
+  color: $paper;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    transform 0.25s,
+    background-color 0.25s;
+}
+.auth__button:hover {
+  background: #363c3a;
+}
+.auth__button:active {
+  transform: scale(0.98);
+}
+.auth a {
+  color: $ink;
+  display: inline-block;
+  margin: 8px 12px 8px 0;
+  overflow-wrap: anywhere;
+}
+.auth a:hover {
+  text-decoration-thickness: 2px;
+}
+.auth a:active {
+  transform: scale(0.98);
+}
+.auth :where(a, button, input):focus-visible {
+  outline: 3px solid #34594b;
+  outline-offset: 4px;
+}
+.auth__hint {
+  line-height: 1.6;
+  color: #4c5551;
+}
+.auth__error {
+  padding: 12px;
+  border-left: 3px solid #9b2525;
+  color: #7e1717;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 540px) {
+  .auth {
+    padding: 32px;
+  }
+  .auth__card {
+    padding: 24px 18px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth__button {
+    transition: none;
+  }
+}

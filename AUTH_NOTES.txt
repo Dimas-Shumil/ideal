@@ -1,0 +1,338 @@
+ИДЕАЛ — этап 8: сервер, авторизация и безопасность
+23.10.2026. Реализация для применения ZIP-патчем поверх a05a9bb.
+
+1. СОГЛАСОВАНО С ПОЛЬЗОВАТЕЛЕМ
+Один клуб, сейчас один владелец. OWNER не совмещает роль тренера.
+Три взаимоисключающие роли: OWNER, ADMIN, TRAINER. Без общей STAFF.
+Аккаунты сотрудников создаёт/отключает OWNER; дополнительных OWNER назначать
+можно с подтверждением. Публичной регистрации и клиентского кабинета нет.
+ADMIN: будущая работа с клиентами, выдача абонементов, запись и посещения,
+фиксация оплаты. Возврат — только OWNER. ADMIN не управляет аккаунтами,
+ролями, общими настройками, полным аудитом и финансовой отчётностью.
+Эти бизнес-модули сейчас НЕ созданы; матрица ограничивает следующие этапы.
+TRAINER: только назначенные клиенты/свои занятия по AUTH_PLAN и политикам.
+Вход по уникальному логину; email и SMTP не нужны.
+Восстановление — оператор ShumDev через CLI, со скрытым вводом и отзывом
+сессий. Тренер/администратор обращается к владельцу, владелец — к ShumDev.
+Idle 8 часов, absolute 7 суток. Анонимная сессия входа — 15 минут.
+
+Подтверждено пользователем на Windows:
+Node v24.19.0, npm 11.8.0; PostgreSQL/psql 18.6, служба postgresql-x64-18
+Running; SELECT version() выполнен. PostgreSQL уже установлен, Docker не нужен.
+Git a05a9bb/main/origin и чистота — сведения пользователя, не удалённая проверка.
+
+2. ЧТО ДОБАВЛЕНО
+Express 5 / ESM; app.js отдельно от index.js. БД через PostgreSQL / Prisma 7.
+Ровно User, AuthSession, AuditEvent + служебная _prisma_migrations.
+User.role — enum, без множественных ролей, без профилей/клиентов/CRM.
+express-session — единственный механизм сессий. AuthStore расширяет
+connect-pg-simple: наследует destroy/cleanup/close, адаптирует get/set/touch
+и отдельное установление аутентифицированной сессии. Таблицу создаёт только
+Prisma migration, createTableIfMissing=false. Явные userId FK/index/authVersion.
+GET сессии фильтрует серверные idle/absolute и актуальную активность/версию.
+После входа regenerate SID и CSRF. Сессия связывается с актуальной версией
+пользователя под общей advisory transaction lock. Изменения доступа используют
+ту же блокировку; роль и active повторно читаются сервером на запросе.
+Authenticated set — UPDATE-only: снимок параллельного запроса не может
+воскресить удалённую logout/reset сессию. Touch не вставляет строки и не
+продлевает absoluteAt. Анонимный set не может заменить привязанную сессию.
+Пароль/роль/active меняются транзакционно с audit, increment authVersion
+и DELETE сессий по точному userId. Защита последнего активного OWNER под
+общей блокировкой, включая конкурирующие операции. Прямой ручной SQL
+в обход сервисов не является поддерживаемым способом управления аккаунтами.
+
+Argon2id: memory 65536 KiB, timeCost 3, parallelism 1. На процесс максимум
+две одновременные операции хеширования/проверки, иначе безопасный 503.
+Новые пароли: 12–128 символов (JS UTF-16), максимум 256 UTF-8 байт, без NUL.
+Не обрезаются и не нормализуются. Перед production измерить latency на VPS.
+Неизвестный аккаунт проверяет случайный dummy hash, без seed-пароля.
+Логины: 3–64 ASCII-символа a-z/0-9/._-, первый — буква/цифра;
+пробелы по краям убираются, регистр приводится к нижнему. Уникальность в БД.
+
+CSRF session token + обязательный точный Origin для login/logout/password.
+Referrer-Policy strict-origin-when-cross-origin сохраняет Origin у no-JS форм.
+Отсутствующий Origin отклоняется; Referer не заменяет проверку. Без CORS.
+Вход form-urlencoded работает без JS. returnTo не принимается: перенаправление
+только на фиксированный адрес роли. Ошибки входа общие; password не отражается.
+Cookie HttpOnly, SameSite=Lax, Path=/, без Domain; production Secure и
+__Host-ideal.sid. Development имя включает PORT (отдельно от других проектов).
+Cookie может продлеваться rolling, но серверный absoluteAt никогда не растёт.
+Закрытые/auth/API ответы и ошибки — Cache-Control no-store.
+
+Общие HTTP лимиты: 300 запросов/IP/минуту. GET login 60/IP/15 минут;
+POST login 30/IP и 10/нормализованный логин/15 минут, успешные запросы
+вычитаются из auth-счётчиков. Ключ логина — HMAC, не открытый логин в store.
+Смена пароля 5/пользователь/15 минут. Счётчики сейчас в памяти одного процесса;
+PM2 только fork, instances:1. Не запускать cluster/несколько реплик без общего
+лимитера или согласованного лимитера на proxy; перезапуск сбрасывает счётчики.
+TRUST_PROXY=none локально. За локальным Nginx — loopback, Node слушает
+только 127.0.0.1; не доверять произвольным proxy адресам/заголовкам.
+
+Helmet/CSP без unsafe-inline/unsafe-eval. Inline hero-script разрешён точным
+SHA-256 хешем, рассчитанным из index.html при запуске; после изменения этого
+HTML перезапустить Node. Существующий ранний запуск hero не переносился.
+style-src-attr none; штатные анимации изменяют отдельные CSSOM свойства.
+Статика только /site/css, /site/scripts, /site/img; остальные файлы/SCSS закрыты.
+Семь публичных страниц через явные маршруты. Корень репозитория не раздаётся.
+Приватные страницы и API проверяют роль независимо. /trainer.html публичный,
+/trainer закрытый — разные адреса. Публичные страницы не создают сессии.
+Старые HTML/SCSS/JS и компоненты не менялись; demo-ID и лимит99 не в БД.
+
+Аудит: actor/target/action/requestId/time, без тел запросов, логинов неудачных
+попыток, паролей, cookies, SID и CSRF. Восстановление CLI отмечается actor=null
+как действие локального оператора. Критичные события в транзакции с изменением;
+logout не отвечает успехом при ошибке удаления/аудита. HTTP 500 без stack,
+лог содержит только event/requestId/status. DB ошибки не выдаются клиенту.
+/health/live — жив процесс; /health/ready — SELECT 1 без деталей конфигурации.
+Readiness не заменяет db:status и проверку auth-схемы.
+
+3. МАРШРУТЫ
+GET /login — HTML с короткой pre-auth сессией/hidden _csrf.
+POST /login — no-JS вход, 303 в фиксированный раздел роли.
+POST /api/auth/login — тот же протокол, JSON результата после успешного входа;
+ошибки формы могут возвращаться HTML. Не считать этот endpoint готовым SPA API.
+GET /api/auth/me — 401 без входа; минимальные поля своего пользователя и CSRF.
+POST /logout, POST /api/auth/logout — CSRF+Origin; уничтожение сессии.
+POST /api/auth/password — currentPassword/newPassword + CSRF+Origin,
+для всех трёх ролей; отзывает ВСЕ сессии, затем нужен новый вход.
+/admin и /api/admin/check — только OWNER.
+/staff и /api/staff/check — только ADMIN.
+/trainer и /api/trainer/check — только TRAINER.
+Это страницы проверки, без рабочих панелей. OWNER не получает TRAINER-контекст.
+Управление сотрудниками HTTP пока отсутствует: user:manage — CLI владельца.
+
+4. WINDOWS — ПЕРВЫЙ ЗАПУСК, CMD
+Все команды из C:\Users\ШУМ\LITLE WORKS\IDEAL.
+Сначала распаковать ZIP-ПАТЧ в эту папку с заменой, не во вложенную папку.
+Удалений нет. .env и прежние страницы патч не заменяет.
+
+Проверить:
+node --version
+npm --version
+git remote -v
+git branch --show-current
+git status --short --branch
+Ожидается main; origin Dimas-Shumil/ideal, upstream PabloAlligator/ideal.
+Остановиться при неожиданной ветке/remote/посторонних изменениях, без reset/clean.
+
+A. Создать две пустые базы и отдельных пользователей PostgreSQL.
+Открыть psql под установленным пользователем postgres:
+"C:\Program Files\PostgreSQL\18\bin\psql.exe" -h 127.0.0.1 -p 5432 -U postgres -d postgres -W
+Пароль postgres вводится скрыто. Внутри psql выполнять по одной команде:
+
+CREATE ROLE ideal_app LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
+\password ideal_app
+CREATE DATABASE ideal_dev OWNER ideal_app;
+CREATE ROLE ideal_test LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
+\password ideal_test
+CREATE DATABASE ideal_auth_test OWNER ideal_test;
+REVOKE CONNECT ON DATABASE ideal_dev FROM PUBLIC;
+GRANT CONNECT ON DATABASE ideal_dev TO ideal_app;
+REVOKE CONNECT ON DATABASE ideal_auth_test FROM PUBLIC;
+GRANT CONNECT ON DATABASE ideal_auth_test TO ideal_test;
+\q
+
+\password запрашивает новый пароль дважды, не вставляет его в SQL-историю.
+Два разных пароля, не пароль postgres и не пароль владельца платформы.
+Если роль/база уже существует, не удалять её: проверить назначение прежде
+продолжения. Не применять эти команды к рабочим базам других проектов.
+Суперпользователь postgres нужен только для подготовки, приложение им не работает.
+
+B. Локальный .env — открыть в VS Code, сохранить существующие значения.
+Сверить имена с .env.example и добавить/обновить ТОЛЬКО ключи IDEAL,
+избегая повторов одного ключа. Не выполнять copy .env.example .env поверх
+существующего файла. Не присылать .env в чат и не включать в git/архивы.
+
+NODE_ENV=development
+PORT=3000
+APP_ORIGIN=http://127.0.0.1:3000
+DATABASE_URL=postgresql://ideal_app:ПАРОЛЬ_БД@127.0.0.1:5432/ideal_dev
+TEST_DATABASE_URL=postgresql://ideal_test:ДРУГОЙ_ПАРОЛЬ_БД@127.0.0.1:5432/ideal_auth_test
+TRUST_PROXY=none
+SESSION_IDLE_HOURS=8
+SESSION_ABSOLUTE_DAYS=7
+SESSION_SECRET=СГЕНЕРИРОВАННОЕ_ЗНАЧЕНИЕ
+
+Кириллические placeholders выше — пояснение, их не вставлять как реальные
+значения. DATABASE_URL/TEST_DATABASE_URL заполнить локально. Если пароль
+содержит @ : / # ? % и другие спецсимволы, кодировать компонент пароля
+через percent-encoding. Не использовать онлайн-конвертеры паролей.
+SESSION_SECRET сгенерировать локально:
+node -e "console.log(require('node:crypto').randomBytes(48).toString('hex'))"
+Скопировать вывод в .env; в чат не отправлять. Смена SESSION_SECRET делает
+прежние подписанные cookies недействительными. Приложение проверяет наличие
+и формат ключей, выводит только имена некорректных переменных, не их значения.
+
+C. Установить зависимости строго из lock:
+npm ci
+npm run db:generate
+npm run db:deploy
+npm run db:status
+
+Готовые auth.css и прежние CSS уже в патче/проекте. Sass для запуска не нужен.
+При правке auth.scss пересобрать: npm run css:auth
+Если порт 3000 занят другим проектом: выбрать свободный, например 3003,
+одновременно изменить PORT и APP_ORIGIN, перезапустить приложение.
+
+D. Прогнать тесты ДО создания реальных сотрудников:
+npm test
+
+Команда требует TEST_DATABASE_URL, отдельного DB-пользователя и имя БД *_test.
+Никогда не подставляет DATABASE_URL вместо отсутствующей тестовой переменной.
+Дважды выполняет migrate deploy для test DB, генерирует Prisma Client,
+затем интеграционные проверки и контрактные unit tests.
+ВНИМАНИЕ: тестовые User/AuthSession/AuditEvent очищаются, создаются случайные
+учётные данные, которые не печатаются. Это исключительно отдельная test DB.
+Не хранить там нужные аккаунты и данные. Проверки не трогают ideal_dev.
+Для unit-only без БД: npm run test:unit
+
+E. Создать первого владельца в ideal_dev:
+npm run owner:create
+
+Интерактивно: личный логин, отображаемое имя, пароль дважды скрыто.
+Нет пароля по умолчанию и публичного bootstrap. Повторный запуск откажет,
+если в базе уже есть пользователь. Пароли не принимать аргументами/pipe.
+
+F. Запустить:
+npm run dev
+
+Открыть http://127.0.0.1:3000/login — именно 127.0.0.1, не localhost,
+иначе строгий Origin не совпадёт. Главная http://127.0.0.1:3000/.
+Go Live остаётся для статического просмотра; авторизация работает только через Node.
+Остановка Ctrl+C. Обычный запуск без наблюдения за файлами: npm start.
+
+G. Создать проверочных ADMIN/TRAINER:
+npm run user:manage
+
+CLI попросит текущие логин/пароль OWNER, затем действие, логин сотрудника,
+имя, роль и пароль нового пользователя. Повышение в OWNER явно подтверждается.
+Изменение роли/активности повторно подтверждается и отзывает все сессии.
+CLI требует доступ к серверу/терминалу и .env; пароль владельца не заменяет
+системный доступ. В интерфейсе управление будет на этапе9.
+
+H. Восстановление оператором ShumDev:
+npm run password:reset
+
+Логин аккаунта, подтверждение, новый пароль дважды скрыто. Старый пароль
+не нужен; системный доступ оператора и .env обязательны. Сессии отзываются,
+роль/active не меняются. Чтобы включить отключённого сотрудника — user:manage
+под действующим OWNER. Не передавать файлы с временными паролями.
+
+5. РУЧНАЯ ПРИЁМКА НА WINDOWS
+— npm test проходит именно на PostgreSQL18.6 Windows и отдельной test DB.
+— CLI в VS Code Terminal: ввод нового/повторного пароля действительно невидим;
+  неверное подтверждение/отмена не меняет данные, повторный bootstrap запрещён.
+— Вход OWNER /admin; ADMIN /staff; TRAINER /trainer. Другие разделы запрещены,
+  API 401 без входа и 403 при другой роли. /trainer.html остаётся публичной.
+— Форма входа при отключённом JS: Tab, Shift+Tab, Enter; logout кнопкой.
+— Две сессии одного сотрудника в разных браузерах: password:reset/роль/active
+  закрывают обе при следующем запросе; сессия другого сотрудника остаётся.
+— Единственного OWNER нельзя отключить/понизить; разные аккаунты, не общий вход.
+— DevTools Network: no-store, HttpOnly/SameSite; нет JWT/session в localStorage.
+  localStorage ideal-demo-cart-v1 содержит только demo ID/quantity.
+— Пройти семь страниц, меню, диалоги, hero, смену фона, Coverflow/drag/клавиши,
+  карусели, reduced motion. Результаты выполненного здесь браузера — ниже.
+
+6. ПЕРЕД PRODUCTION / TLS-NGINX
+Это НЕ выполненный деплой. Node24 поддерживается; перед production обновить
+до актуального исправления безопасности ветки24 и повторить проверки.
+Отдельные production DB/секреты, runtime роль без superuser и DDL; миграции
+выполняет отдельный migrator. В локальной инструкции владелец БД и мигратор
+совмещены ради простой подготовки dev/test, это не production-разделение.
+NODE_ENV=production, APP_ORIGIN=https://реальный-домен, TRUST_PROXY=loopback
+только при локальном Nginx. Node — loopback; PostgreSQL не открывать наружу.
+Nginx не раздаёт корень IDEAL/закрытые HTML, проксирует закрытые маршруты Node.
+Нужны реальная проверка Secure/__Host cookie, HSTS, Origin и forwarded headers
+через TLS, no-store, отказ при сбое БД, HTTPS form без JS, рабочий graceful shutdown.
+PM2 один fork процесс. Масштабирование потребует общего rate-limit хранилища.
+Сессии/аудит чистятся только по согласованной retention; session prune каждые
+~60 секунд с рандомизацией адаптера, абсолютный срок проверяется на чтении,
+не зависит от своевременности prune. Audit retention пока не автоматизирован.
+Backup/restore и эксплуатационные проверки следующих этапов не объявлены готовыми.
+
+7. ИСТОЧНИКИ ВЫБОРА ЗАВИСИМОСТЕЙ
+Проверены официальные документации и npm metadata перед установкой, 23.10.2026.
+https://expressjs.com/en/5x/api/
+https://expressjs.com/en/resources/middleware/session/
+https://github.com/expressjs/session
+https://github.com/voxpelli/node-connect-pg-simple
+https://github.com/ranisalt/node-argon2
+https://www.prisma.io/docs/guides/upgrade-prisma-orm/v7
+https://www.prisma.io/docs/orm/v7/core-concepts/supported-databases/postgresql
+https://docs.prisma.io/docs/orm/reference/system-requirements
+https://github.com/nodejs/Release
+
+Node24.19 удовлетворяет engines выбранных пакетов; npm11.8 поддерживает lock v3.
+Express5.3.0, express-session1.19.0, connect-pg-simple10.0.0,
+Prisma/client/adapter-pg7.10.1, argon2 0.45.1; полный список package.json/lock.
+Prisma8 на момент проверки — release candidate, не выбран. prisma-client-js
+в Prisma7 поддерживается и выбран для обычного JS без дополнительной TS-сборки;
+при будущем переходе на новый generator отдельно согласовать структуру output.
+В Prisma7 datasource URL в prisma.config.ts, runtime клиент с PrismaPg adapter.
+Не переносились версии/миграции SQLite исходных проектов.
+
+8. РЕАЛЬНЫЕ ПРОВЕРКИ ЗДЕСЬ
+— npm ci с package-lock.json: PASS на Node24.19.0/npm11.9.0 Linux.
+  Это не запуск npm11.8.0 Windows; его пользователь выполняет отдельно.
+— Prisma generate7.10.1: PASS.
+— PostgreSQL18.4 Linux, временный отдельный тестовый кластер/базы и роли:
+  initial migrate deploy на чистую БД и повторный deploy без изменений PASS.
+  Сверка migrate diff между test DB и schema.prisma: No difference detected.
+  Ручные CHECK constraints миграции дополнительно к Prisma схеме сохранены.
+  БД запущена из отдельного embedded-дистрибутива с адаптацией тестового
+  запуска к ограничениям контейнера; harness/БД не включены в патч.
+  Это реальный PostgreSQL/HTTP, не SQLite/мок/PGlite и не Windows18.6.
+— npm test: 20/20 PASS, без skip. Сценарии в tests/auth.test.js/policy.test.js:
+  схема/FK, bootstrap, явные public routes/границы статики, no-JS HTML,
+  CSRF/Origin/невалидный Unicode/поля/длины, единые ошибки входа,
+  роли HTML/API, фиксация SID, cookie/no-store, logout, idle/absolute/pre-auth,
+  точный массовый отзыв при reset/role/active, self password change TRAINER,
+  последняя OWNER-гонка, audit rollback при ошибке вставки,
+  stale login после смены версии, logout/save/touch без воскрешения,
+  отказ store с безопасным500, per-login rate limit/поддельный X-Forwarded-For,
+  контракт TRAINER list/search/count/export/get/attachment и отзыв назначения.
+  Production cookie/HSTS проверены с СИМУЛИРОВАННЫМ loopback HTTPS proxy,
+  это не замена реальному TLS/Nginx.
+  Отдельный unit test подтверждает одинаковый CSP хеш для LF/CRLF/CR:
+  Windows-переводы строк не должны блокировать hero.
+— node --check: 31 JS/MJS (включая10 прежних frontend) PASS.
+— npm audit и npm audit --omit=dev: 0 известных уязвимостей по ответу registry
+  на момент проверки. Это не полный security audit и не гарантия их отсутствия.
+— CLI в псевдотерминале Linux на отдельной cli test DB: создание первого OWNER,
+  отказ повторного bootstrap, создание TRAINER через авторизацию OWNER,
+  восстановление пароля, отказ без TTY — PASS. Случайные вводимые пароли
+  отсутствуют в захваченном выводе, значения не сохранялись в артефакт.
+  Windows Terminal всё равно проверить по разделу5.
+— 55 прежних frontend/assets/components/sync-файлов побайтно идентичны входу.
+  Новые auth.scss/auth.css проверены на запрещённый синтаксис, CSS пересобран.
+
+БРАУЗЕРНЫЙ ПРОГОН ЭТАПА8
+Chromium153.0.8010.0 headless, реальная выдача через Express с CSP;
+web security и CSP включены. Не эмуляция DOM и не Go Live.
+56 комбинаций: семь публичных страниц + login × ширины
+1920/1440/1024/768/390/375/320, высота900, reduced motion.
+Все ответы200, один h1, document.scrollWidth <= clientWidth,
+нет pageerror и нарушений CSP в собранных сообщениях браузера.
+На1440/390: Coverflow Home/End/кнопки/drag со сменой позиции,
+добавление в общую demo-cart (только id/quantity), переключение абонементов,
+клавиатурная прокрутка карусели; desktop-кнопка карусели на1440.
+На390: меню/Escape/возврат фокуса. На1440/390: диалог тренера/Escape/
+возврат фокуса. С выключенным JS: Enter во входе OWNER, защищённая
+страница и POST-выход. С обычным motion1440: hero завершает intro,
+фон секций меняется через CSSOM под действующей CSP.
+Визуально просмотрены снимки hero1440 и формы входа390; это не полная
+пиксельная приёмка всех разделов и не доказательство плавности на реальном
+телефоне. Глобальный overflow и перечисленные механики подтверждены,
+полный обход Tab/Shift+Tab/всех экранов/нативного touch/Safari не выполнен.
+Нет базовых снимков предыдущего этапа для автоматического pixel-diff.
+Исторические пометки этапов1–7 «браузер не выполнен» относятся к тем этапам.
+
+НЕ ВЫПОЛНЕНО ЗДЕСЬ
+Установка/запуск на пользовательском Windows18.6; реальные TLS/Nginx/PM2,
+production cookie через настоящий reverse proxy, нагрузка/Argon на VPS,
+backup/restore, несколько реплик, доставка Push/PWA. Рабочих баз не касались.
+Этап9 не начат. Удалений файлов нет.
+
+Проверка выдачи: ZIP CRC PASS; 39 новых/изменённых файлов, сравнение с входным
+архивом побайтно, неизменённые файлы исключены. Нет .env, .git, node_modules,
+секретов, БД, временного PostgreSQL/браузерного harness и проектов-источников.

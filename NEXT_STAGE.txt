@@ -1,43 +1,53 @@
-IDEAL — завершение этапа 7 / 23.10.2026
+ИДЕАЛ — применение этапа8 / 23.10.2026
 
-Документационный анализ четырёх переданных архивов завершён. Статус больше
-не «ждём три архива». Факты, пути, ограничения и эксплуатационные пробелы —
-PROJECTS_ANALYSIS.txt. Архитектура и матрица остаются предложением до решения
-клуба. Наличие исходников не означает проверку работающих production-систем.
+Текущий результат — ZIP-ПАТЧ относительно корня IDEAL, не полный проект.
+Удалений нет. Не содержит .env/секретов/БД/.git/node_modules/исходников доноров.
+Неизменённый frontend не включён. package.json и package-lock.json включены.
 
-Сейчас применить ZIP-патч поверх корня IDEAL с заменой ровно пяти документов:
-ARCHITECTURE_NOTES.txt, PROJECTS_ANALYSIS.txt, AUTH_PLAN.txt,
-ROADMAP.txt, NEXT_STAGE.txt. Удалений нет, frontend не менялся.
-Не добавлять backend/auth/админ-панель на этом этапе.
+1. Распаковать патч в C:\Users\ШУМ\LITLE WORKS\IDEAL с заменой.
+2. Выполнить Windows-подготовку из AUTH_NOTES.txt: две базы и два DB-пользователя,
+   вручную объединить переменные .env с .env.example, не перезаписывать .env.
+3. npm ci; npm run db:generate; npm run db:deploy; npm run db:status; npm test.
+4. npm run owner:create; npm run dev; открыть http://127.0.0.1:3000/login.
+5. Проверить роли/CLI/сессии и прежние страницы по AUTH_NOTES.txt.
+   Браузер здесь не подтверждает идентичный результат Windows и TLS production.
 
-На Windows CMD, из C:\Users\ШУМ\LITLE WORKS\IDEAL:
+Перед командами Git (Git на ПК пользователя здесь не выполнялся):
 git remote -v
 git branch --show-current
 git status --short --branch
 
-Ожидаются main, origin https://github.com/Dimas-Shumil/ideal.git,
-upstream https://github.com/PabloAlligator/ideal.git и только пять M документов.
-Если ветка/remote/список изменений другой — не выполнять следующие команды
-вслепую: сначала разобраться. Git на компьютере пользователя здесь не выполнялся.
+Ожидается main; origin https://github.com/Dimas-Shumil/ideal.git,
+upstream https://github.com/PabloAlligator/ideal.git. Не пушить upstream.
+Проверить список: новые server/prisma/tests/tools CLI/package/env.example/auth
+SCSS+CSS и изменённые .gitignore/архитектурные документы. Семь прежних страниц,
+их CSS/JS и компоненты должны оставаться без изменений.
 
-После проверки исходного состояния:
 git diff --check
 git diff --stat
-git diff -- ARCHITECTURE_NOTES.txt PROJECTS_ANALYSIS.txt AUTH_PLAN.txt ROADMAP.txt NEXT_STAGE.txt
+git status --short --untracked-files=all
+git check-ignore .env node_modules
 
-Ожидается только документация, без удаления/добавления frontend. Браузерные
-проверки из прошлых этапов остаются невыполненными; этот патч их не закрывает.
+.env и node_modules должны игнорироваться; .env.example должен попадать в git.
+Если есть посторонние файлы/изменения — не добавлять их автоматически.
+После успешной локальной приёмки добавить ровно файлы патча:
 
-Затем:
-git add ARCHITECTURE_NOTES.txt PROJECTS_ANALYSIS.txt AUTH_PLAN.txt ROADMAP.txt NEXT_STAGE.txt
-git commit -m "Завершён анализ проектов и уточнена архитектура ИДЕАЛ"
+git add .gitignore .env.example package.json package-lock.json prisma.config.ts
+git add server prisma tests
+git add tools/cli.mjs tools/create-owner.mjs tools/reset-password.mjs tools/manage-user.mjs tools/run-tests.mjs
+git add site/sass/auth.scss site/css/auth.css
+git add AUTH_NOTES.txt AUTH_PLAN.txt ARCHITECTURE_NOTES.txt ROADMAP.txt NEXT_STAGE.txt
+git diff --cached --check
+git diff --cached --stat
+
+Не печатать .env или секреты для проверки. В staged не должно быть БД/логов/
+node_modules/архивов/.env, только безопасный .env.example.
+
+git commit -m "Добавлена серверная основа, авторизация и защита доступа ИДЕАЛ"
 git push origin main
 git status --short --branch
 
-Ожидается ## main...origin/main без изменений/ahead. Не пушить upstream.
-После подтверждения успешного push и завершения этапа 7 ассистент готовит
-название и стартовый промпт этапа 8: авторизация, роли и безопасность.
-Промпт сейчас намеренно не создан. Сохранить ZIP-патч, весь порядок ROADMAP 1–16,
-семь публичных страниц, no-React, дизайн/анимации, границы демо-магазина,
-перечень бизнес-решений перед миграцией и честные ограничения проверок.
-Следующий этап — только по отдельному заданию пользователя.
+Ожидается ## main...origin/main без изменений и ahead.
+После подтверждения успешного push и отдельного задания — этап9:
+админ-панель владельца на готовой auth-основе. Самостоятельно не переходить.
+Полный порядок 1–16 сохранён в ROADMAP.txt. Клиентский кабинет не согласован.
