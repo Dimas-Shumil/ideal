@@ -49,11 +49,14 @@ menuToggle.addEventListener('click', () => {
 function openPreview(name, opener) {
   restoreFocusTo = opener;
   setMenuState(false);
+  const isShopDemo = name === 'Демо-товар';
   const isProfile = name.startsWith('Профиль тренера');
   const isBooking = name === 'Записаться';
   const isMembership = name === 'Абонементы';
-  previewTitle.textContent = isProfile ? 'Профиль готовится' : isBooking ? 'Запись в клуб' : isMembership ? 'Абонементы' : name;
-  previewText.textContent = isProfile
+  previewTitle.textContent = isShopDemo ? 'Демонстрационный товар' : isProfile ? 'Профиль готовится' : isBooking ? 'Запись в клуб' : isMembership ? 'Абонементы' : name;
+  previewText.textContent = isShopDemo
+    ? 'Это пример оформления каталога, а не товар клуба. Ассортимент, фасовки и цены ещё не утверждены. Страницы товаров и корзина пока недоступны; покупка и отправка заявок не выполняются.'
+    : isProfile
     ? 'Это демонстрационная карточка. Имя, фотографию и специализацию добавим после получения материалов клуба. Персональная страница пока недоступна.'
     : isBooking
     ? 'Интерфейс записи подготовим вместе со страницей тренировок. Запись пока недоступна: заявки ещё не отправляются.'
@@ -125,7 +128,7 @@ document.addEventListener('keydown', (event) => {
 menuPanel.addEventListener('click', event => {
   if (event.target.closest('a[href]')) setMenuState(false);
 });
-document.querySelectorAll('a[href="/trainers.html"], a[href="/about.html"]').forEach(link => {
+document.querySelectorAll('a[href="/trainers.html"], a[href="/about.html"], a[href="/shop.html"]').forEach(link => {
   if (location.pathname.endsWith(link.getAttribute('href'))) link.setAttribute('aria-current', 'page');
 });
 // Do not keep the desktop page locked after a responsive menu breakpoint change.

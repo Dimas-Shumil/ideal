@@ -167,7 +167,7 @@
     status.textContent = `${cards[active].dataset.name}: добавлено в корзину. Оформление заказа пока недоступно.`;
     showStore(event.currentTarget);
   });
-  section.querySelector('[data-nutrition-store]').addEventListener('click', event => {
+  section.querySelector('[data-nutrition-store]')?.addEventListener('click', event => {
     event.preventDefault(); showStore(event.currentTarget);
   });
   dialog.querySelector('[data-nutrition-close]').addEventListener('click', () => dialog.close());
