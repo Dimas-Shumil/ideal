@@ -20,6 +20,8 @@
   const darkColor = [17, 19, 21]; // #111315
   const shopColor = [247, 247, 245]; // #f7f7f5
   const nutrition = wrapper.querySelector('.nutrition');
+  const trainerCTA = wrapper.querySelector('.trainer-cta');
+  const trainerColor = [27, 29, 31]; // совпадает с существующим footer
   const nutritionShell = nutrition?.querySelector('.nutrition__shell');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -35,6 +37,8 @@
   const ease = (value) => value * value * (3 - 2 * value);
   let targetDark = 0;
   let targetLight = 0;
+  let targetTrainer = 0;
+  let currentTrainer = 0;
   let currentDark = 0;
   let currentLight = 0;
   let frame = 0;
@@ -45,12 +49,17 @@
   // резкого включения собственного background-color во время прокрутки.
   function renderBackground() {
     const enteredDark = mixColor(lightColor, darkColor, currentDark);
-    const [r, g, b] = mixColor(enteredDark, shopColor, currentLight);
+    const shopBackground = mixColor(enteredDark, shopColor, currentLight);
+    const [r, g, b] = mixColor(shopBackground, trainerColor, currentTrainer);
     const color = `rgb(${r}, ${g}, ${b})`;
 
     if (lastColor !== color) {
       wrapper.style.backgroundColor = color;
       lastColor = color;
+    }
+
+    if (trainerCTA) {
+      trainerCTA.style.color = `rgb(${mixColor([25, 28, 30], [247, 247, 245], currentTrainer).join(', ')})`;
     }
 
     // Магазин проявляется по мере осветления единого фона.
@@ -67,6 +76,8 @@
     const dt = lastFrameTime ? Math.min(time - lastFrameTime, 64) : 16;
     lastFrameTime = time;
     const follow = reducedMotion.matches ? 1 : 1 - Math.exp(-dt / 190);
+    currentTrainer += (targetTrainer - currentTrainer) * follow;
+    if (Math.abs(targetTrainer - currentTrainer) < 0.0005) currentTrainer = targetTrainer;
     currentDark += (targetDark - currentDark) * follow;
     currentLight += (targetLight - currentLight) * follow;
 
@@ -74,7 +85,7 @@
     if (Math.abs(targetLight - currentLight) < 0.0005) currentLight = targetLight;
     renderBackground();
 
-    if (currentDark !== targetDark || currentLight !== targetLight) {
+    if (currentDark !== targetDark || currentLight !== targetLight || currentTrainer !== targetTrainer) {
       frame = requestAnimationFrame(animateBackground);
     } else {
       frame = 0;
@@ -83,6 +94,8 @@
   }
 
   function measureBackground() {
+    // Начинаем затемнение, когда предыдущая секция уже покинула viewport.
+    targetTrainer = trainerCTA ? getScrollProgress(trainerCTA, 0.32, 0.05) : 0;
     targetDark = getScrollProgress(memberships, 0.96, 0.14);
     targetLight = nutrition ? getScrollProgress(nutrition, 0.98, 0.06) : 0;
     if (!frame) frame = requestAnimationFrame(animateBackground);
@@ -92,10 +105,29 @@
   // Это важно для обновления страницы с восстановленным scrollY.
   targetDark = currentDark = getScrollProgress(memberships, 0.96, 0.14);
   targetLight = currentLight = nutrition ? getScrollProgress(nutrition, 0.98, 0.06) : 0;
+  targetTrainer = currentTrainer = trainerCTA ? getScrollProgress(trainerCTA, 0.32, 0.05) : 0;
   renderBackground();
   window.addEventListener('scroll', measureBackground, { passive: true });
   window.addEventListener('resize', measureBackground);
   reducedMotion.addEventListener('change', measureBackground);
+
+  // Reveal подключается только при поддержке браузера; без JS контент виден.
+  if (trainerCTA && 'IntersectionObserver' in window && !reducedMotion.matches) {
+    const observer = new IntersectionObserver(entries => {
+      if (!entries.some(entry => entry.isIntersecting)) return;
+      trainerCTA.classList.add('is-visible');
+      observer.disconnect();
+    }, { threshold: 0, rootMargin: '0px 0px -22% 0px' });
+    trainerCTA.classList.add('is-reveal-enabled');
+    observer.observe(trainerCTA);
+    trainerCTA.addEventListener('focusin', () => {
+      trainerCTA.classList.add('is-visible');
+      observer.disconnect();
+    });
+    reducedMotion.addEventListener('change', event => {
+      if (event.matches) { trainerCTA.classList.remove('is-reveal-enabled'); observer.disconnect(); }
+    });
+  }
 
   // Пункты уже существующего header / hero теперь ведут к новым разделам.
   // Старые main.js и hero-motion.js не изменяем. Перехватываем только

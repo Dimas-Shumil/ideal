@@ -2995,6 +2995,87 @@ html.hero-intro .header {
 }
 
 
+// Персональные тренировки · рекламная композиция, не каталог.
+.trainer-cta {
+  position: relative;
+  padding: clamp(100px, 11vw, 180px) clamp(26px, 4.7vw, 84px) 64px;
+  color: #f7f7f5;
+  background: transparent;
+
+  &__shell { max-width: 1560px; margin: 0 auto; min-width: 0; }
+  &__eyebrow, &__signature {
+    display: flex; justify-content: space-between; gap: 20px;
+    font-size: 10px; font-weight: 600; letter-spacing: .13em; line-height: 1.6;
+  }
+  &__eyebrow { padding-bottom: 24px; border-bottom: 1px solid #5d6062; color: #c4c6c7; }
+  &__composition {
+    display: grid; grid-template-columns: 1.12fr .45fr 1fr;
+    grid-template-rows: auto auto; align-items: start;
+    position: relative; padding-top: 64px;
+  }
+  &__title {
+    grid-column: 1 / 3; grid-row: 1; z-index: 1;
+    margin: 0 0 48px; font: 450 clamp(66px, 7.8vw, 140px)/.94 $font-ui;
+    letter-spacing: -.07em;
+    span { display: block; }
+    span:nth-child(2) { margin-left: clamp(32px, 4vw, 72px); color: #b9bcbe; }
+  }
+  &__portrait { grid-column: 3; grid-row: 1 / 3; margin: 52px -24px 0 0; min-width: 0; }
+  &__image { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 35%; filter: grayscale(1); }
+  &__caption { display: flex; justify-content: space-between; gap: 12px; padding-top: 16px; color: #b9bcbe; font-size: 9px; letter-spacing: .12em; }
+  &__copy { grid-column: 1 / 3; grid-row: 2; max-width: 450px; padding-right: 32px; }
+  &__lead { margin: 0 0 20px; font-size: clamp(20px, 2vw, 28px); line-height: 1.3; letter-spacing: -.035em; }
+  &__text { max-width: 350px; margin: 0 0 32px; font-size: 14px; line-height: 1.8; color: #c4c6c7; }
+  &__link {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 58px; padding: 16px 30px; border: 1px solid #a3a6a8;
+    border-radius: 2px; color: #fff; background: #25282a;
+    font-size: 13px; font-weight: 600; text-decoration: none;
+    transition: background-color 650ms $ease-ideal, border-color 650ms $ease-ideal, transform 650ms $ease-ideal;
+    &:hover { background: #3b3f42; border-color: #f7f7f5; }
+    &:active { transform: scale(.98); }
+    &:focus-visible { outline: 2px solid #fff; outline-offset: 6px; }
+  }
+  &__signature { margin: 72px 0 0; padding-top: 24px; border-top: 1px solid #5d6062; color: #b9bcbe; }
+
+  &.is-reveal-enabled {
+    .trainer-cta__title, .trainer-cta__copy { opacity: 0; transform: translateY(28px); transition: opacity 1500ms $ease-ideal, transform 1500ms $ease-ideal; }
+    .trainer-cta__portrait { opacity: 0; transform: translateY(20px) scale(.96); transition: opacity 1800ms $ease-ideal, transform 1800ms $ease-ideal; }
+    &.is-visible {
+      .trainer-cta__title, .trainer-cta__copy, .trainer-cta__portrait { opacity: 1; transform: none; }
+      .trainer-cta__copy { transition-delay: 160ms; }
+    }
+  }
+  @media (max-width: 1024px) {
+    &__composition { grid-template-columns: 1.25fr 1fr; gap: 0 30px; }
+    &__title { grid-column: 1; font-size: clamp(58px, 7.5vw, 80px); }
+    &__portrait { grid-column: 2; margin-right: 0; }
+    &__copy { grid-column: 1; padding-right: 0; }
+  }
+  @media (max-width: 600px) {
+    padding-top: 110px; padding-bottom: 48px;
+    &__eyebrow span:last-child { display: none; }
+    &__composition { grid-template-columns: minmax(0, 1fr); padding-top: 36px; }
+    &__title { grid-column: 1; grid-row: 1; font-size: clamp(48px, 12vw, 72px); margin-bottom: 28px; }
+    &__title span:nth-child(2) { margin-left: 24px; }
+    &__portrait { grid-column: 1; grid-row: 2; width: 83%; margin: 0 0 32px auto; }
+    &__image { aspect-ratio: 1 / 1; }
+    &__caption { font-size: 8px; letter-spacing: .05em; }
+    &__copy { grid-column: 1; grid-row: 3; max-width: 100%; }
+    &__lead { font-size: 23px; }
+    &__text { font-size: 14px; margin-bottom: 26px; }
+    &__link { width: 100%; }
+    &__signature { margin-top: 44px; font-size: 8px; gap: 12px; }
+    &__signature span:last-child { text-align: right; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &.is-reveal-enabled {
+      .trainer-cta__title, .trainer-cta__copy, .trainer-cta__portrait { opacity: 1; transform: none; transition: none; }
+    }
+    &__link { transition: none; }
+  }
+}
+
 // FOOTER / IDEAL MONO — только стили нового блока
 
 // IDEAL / MONO — простой футер; вставить в site/sass/main.scss
