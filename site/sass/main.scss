@@ -684,7 +684,7 @@ body.menu-open {
     column-gap: clamp(30px, 7vw, 110px);
     margin: 0 0 auto;
   }
-  & nav button {
+  & nav :is(button, a) {
     position: relative;
     display: flex;
     align-items: center;
@@ -706,30 +706,30 @@ body.menu-open {
       transform 0.7s $ease-ideal,
       color 0.4s ease;
   }
-  &.is-open nav button {
+  &.is-open nav :is(button, a) {
     opacity: 1;
     transform: translateY(0);
     transition-delay: 90ms;
   }
-  &.is-open nav button:nth-child(2) {
+  &.is-open nav :is(button, a):nth-child(2) {
     transition-delay: 148ms;
   }
-  &.is-open nav button:nth-child(3) {
+  &.is-open nav :is(button, a):nth-child(3) {
     transition-delay: 206ms;
   }
-  &.is-open nav button:nth-child(4) {
+  &.is-open nav :is(button, a):nth-child(4) {
     transition-delay: 264ms;
   }
-  &.is-open nav button:nth-child(5) {
+  &.is-open nav :is(button, a):nth-child(5) {
     transition-delay: 322ms;
   }
-  &.is-open nav button:nth-child(6) {
+  &.is-open nav :is(button, a):nth-child(6) {
     transition-delay: 380ms;
   }
-  &.is-open nav button:nth-child(7) {
+  &.is-open nav :is(button, a):nth-child(7) {
     transition-delay: 438ms;
   }
-  & nav button::before {
+  & nav :is(button, a)::before {
     content: '';
     position: absolute;
     left: 0;
@@ -741,14 +741,14 @@ body.menu-open {
     transform-origin: left;
     transition: transform 0.55s $ease-ideal;
   }
-  & nav button:hover::before,
-  & nav button:focus-visible::before {
+  & nav :is(button, a):hover::before,
+  & nav :is(button, a):focus-visible::before {
     transform: scaleX(1);
   }
-  & nav button:hover {
+  & nav :is(button, a):hover {
     color: #62686c;
   }
-  & nav button:active {
+  & nav :is(button, a):active {
     transform: scale(0.98);
     transition-delay: 0ms;
   }
@@ -757,7 +757,7 @@ body.menu-open {
     flex: none;
     transition: transform 0.5s $ease-ideal;
   }
-  & nav button:hover &__arrow {
+  & nav :is(button, a):hover &__arrow {
     transform: translate(4px, -4px);
   }
   &__bottom {
@@ -1130,7 +1130,7 @@ body.menu-open {
     & nav {
       grid-template-columns: 1fr;
     }
-    & nav button {
+    & nav :is(button, a) {
       padding: clamp(10px, 1.75vh, 18px) 0;
       font-size: clamp(29px, 7.6vw, 42px);
     }
@@ -1161,7 +1161,7 @@ body.menu-open {
     }
   }
   .menu-panel {
-    & nav button {
+    & nav :is(button, a) {
       font-size: 29px;
       padding: 10px 0;
     }
@@ -1176,7 +1176,7 @@ body.menu-open {
     animation-duration: 0.01ms;
   }
   .menu-panel {
-    & nav button {
+    & nav :is(button, a) {
       transform: none;
     }
   }
@@ -3203,3 +3203,6 @@ html.hero-intro .header {
     &__bottom { font-size: 11px; flex-wrap: wrap; }
   }
 }
+
+.header__nav-link, .menu-panel nav a { text-decoration: none; }
+.header__nav-link[aria-current="page"]::after { transform: scaleX(1); }

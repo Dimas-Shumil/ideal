@@ -626,7 +626,7 @@ body.menu-open {
   column-gap: clamp(30px, 7vw, 110px);
   margin: 0 0 auto;
 }
-.menu-panel nav button {
+.menu-panel nav :is(button, a) {
   position: relative;
   display: flex;
   align-items: center;
@@ -645,30 +645,30 @@ body.menu-open {
   transform: translateY(28px);
   transition: opacity 0.55s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), color 0.4s ease;
 }
-.menu-panel.is-open nav button {
+.menu-panel.is-open nav :is(button, a) {
   opacity: 1;
   transform: translateY(0);
   transition-delay: 90ms;
 }
-.menu-panel.is-open nav button:nth-child(2) {
+.menu-panel.is-open nav :is(button, a):nth-child(2) {
   transition-delay: 148ms;
 }
-.menu-panel.is-open nav button:nth-child(3) {
+.menu-panel.is-open nav :is(button, a):nth-child(3) {
   transition-delay: 206ms;
 }
-.menu-panel.is-open nav button:nth-child(4) {
+.menu-panel.is-open nav :is(button, a):nth-child(4) {
   transition-delay: 264ms;
 }
-.menu-panel.is-open nav button:nth-child(5) {
+.menu-panel.is-open nav :is(button, a):nth-child(5) {
   transition-delay: 322ms;
 }
-.menu-panel.is-open nav button:nth-child(6) {
+.menu-panel.is-open nav :is(button, a):nth-child(6) {
   transition-delay: 380ms;
 }
-.menu-panel.is-open nav button:nth-child(7) {
+.menu-panel.is-open nav :is(button, a):nth-child(7) {
   transition-delay: 438ms;
 }
-.menu-panel nav button::before {
+.menu-panel nav :is(button, a)::before {
   content: "";
   position: absolute;
   left: 0;
@@ -680,13 +680,13 @@ body.menu-open {
   transform-origin: left;
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.menu-panel nav button:hover::before, .menu-panel nav button:focus-visible::before {
+.menu-panel nav :is(button, a):hover::before, .menu-panel nav :is(button, a):focus-visible::before {
   transform: scaleX(1);
 }
-.menu-panel nav button:hover {
+.menu-panel nav :is(button, a):hover {
   color: #62686c;
 }
-.menu-panel nav button:active {
+.menu-panel nav :is(button, a):active {
   transform: scale(0.98);
   transition-delay: 0ms;
 }
@@ -695,7 +695,7 @@ body.menu-open {
   flex: none;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.menu-panel nav button:hover .menu-panel__arrow {
+.menu-panel nav :is(button, a):hover .menu-panel__arrow {
   transform: translate(4px, -4px);
 }
 .menu-panel__bottom {
@@ -1040,7 +1040,7 @@ body.menu-open {
   .menu-panel nav {
     grid-template-columns: 1fr;
   }
-  .menu-panel nav button {
+  .menu-panel nav :is(button, a) {
     padding: clamp(10px, 1.75vh, 18px) 0;
     font-size: clamp(29px, 7.6vw, 42px);
   }
@@ -1067,7 +1067,7 @@ body.menu-open {
   .hero__title-wrap {
     top: 24.6%;
   }
-  .menu-panel nav button {
+  .menu-panel nav :is(button, a) {
     font-size: 29px;
     padding: 10px 0;
   }
@@ -1080,7 +1080,7 @@ body.menu-open {
     transition-duration: 0.01ms;
     animation-duration: 0.01ms;
   }
-  .menu-panel nav button {
+  .menu-panel nav :is(button, a) {
     transform: none;
   }
 }
@@ -3206,4 +3206,12 @@ html.hero-intro.hero-intro-playing .hero__scroll {
     font-size: 11px;
     flex-wrap: wrap;
   }
+}
+
+.header__nav-link, .menu-panel nav a {
+  text-decoration: none;
+}
+
+.header__nav-link[aria-current=page]::after {
+  transform: scaleX(1);
 }

@@ -35,7 +35,7 @@ function setMenuState(open, { returnFocus = false } = {}) {
   document.body.classList.toggle('menu-open', open);
   if (open) {
     // The toggle remains keyboard-accessible. Focus the first navigation entry after opening.
-    const firstLink = menuPanel.querySelector('nav button');
+    const firstLink = menuPanel.querySelector('nav a, nav button');
     if (firstLink) firstLink.focus({ preventScroll: true });
   } else if (returnFocus) {
     menuToggle.focus({ preventScroll: true });
@@ -49,10 +49,13 @@ menuToggle.addEventListener('click', () => {
 function openPreview(name, opener) {
   restoreFocusTo = opener;
   setMenuState(false);
+  const isProfile = name.startsWith('Профиль тренера');
   const isBooking = name === 'Записаться';
   const isMembership = name === 'Абонементы';
-  previewTitle.textContent = isBooking ? 'Запись в клуб' : isMembership ? 'Абонементы' : name;
-  previewText.textContent = isBooking
+  previewTitle.textContent = isProfile ? 'Профиль готовится' : isBooking ? 'Запись в клуб' : isMembership ? 'Абонементы' : name;
+  previewText.textContent = isProfile
+    ? 'Это демонстрационная карточка. Имя, фотографию и специализацию добавим после получения материалов клуба. Персональная страница пока недоступна.'
+    : isBooking
     ? 'Интерфейс записи подготовим вместе со страницей тренировок. Запись пока недоступна: заявки ещё не отправляются.'
     : isMembership
       ? 'Здесь откроются тарифы клуба и выбор абонемента. На этом этапе доступен только первый экран сайта.'
@@ -68,7 +71,8 @@ function closePreview() {
   clearTimeout(modalCloseTimer);
   if (motionReduced.matches) {
     previewDialog.close();
-    restoreFocusTo?.focus({ preventScroll: true });
+    if (restoreFocusTo?.isConnected && !restoreFocusTo.closest('[inert]')) restoreFocusTo.focus({ preventScroll: true });
+    else menuToggle.focus({ preventScroll: true });
     return;
   }
   modalCloseTimer = window.setTimeout(() => {
@@ -106,7 +110,7 @@ document.addEventListener('keydown', (event) => {
     setMenuState(false, { returnFocus: true });
   }
   if (event.key !== 'Tab' || menuToggle.getAttribute('aria-expanded') !== 'true' || previewDialog.open) return;
-  const focusable = [menuToggle, ...menuPanel.querySelectorAll('button:not([disabled])')];
+  const focusable = [menuToggle, ...menuPanel.querySelectorAll('a[href], button:not([disabled])')];
   const position = focusable.indexOf(document.activeElement);
   if (event.shiftKey && position <= 0) {
     event.preventDefault();
@@ -115,4 +119,16 @@ document.addEventListener('keydown', (event) => {
     event.preventDefault();
     focusable[0].focus();
   }
+});
+
+// Real navigation participates in the same menu lifecycle as preview buttons.
+menuPanel.addEventListener('click', event => {
+  if (event.target.closest('a[href]')) setMenuState(false);
+});
+document.querySelectorAll('a[href="/trainers.html"]').forEach(link => {
+  if (location.pathname.endsWith('/trainers.html')) link.setAttribute('aria-current', 'page');
+});
+// Do not keep the desktop page locked after a responsive menu breakpoint change.
+window.matchMedia('(min-width: 1181px)').addEventListener('change', event => {
+  if (event.matches) setMenuState(false, { returnFocus: true });
 });
