@@ -24,7 +24,7 @@ export function loadUser(prisma) {
 }
 export function requireAuth(req, res, next) {
   if (req.user) return next();
-  if (req.path.startsWith("/api/"))
+  if (req.originalUrl.startsWith("/api/"))
     return res.status(401).json({ error: "UNAUTHORIZED", requestId: req.id });
   res.redirect(303, "/login");
 }

@@ -1,53 +1,46 @@
-ИДЕАЛ — применение этапа8 / 23.10.2026
+ИДЕАЛ — применение этапа9 / 24.10.2026
 
-Текущий результат — ZIP-ПАТЧ относительно корня IDEAL, не полный проект.
-Удалений нет. Не содержит .env/секретов/БД/.git/node_modules/исходников доноров.
-Неизменённый frontend не включён. package.json и package-lock.json включены.
+ZIP-патч распаковать с заменой относительно корня IDEAL.
+Удалений нет. .env, зависимости, схема БД, миграции, публичные страницы
+не менялись. Существующий OWNER sergei и его пароль сохраняются.
+Инструкция и результаты проверок — OWNER_PANEL_NOTES.txt.
 
-1. Распаковать патч в C:\Users\ШУМ\LITLE WORKS\IDEAL с заменой.
-2. Выполнить Windows-подготовку из AUTH_NOTES.txt: две базы и два DB-пользователя,
-   вручную объединить переменные .env с .env.example, не перезаписывать .env.
-3. npm ci; npm run db:generate; npm run db:deploy; npm run db:status; npm test.
-4. npm run owner:create; npm run dev; открыть http://127.0.0.1:3000/login.
-5. Проверить роли/CLI/сессии и прежние страницы по AUTH_NOTES.txt.
-   Браузер здесь не подтверждает идентичный результат Windows и TLS production.
+Windows / VS Code, компьютер папы:
+cd /d "C:\Users\ШУМ\LITLE WORKS\IDEAL"
+npm run db:status
+Новых миграций нет. Если есть прежние pending: npm run db:deploy.
+npm test
+Ожидается 26/26 на TEST_DATABASE_URL (никогда не на ideal_dev).
+npm run dev
+Открыть http://127.0.0.1:3000/login и войти существующим владельцем.
+Проверить /admin, сотрудников, поиск, роли, активность, имя и logout.
+Подробная приёмка и безопасная смена пароля — OWNER_PANEL_NOTES.txt.
 
-Перед командами Git (Git на ПК пользователя здесь не выполнялся):
+После успешной приёмки сначала проверить Git:
 git remote -v
 git branch --show-current
 git status --short --branch
-
-Ожидается main; origin https://github.com/Dimas-Shumil/ideal.git,
-upstream https://github.com/PabloAlligator/ideal.git. Не пушить upstream.
-Проверить список: новые server/prisma/tests/tools CLI/package/env.example/auth
-SCSS+CSS и изменённые .gitignore/архитектурные документы. Семь прежних страниц,
-их CSS/JS и компоненты должны оставаться без изменений.
+Должны быть main, origin=Dimas-Shumil/ideal, upstream=PabloAlligator/ideal.
+Не пушить upstream. Если состояние отличается — сначала разобраться.
 
 git diff --check
 git diff --stat
 git status --short --untracked-files=all
-git check-ignore .env node_modules
 
-.env и node_modules должны игнорироваться; .env.example должен попадать в git.
-Если есть посторонние файлы/изменения — не добавлять их автоматически.
-После успешной локальной приёмки добавить ровно файлы патча:
-
-git add .gitignore .env.example package.json package-lock.json prisma.config.ts
-git add server prisma tests
-git add tools/cli.mjs tools/create-owner.mjs tools/reset-password.mjs tools/manage-user.mjs tools/run-tests.mjs
-git add site/sass/auth.scss site/css/auth.css
-git add AUTH_NOTES.txt AUTH_PLAN.txt ARCHITECTURE_NOTES.txt ROADMAP.txt NEXT_STAGE.txt
+Добавить только файлы патча:
+git add server/app.js server/middleware/auth.js server/modules/auth/routes.js server/modules/users/service.js
+git add server/modules/owner/routes.js server/views/owner/confirm.ejs server/views/owner/panel.ejs
+git add site/sass/owner.scss site/css/owner.css site/scripts/owner.js tests/auth.test.js
+git add OWNER_PANEL_NOTES.txt AUTH_NOTES.txt AUTH_PLAN.txt ARCHITECTURE_NOTES.txt ROADMAP.txt NEXT_STAGE.txt
 git diff --cached --check
 git diff --cached --stat
+В staged не должно быть .env, БД, node_modules, ZIP или чужих изменений.
 
-Не печатать .env или секреты для проверки. В staged не должно быть БД/логов/
-node_modules/архивов/.env, только безопасный .env.example.
-
-git commit -m "Добавлена серверная основа, авторизация и защита доступа ИДЕАЛ"
+git commit -m "Добавлена панель владельца и управление сотрудниками ИДЕАЛ"
 git push origin main
 git status --short --branch
-
 Ожидается ## main...origin/main без изменений и ahead.
-После подтверждения успешного push и отдельного задания — этап9:
-админ-панель владельца на готовой auth-основе. Самостоятельно не переходить.
-Полный порядок 1–16 сохранён в ROADMAP.txt. Клиентский кабинет не согласован.
+
+Этап9 завершён в патче; Windows-приёмка и push ещё не подтверждены.
+Следующий этап10 — кабинет тренера — только после успешного push
+и отдельного задания. Этапы11–16 сохраняются в ROADMAP.txt.

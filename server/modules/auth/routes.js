@@ -57,12 +57,10 @@ export async function authRoutes({ prisma, store, config, users }) {
     async (req, res) => {
       const parsed = loginBody.safeParse(req.body);
       if (!parsed.success)
-        return res
-          .status(400)
-          .render("auth/login", {
-            csrf: req.session.csrf,
-            error: "Проверьте логин и пароль.",
-          });
+        return res.status(400).render("auth/login", {
+          csrf: req.session.csrf,
+          error: "Проверьте логин и пароль.",
+        });
       const user = await prisma.user.findUnique({
         where: { login: parsed.data.login },
       });
@@ -72,12 +70,10 @@ export async function authRoutes({ prisma, store, config, users }) {
       );
       if (!valid || !user?.active) {
         await audit(prisma, "LOGIN_FAILED", { requestId: req.id });
-        return res
-          .status(401)
-          .render("auth/login", {
-            csrf: req.session.csrf,
-            error: "Неверный логин или пароль.",
-          });
+        return res.status(401).render("auth/login", {
+          csrf: req.session.csrf,
+          error: "Неверный логин или пароль.",
+        });
       }
       await regenerate(req);
       req.session.userId = user.id;
@@ -128,11 +124,24 @@ export async function authRoutes({ prisma, store, config, users }) {
     },
   );
   router.post(
-    "/api/auth/password",
+    ["/api/auth/password", "/admin/account/password"],
     requireAuth,
     limit(5, (req) => req.user.id),
     guard,
     async (req, res) => {
+      const invalid = () =>
+        req.path === "/admin/account/password"
+          ? res
+              .status(400)
+              .render("owner/panel", {
+                page: "account",
+                user: req.user,
+                csrf: req.session.csrf,
+                error:
+                  "Проверьте текущий пароль и новый пароль: 12–128 символов, до 256 байт.",
+                values: {},
+              })
+          : res.status(400).json({ error: "INVALID_INPUT" });
       const body = req.body;
       if (
         !body ||
@@ -143,12 +152,12 @@ export async function authRoutes({ prisma, store, config, users }) {
         Buffer.byteLength(body.currentPassword) > 256 ||
         !password.safeParse(body.newPassword).success
       )
-        return res.status(400).json({ error: "INVALID_INPUT" });
+        return invalid();
       const current = await prisma.user.findUnique({
         where: { id: req.user.id },
       });
       if (!(await verifyPassword(current.passwordHash, body.currentPassword)))
-        return res.status(400).json({ error: "INVALID_INPUT" });
+        return invalid();
       // Optimistic password guard prevents concurrent stale self-reset.
       await users.change(
         req.user.id,
@@ -169,6 +178,8 @@ export async function authRoutes({ prisma, store, config, users }) {
         sameSite: "lax",
         secure: config.production,
       });
+      if (req.path === "/admin/account/password")
+        return res.redirect(303, "/login");
       res.json({ ok: true, reauthenticate: true });
     },
   );

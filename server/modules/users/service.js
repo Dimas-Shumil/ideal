@@ -4,13 +4,14 @@ import { accountBody, password } from "../auth/schema.js";
 import { hashPassword, verifyPassword } from "../auth/password.js";
 const fail = (status, message) => Object.assign(new Error(message), { status });
 export function userService(prisma) {
-  async function operator(tx, actorId, operatorHash) {
+  async function operator(tx, actorId, operatorHash, expectedVersion) {
     if (!actorId) return; // Only local operator CLI is allowed to omit actor.
     const actor = await tx.user.findUnique({ where: { id: actorId } });
     if (
       !actor?.active ||
       actor.role !== "OWNER" ||
-      actor.passwordHash !== operatorHash
+      actor.passwordHash !== operatorHash ||
+      (expectedVersion !== undefined && actor.authVersion !== expectedVersion)
     )
       throw fail(403, "FORBIDDEN");
   }
@@ -20,6 +21,7 @@ export function userService(prisma) {
       {
         actorId = null,
         operatorHash = null,
+        expectedVersion,
         bootstrap = false,
         requestId = null,
       } = {},
@@ -28,11 +30,13 @@ export function userService(prisma) {
       const passwordHash = await hashPassword(data.password);
       return prisma.$transaction(async (tx) => {
         await accessLock(tx);
-        await operator(tx, actorId, operatorHash);
+        await operator(tx, actorId, operatorHash, expectedVersion);
         if (bootstrap && (await tx.user.count()))
           throw fail(409, "BOOTSTRAP_CLOSED");
         if (bootstrap && data.role !== "OWNER")
           throw fail(400, "OWNER_REQUIRED");
+        if (await tx.user.findUnique({ where: { login: data.login } }))
+          throw fail(409, "DUPLICATE_LOGIN");
         const user = await tx.user.create({
           data: {
             login: data.login,
@@ -55,6 +59,7 @@ export function userService(prisma) {
       {
         actorId = null,
         operatorHash = null,
+        expectedVersion,
         requestId = null,
         self = false,
       } = {},
@@ -62,7 +67,9 @@ export function userService(prisma) {
       const allowed = Object.keys(changes);
       if (
         !allowed.length ||
-        allowed.some((k) => !["password", "role", "active"].includes(k))
+        allowed.some(
+          (k) => !["password", "role", "active", "displayName"].includes(k),
+        )
       )
         throw fail(400, "INVALID_FIELDS");
       if ("active" in changes && typeof changes.active !== "boolean")
@@ -72,14 +79,22 @@ export function userService(prisma) {
         !["OWNER", "ADMIN", "TRAINER"].includes(changes.role)
       )
         throw fail(400, "INVALID_ROLE");
+      if (
+        "displayName" in changes &&
+        (typeof changes.displayName !== "string" ||
+          !changes.displayName.trim() ||
+          changes.displayName.trim().length > 100)
+      )
+        throw fail(400, "INVALID_NAME");
       const data = { ...changes };
+      if ("displayName" in data) data.displayName = data.displayName.trim();
       if ("password" in data) {
         data.passwordHash = await hashPassword(password.parse(data.password));
         delete data.password;
       }
       return prisma.$transaction(async (tx) => {
         await accessLock(tx);
-        if (!self) await operator(tx, actorId, operatorHash);
+        if (!self) await operator(tx, actorId, operatorHash, expectedVersion);
         const user = await tx.user.findUnique({ where: { id } });
         if (!user) throw fail(404, "NOT_FOUND");
         if (
@@ -98,11 +113,15 @@ export function userService(prisma) {
           (await tx.user.count({ where: { active: true, role: "OWNER" } })) <= 1
         )
           throw fail(409, "LAST_OWNER");
+        const revoke = allowed.some((key) => key !== "displayName");
         await tx.user.update({
           where: { id },
-          data: { ...data, authVersion: { increment: 1 } },
+          data: {
+            ...data,
+            ...(revoke ? { authVersion: { increment: 1 } } : {}),
+          },
         });
-        await tx.authSession.deleteMany({ where: { userId: id } });
+        if (revoke) await tx.authSession.deleteMany({ where: { userId: id } });
         for (const key of allowed)
           await audit(tx, `USER_${key.toUpperCase()}_CHANGED`, {
             actorId,

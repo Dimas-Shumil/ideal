@@ -11,6 +11,7 @@ import { authRoutes } from "./modules/auth/routes.js";
 import { loadUser, requireAuth, requireRole } from "./middleware/auth.js";
 import { inlineScriptHashes } from "./middleware/security.js";
 import { userService } from "./modules/users/service.js";
+import { ownerRoutes } from "./modules/owner/routes.js";
 const root = fileURLToPath(new URL("../", import.meta.url));
 export async function createApp({
   config,
@@ -130,18 +131,20 @@ export async function createApp({
   app.use(loadUser(db.prisma));
   const users = userService(db.prisma);
   app.use(await authRoutes({ config, prisma: db.prisma, store, users }));
+  app.use(ownerRoutes({ config, prisma: db.prisma, users }));
   for (const [route, role, label] of [
     ["/admin", "OWNER", "Владелец"],
     ["/staff", "ADMIN", "Администратор"],
     ["/trainer", "TRAINER", "Тренер"],
   ]) {
-    app.get(route, requireAuth, requireRole(role), (req, res) =>
-      res.render("auth/check", {
-        label,
-        user: req.user,
-        csrf: req.session.csrf,
-      }),
-    );
+    if (route !== "/admin")
+      app.get(route, requireAuth, requireRole(role), (req, res) =>
+        res.render("auth/check", {
+          label,
+          user: req.user,
+          csrf: req.session.csrf,
+        }),
+      );
     app.get(`/api${route}/check`, requireAuth, requireRole(role), (req, res) =>
       res.json({ ok: true, role: req.user.role }),
     );

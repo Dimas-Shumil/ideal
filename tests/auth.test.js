@@ -511,3 +511,222 @@ test("production cookie flags with a simulated trusted loopback HTTPS proxy", as
     result.store.close();
   }
 });
+
+test("OWNER panel: independent authorization for every new page and operation", async () => {
+  const paths = [
+    "/admin/employees",
+    "/admin/employees/new",
+    "/admin/account",
+    `/admin/employees/${admin.id}`,
+    "/api/admin/employees",
+  ];
+  for (const path of paths)
+    await request(app)
+      .get(path)
+      .expect(path.startsWith("/api/") ? 401 : 303);
+  for (const role of ["admin", "trainer"]) {
+    const session = await login(role);
+    for (const path of paths) await session.agent.get(path).expect(403);
+    for (const path of [
+      "/api/admin/employees",
+      `/api/admin/employees/${admin.id}/name`,
+      `/api/admin/employees/${admin.id}/role`,
+      `/api/admin/employees/${admin.id}/active`,
+    ])
+      await session.agent
+        .post(path)
+        .set("Origin", config.APP_ORIGIN)
+        .send({ _csrf: session.token })
+        .expect(403);
+  }
+});
+test("OWNER panel: forms, validation, duplicates, search and safe projections", async () => {
+  const s = await login("owner");
+  for (const path of [
+    "/admin",
+    "/admin/employees",
+    "/admin/employees/new",
+    "/admin/account",
+    `/admin/employees/${admin.id}`,
+  ]) {
+    const r = await s.agent.get(path).expect(200);
+    assert.ok(!r.text.includes(secret));
+    assert.ok(!r.text.includes("passwordHash"));
+  }
+  const body = {
+    _csrf: s.token,
+    ownerPassword: secret,
+    confirm: "yes",
+    login: "panel-user",
+    displayName: "<script>Имя</script>",
+    role: "TRAINER",
+    password: secret,
+  };
+  const post = (data) =>
+    s.agent
+      .post("/api/admin/employees")
+      .set("Origin", config.APP_ORIGIN)
+      .send(data);
+  await s.agent.post("/api/admin/employees").send(body).expect(403);
+  await post({ ...body, _csrf: "f".repeat(64) }).expect(403);
+  await post({ ...body, authVersion: 1 }).expect(400);
+  await post({ ...body, ownerPassword: "wrong" }).expect(403);
+  await post({ ...body, confirm: "no" }).expect(400);
+  const created = await post(body).expect(201);
+  assert.deepEqual(Object.keys(created.body.user).sort(), [
+    "id",
+    "login",
+    "role",
+  ]);
+  await post(body).expect(409);
+  const listed = await s.agent
+    .get("/api/admin/employees?q=panel-user&role=TRAINER&active=true")
+    .expect(200);
+  assert.equal(listed.body.total, 1);
+  assert.deepEqual(Object.keys(listed.body.items[0]).sort(), [
+    "active",
+    "displayName",
+    "id",
+    "login",
+    "role",
+  ]);
+  await s.agent.get("/api/admin/employees?active=wat").expect(400);
+  const page = await s.agent.get("/admin/employees?q=panel-user").expect(200);
+  assert.ok(page.text.includes("&lt;script&gt;Имя&lt;/script&gt;"));
+  const employee = created.body.user;
+  const target = await login("panel-user");
+  const mutate = (action, data) =>
+    s.agent
+      .post(`/api/admin/employees/${employee.id}/${action}`)
+      .set("Origin", config.APP_ORIGIN)
+      .send({ _csrf: s.token, ownerPassword: secret, confirm: "yes", ...data });
+  await mutate("name", { displayName: "Новое имя" }).expect(200);
+  await target.agent.get("/api/auth/me").expect(200);
+  await mutate("name", { displayName: "Новое имя", role: "OWNER" }).expect(400);
+  await mutate("role", { role: "ADMIN" }).expect(200);
+  await target.agent.get("/api/auth/me").expect(401);
+  const target2 = await login("panel-user");
+  await mutate("active", { active: "false" }).expect(200);
+  await target2.agent.get("/api/auth/me").expect(401);
+  await s.agent.get("/api/auth/me").expect(200);
+  await mutate("active", { active: "true" }).expect(200);
+  await mutate("role", { role: "OWNER", ownerPassword: "wrong" }).expect(403);
+  await mutate("role", { role: "OWNER" }).expect(200);
+  await mutate("active", { active: "false" }).expect(200);
+  const audit = await db.prisma.auditEvent.findMany({
+    where: { targetId: employee.id },
+  });
+  assert.ok(audit.some((x) => x.action === "USER_DISPLAYNAME_CHANGED"));
+  assert.ok(!JSON.stringify(audit).includes(secret));
+});
+test("OWNER HTTP: concurrent last-owner protection and audit rollback", async () => {
+  const a = await login("owner");
+  const extra = await users.create({
+    login: "race-owner",
+    displayName: "Второй",
+    role: "OWNER",
+    password: secret,
+  });
+  const b = await login("race-owner");
+  const disable = (session, target) =>
+    session.agent
+      .post(`/api/admin/employees/${target}/active`)
+      .set("Origin", config.APP_ORIGIN)
+      .send({
+        _csrf: session.token,
+        ownerPassword: secret,
+        confirm: "yes",
+        active: "false",
+      });
+  const results = await Promise.all([
+    disable(a, owner.id),
+    disable(b, extra.id),
+  ]);
+  assert.deepEqual(results.map((x) => x.status).sort(), [200, 409]);
+  await users.change(owner.id, { active: true });
+  await users.change(extra.id, { active: false });
+  const s = await login("owner");
+  const before = await db.prisma.user.findUnique({ where: { id: admin.id } });
+  await db.pool.query(
+    `CREATE FUNCTION panel_reject_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'private db failure'; END $$`,
+  );
+  await db.pool.query(
+    `CREATE TRIGGER panel_reject_audit BEFORE INSERT ON "AuditEvent" FOR EACH ROW EXECUTE FUNCTION panel_reject_audit()`,
+  );
+  try {
+    const r = await s.agent
+      .post(`/api/admin/employees/${admin.id}/name`)
+      .set("Origin", config.APP_ORIGIN)
+      .send({
+        _csrf: s.token,
+        ownerPassword: secret,
+        confirm: "yes",
+        displayName: "Не сохранить",
+      })
+      .expect(500);
+    assert.ok(!r.text.includes("private db failure"));
+    assert.equal(
+      (await db.prisma.user.findUnique({ where: { id: admin.id } }))
+        .displayName,
+      before.displayName,
+    );
+  } finally {
+    await db.pool.query('DROP TRIGGER panel_reject_audit ON "AuditEvent"');
+    await db.pool.query("DROP FUNCTION panel_reject_audit()");
+  }
+});
+test("OWNER no-JS password form revokes all own sessions and redirects to login", async () => {
+  const a = await login("owner"),
+    b = await login("owner");
+  await a.agent
+    .post("/admin/account/password")
+    .set("Origin", config.APP_ORIGIN)
+    .type("form")
+    .send({ _csrf: a.token, currentPassword: secret, newPassword: secret })
+    .expect(303)
+    .expect("Location", "/login");
+  for (const s of [a, b]) await s.agent.get("/api/auth/me").expect(401);
+});
+test("OWNER mutation rejects an actor whose access version changed after authorization", async () => {
+  const actor = await db.prisma.user.findUnique({ where: { id: owner.id } });
+  await users.change(owner.id, { password: secret });
+  await assert.rejects(
+    () =>
+      users.change(
+        admin.id,
+        { displayName: "Недопустимо" },
+        {
+          actorId: owner.id,
+          operatorHash: actor.passwordHash,
+          expectedVersion: actor.authVersion,
+        },
+      ),
+    /FORBIDDEN/,
+  );
+});
+test("OWNER critical endpoints all require CSRF and exact Origin", async () => {
+  const s = await login("owner");
+  for (const path of [
+    "/api/admin/employees",
+    ...["name", "role", "active"].map(
+      (action) => `/api/admin/employees/${admin.id}/${action}`,
+    ),
+    "/admin/account/password",
+  ]) {
+    await request(app)
+      .post(path)
+      .send({})
+      .expect(path.startsWith("/api/") ? 401 : 303);
+    await s.agent.post(path).send({ _csrf: s.token }).expect(403);
+    await s.agent
+      .post(path)
+      .set("Origin", "https://evil.example")
+      .send({ _csrf: s.token })
+      .expect(403);
+    await s.agent
+      .post(path)
+      .set("Origin", config.APP_ORIGIN)
+      .send({})
+      .expect(403);
+  }
+});
