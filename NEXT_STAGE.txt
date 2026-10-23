@@ -1,46 +1,54 @@
-ИДЕАЛ — применение этапа9 / 24.10.2026
+ИДЕАЛ — применение этапа 10 / 24.10.2026
 
-ZIP-патч распаковать с заменой относительно корня IDEAL.
-Удалений нет. .env, зависимости, схема БД, миграции, публичные страницы
-не менялись. Существующий OWNER sergei и его пароль сохраняются.
-Инструкция и результаты проверок — OWNER_PANEL_NOTES.txt.
-
-Windows / VS Code, компьютер папы:
+Остановить Node (Ctrl+C). ZIP-патч распаковать с заменой в корень IDEAL,
+не во вложенную папку. Удалений нет. .env, БД, зависимости и миграции не менять.
+Команды CMD:
 cd /d "C:\Users\ШУМ\LITLE WORKS\IDEAL"
 npm run db:status
-Новых миграций нет. Если есть прежние pending: npm run db:deploy.
 npm test
-Ожидается 26/26 на TEST_DATABASE_URL (никогда не на ideal_dev).
+Ожидается 31/31 на отдельной ideal_auth_test / ideal_test, НЕ ideal_dev.
+Здесь полный прогон не выполнен: PostgreSQL недоступен. npm ci не нужен,
+если node_modules уже установлены. Новых миграций нет.
 npm run dev
-Открыть http://127.0.0.1:3000/login и войти существующим владельцем.
-Проверить /admin, сотрудников, поиск, роли, активность, имя и logout.
-Подробная приёмка и безопасная смена пароля — OWNER_PANEL_NOTES.txt.
 
-После успешной приёмки сначала проверить Git:
+http://127.0.0.1:3000/login — войти существующим TRAINER или создать тестового
+TRAINER через панель OWNER. Пароль sergei не менять/не сбрасывать.
+Проверить /trainer, /trainer/clients, /trainer/lessons, /trainer/account:
+— свои имя/логин/роль; длинное имя; desktop/mobile; пустые состояния без «0»;
+— ссылки, Tab/Shift+Tab/Enter, focus, reduced motion и работа без JavaScript;
+— чужие userId/trainerId в query не меняют аккаунт;
+— OWNER/ADMIN не проходят в TRAINER-разделы; /trainer.html публичный;
+— неверный текущий пароль даёт ошибку без повторного вывода пароля;
+— на тестовом TRAINER две сессии: смена своего пароля закрывает обе,
+  старый пароль не входит, новый входит; POST logout закрывает текущую;
+— двойное нажатие формы и возврат назад; блокировка кнопки с JS;
+— отключение/смена роли тестового TRAINER владельцем закрывает доступ;
+— /admin и семь публичных страниц сохраняют поведение.
+Полные сведения и ограничения — TRAINER_PANEL_NOTES.txt.
+
+После успешных тестов и ручной приёмки проверить Git:
 git remote -v
 git branch --show-current
 git status --short --branch
-Должны быть main, origin=Dimas-Shumil/ideal, upstream=PabloAlligator/ideal.
-Не пушить upstream. Если состояние отличается — сначала разобраться.
+Ожидается main; origin https://github.com/Dimas-Shumil/ideal.git;
+upstream https://github.com/PabloAlligator/ideal.git. При расхождениях остановиться,
+не выполнять reset/clean. Git пользователя здесь недоступен.
 
 git diff --check
 git diff --stat
 git status --short --untracked-files=all
 
-Добавить только файлы патча:
-git add server/app.js server/middleware/auth.js server/modules/auth/routes.js server/modules/users/service.js
-git add server/modules/owner/routes.js server/views/owner/confirm.ejs server/views/owner/panel.ejs
-git add site/sass/owner.scss site/css/owner.css site/scripts/owner.js tests/auth.test.js
-git add OWNER_PANEL_NOTES.txt AUTH_NOTES.txt AUTH_PLAN.txt ARCHITECTURE_NOTES.txt ROADMAP.txt NEXT_STAGE.txt
+git add server/app.js server/modules/auth/routes.js server/modules/users/service.js
+git add server/modules/trainer/routes.js server/views/trainer/panel.ejs server/views/owner/panel.ejs
+git add site/sass/trainer-panel.scss site/css/trainer-panel.css tests/auth.test.js tests/policy.test.js
+git add TRAINER_PANEL_NOTES.txt OWNER_PANEL_NOTES.txt AUTH_NOTES.txt AUTH_PLAN.txt ARCHITECTURE_NOTES.txt ROADMAP.txt NEXT_STAGE.txt
 git diff --cached --check
 git diff --cached --stat
-В staged не должно быть .env, БД, node_modules, ZIP или чужих изменений.
+Убедиться, что staged содержит только файлы патча, без .env/БД/архива.
 
-git commit -m "Добавлена панель владельца и управление сотрудниками ИДЕАЛ"
+git commit -m "Добавлен кабинет тренера ИДЕАЛ и безопасная смена пароля"
 git push origin main
 git status --short --branch
-Ожидается ## main...origin/main без изменений и ahead.
-
-Этап9 завершён в патче; Windows-приёмка и push ещё не подтверждены.
-Следующий этап10 — кабинет тренера — только после успешного push
-и отдельного задания. Этапы11–16 сохраняются в ROADMAP.txt.
+Ожидается ## main...origin/main, без изменений и ahead.
+Пришлите вывод push/status. Этап 11 — клиенты и учёт абонементов —
+не начинать до подтверждения push и отдельного задания.

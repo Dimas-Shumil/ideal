@@ -101,6 +101,7 @@ export function userService(prisma) {
           self &&
           (actorId !== id ||
             !user.active ||
+            (expectedVersion !== undefined && user.authVersion !== expectedVersion) ||
             user.passwordHash !== operatorHash ||
             allowed.length !== 1 ||
             allowed[0] !== "password")

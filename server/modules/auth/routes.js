@@ -4,7 +4,8 @@ import { createHmac } from "node:crypto";
 import { loginBody, password } from "./schema.js";
 import { hashPassword, verifyPassword } from "./password.js";
 import { newCsrf, csrf } from "../../middleware/csrf.js";
-import { requireAuth } from "../../middleware/auth.js";
+import { renderTrainer } from "../trainer/routes.js";
+import { requireAuth, requireRole } from "../../middleware/auth.js";
 import { audit } from "../audit/service.js";
 const save = (req) =>
   new Promise((ok, no) => req.session.save((e) => (e ? no(e) : ok())));
@@ -123,25 +124,25 @@ export async function authRoutes({ prisma, store, config, users }) {
       res.redirect(303, "/login");
     },
   );
+  router.post("/trainer/account/password", requireAuth, requireRole("TRAINER"));
+  router.post("/admin/account/password", requireAuth, requireRole("OWNER"));
   router.post(
-    ["/api/auth/password", "/admin/account/password"],
+    ["/api/auth/password", "/admin/account/password", "/trainer/account/password"],
     requireAuth,
     limit(5, (req) => req.user.id),
     guard,
     async (req, res) => {
-      const invalid = () =>
-        req.path === "/admin/account/password"
-          ? res
-              .status(400)
-              .render("owner/panel", {
-                page: "account",
-                user: req.user,
-                csrf: req.session.csrf,
-                error:
-                  "Проверьте текущий пароль и новый пароль: 12–128 символов, до 256 байт.",
-                values: {},
-              })
-          : res.status(400).json({ error: "INVALID_INPUT" });
+      const invalid = () => {
+        const error = "Проверьте текущий пароль и новый пароль: 12–128 символов, до 256 байт.";
+        if (req.path === "/trainer/account/password")
+          return renderTrainer(req, res.status(400), "account", error);
+        if (req.path === "/admin/account/password")
+          return res.status(400).render("owner/panel", {
+            page: "account", user: req.user, csrf: req.session.csrf,
+            error, values: {},
+          });
+        return res.status(400).json({ error: "INVALID_INPUT" });
+      };
       const body = req.body;
       if (
         !body ||
@@ -156,7 +157,10 @@ export async function authRoutes({ prisma, store, config, users }) {
       const current = await prisma.user.findUnique({
         where: { id: req.user.id },
       });
-      if (!(await verifyPassword(current.passwordHash, body.currentPassword)))
+      if (
+        !current ||
+        !(await verifyPassword(current.passwordHash, body.currentPassword))
+      )
         return invalid();
       // Optimistic password guard prevents concurrent stale self-reset.
       await users.change(
@@ -167,6 +171,7 @@ export async function authRoutes({ prisma, store, config, users }) {
           operatorHash: current.passwordHash,
           requestId: req.id,
           self: true,
+          expectedVersion: req.user.authVersion,
         },
       );
       await new Promise((ok, no) =>
@@ -178,7 +183,10 @@ export async function authRoutes({ prisma, store, config, users }) {
         sameSite: "lax",
         secure: config.production,
       });
-      if (req.path === "/admin/account/password")
+      if (
+        req.path === "/admin/account/password" ||
+        req.path === "/trainer/account/password"
+      )
         return res.redirect(303, "/login");
       res.json({ ok: true, reauthenticate: true });
     },

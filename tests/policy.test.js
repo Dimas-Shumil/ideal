@@ -121,3 +121,19 @@ test("CSP hero hashes survive Windows CRLF checkout", async () => {
     inlineScriptHashes(html.replaceAll("\n", "\r")),
   );
 });
+
+test("trainer contract: no profile/no context/OWNER fail closed; all resources share safe projection", () => {
+  for (const actor of [null, { ...context, id: "missing" }, { ...context, role: "OWNER" }])
+    assert.deepEqual(trainerScope(actor, fixtures), { clients: [], lessons: [], attachments: [] });
+  for (const resource of ["clients", "lessons", "attachments"]) {
+    const safe = trainerScope(context, fixtures)[resource];
+    for (const operation of ["list", "search", "export"])
+      assert.deepEqual(scopedRead(context, fixtures, resource, operation, { userId: "b", trainerId: "tb" }), safe);
+    assert.equal(scopedRead(context, fixtures, resource, "count"), safe.length);
+  }
+  const revoked = structuredClone(fixtures);
+  revoked.assignments[0].active = false;
+  assert.equal(scopedRead(context, revoked, "clients", "get", { id: "ca" }), null);
+  assert.deepEqual(scopedRead(context, revoked, "attachments", "export"), []);
+  assert.deepEqual(trainerScope(context, fixtures).attachments, [{ id: "aa", clientId: "ca" }]);
+});

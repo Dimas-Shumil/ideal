@@ -1,0 +1,13 @@
+// Shared panel layout comes from owner.css; trainer-only adaptations stay here.
+.panel__header > * { min-width: 0; }
+.panel__nav a {
+  transition: background .25s, transform .25s;
+  &:active { transform: scale(.98); }
+}
+.panel__form button { white-space: normal; overflow-wrap: anywhere; max-width: 100%; }
+@media (max-width: 680px) {
+  .panel__header > span { flex: 1 1 140px; max-width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel__nav a { transition: none; }
+}

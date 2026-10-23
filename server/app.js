@@ -12,6 +12,7 @@ import { loadUser, requireAuth, requireRole } from "./middleware/auth.js";
 import { inlineScriptHashes } from "./middleware/security.js";
 import { userService } from "./modules/users/service.js";
 import { ownerRoutes } from "./modules/owner/routes.js";
+import { trainerRoutes } from "./modules/trainer/routes.js";
 const root = fileURLToPath(new URL("../", import.meta.url));
 export async function createApp({
   config,
@@ -132,12 +133,13 @@ export async function createApp({
   const users = userService(db.prisma);
   app.use(await authRoutes({ config, prisma: db.prisma, store, users }));
   app.use(ownerRoutes({ config, prisma: db.prisma, users }));
+  app.use(trainerRoutes());
   for (const [route, role, label] of [
     ["/admin", "OWNER", "Владелец"],
     ["/staff", "ADMIN", "Администратор"],
     ["/trainer", "TRAINER", "Тренер"],
   ]) {
-    if (route !== "/admin")
+    if (route === "/staff")
       app.get(route, requireAuth, requireRole(role), (req, res) =>
         res.render("auth/check", {
           label,
