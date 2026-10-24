@@ -83,7 +83,7 @@ test("schema: auth, CRM and schedule entities; bootstrap cannot repeat", async (
   );
   assert.deepEqual(
     rows.rows.map((x) => x.tablename).sort(),
-    ["AuditEvent", "AuthSession", "User", "_prisma_migrations", "Client", "TrainerProfile", "TrainerAssignment", "MembershipPlan", "MembershipPurchase", "Membership", "MembershipFreeze", "MembershipRefund", "CrmEvent", "CrmOperation", "Lesson", "LessonBooking", "ScheduleEvent", "Visit", "PushSubscription", "PushDelivery"].sort(),
+    ["AuditEvent", "AuthSession", "User", "_prisma_migrations", "Client", "TrainerProfile", "TrainerAssignment", "MembershipPlan", "MembershipPurchase", "Membership", "MembershipFreeze", "MembershipRefund", "CrmEvent", "CrmOperation", "Lesson", "LessonBooking", "ScheduleEvent", "Visit", "PushSubscription", "PushDelivery", "ShopProduct", "ShopVariant", "ShopImage", "ShopOrder", "ShopOrderEvent"].sort(),
   );
   await assert.rejects(() =>
     users.create(
@@ -110,7 +110,8 @@ test("public pages, static boundaries, CSP hash, errors and no root static", asy
   ]) {
     const r = await request(app).get(p).expect(200);
     assert.match(r.headers["content-security-policy"], /script-src 'self'/);
-    assert.ok(!r.headers["set-cookie"]);
+    if (!["/shop.html", "/product.html", "/cart.html"].includes(p)) assert.ok(!r.headers["set-cookie"]);
+    else { assert.ok(r.headers["set-cookie"]); assert.equal(r.headers["cache-control"],"no-store"); }
   }
   const home = await request(app).get("/");
   assert.match(home.headers["content-security-policy"], /sha256-/);

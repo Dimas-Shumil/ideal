@@ -25,3 +25,4 @@
 - [SHOP_NOTES.txt](SHOP_NOTES.txt).
 - [TRAINERS_NOTES.txt](TRAINERS_NOTES.txt).
 - [TRAINER_PANEL_NOTES.txt](TRAINER_PANEL_NOTES.txt).
+- [SHOP_STAGE14.md](SHOP_STAGE14.md) — серверный магазин, этап 14.

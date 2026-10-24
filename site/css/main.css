@@ -3218,3 +3218,10 @@ html.hero-intro.hero-intro-playing .hero__scroll {
 .header__nav-link[aria-current=page]::after {
   transform: scaleX(1);
 }
+
+.nutrition a.nutrition__buy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}

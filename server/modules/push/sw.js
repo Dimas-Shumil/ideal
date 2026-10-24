@@ -1,5 +1,5 @@
 /* Push only: no fetch handler, cache, offline mode, or install prompt. */
-const allowedPaths = new Set(["/trainer/lessons", "/crm/schedule", "/notifications"]);
+const allowedPaths = new Set(["/trainer/lessons", "/crm/schedule", "/notifications", "/shop-panel/orders"]);
 function safeUrl(value) {
   try {
     const url = new URL(value, self.location.origin);

@@ -1,3 +1,4 @@
+import { shopRoutes } from "./modules/shop/routes.js";
 import { pushRoutes } from "./modules/push/routes.js";
 import express from "express";
 import session from "express-session";
@@ -96,13 +97,9 @@ export async function createApp({
     res.sendFile(path.join(root, "server/modules/push/sw.js"));
   });
   const pages = [
-    "index",
     "about",
     "trainers",
     "trainer",
-    "shop",
-    "product",
-    "cart",
   ];
   for (const name of pages)
     app.get(
@@ -114,6 +111,10 @@ export async function createApp({
     res.set("Cache-Control", "no-store");
     next();
   });
+  // Product descriptions need bounded room for UTF-8 URL-encoded form fields.
+  app.use(["/shop-panel/products", "/api/shop-panel/products"],
+    express.urlencoded({ extended: false, limit: "128kb", parameterLimit: 12 }),
+    express.json({ limit: "48kb", strict: true }));
   app.use(
     express.urlencoded({ extended: false, limit: "8kb", parameterLimit: 24 }),
   );
@@ -140,6 +141,7 @@ export async function createApp({
   app.use((req, res, next) => { res.locals.currentPath = req.path; next(); });
   const users = userService(db.prisma);
   app.use(await authRoutes({ config, prisma: db.prisma, store, users }));
+  app.use(shopRoutes({config,prisma:db.prisma,indexHtml:index}));
   app.use(pushRoutes({ config, prisma: db.prisma }));
   app.use(crmRoutes({config,prisma:db.prisma}));
   app.use(scheduleRoutes({ config, prisma: db.prisma }));

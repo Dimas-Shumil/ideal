@@ -56,4 +56,6 @@ run("--test", [
   "tests/schedule.test.js",
   "tests/push.test.js",
   "tests/push-sw.test.js",
+  "tests/shop-unit.test.js",
+  "tests/shop.test.js",
 ]);

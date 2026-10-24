@@ -38,13 +38,16 @@
   }
   function syncInfo(announce = true) {
     active = modulo(Math.round(target));
-    const data = window.IdealProducts[active];
+    const live=!!cards[active].dataset.productId;
+    const data=live?cards[active].dataset:window.IdealProducts[active];
     fields.forEach(([key, element]) => {
-      element.textContent = key === 'price' ? 'Стоимость не указана' : data[key];
+      element.textContent = key === 'price' && !live ? 'Стоимость не указана' : data[key];
     });
     counter.textContent = `${String(active + 1).padStart(2, '0')} / ${String(count).padStart(2, '0')}`;
     cards.forEach((card, index) => card.setAttribute('aria-hidden', String(index !== active)));
-    section.querySelector('[data-nutrition-buy]').setAttribute('aria-label', `Добавить в корзину: ${data.name}`);
+    const buy=section.querySelector('[data-nutrition-buy]');
+    buy.setAttribute('aria-label', `${live?'Выбрать вариант':'Добавить в корзину'}: ${data.name}`);
+    if(live)buy.href=`/product.html?id=${data.productId}`;
     if (announce) status.textContent = `${active + 1} из ${count}. ${data.name}.`;
   }
   function goTo(next) {
@@ -146,6 +149,7 @@
   resize(); syncInfo(false);
 
   const buy = section.querySelector('[data-nutrition-buy]');
+  if(cards[0].dataset.productId)return;
   buy.disabled = false;
   buy.addEventListener('click', () => {
     window.IdealCart.add(window.IdealProducts[active].id, 1);
