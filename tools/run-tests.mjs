@@ -27,6 +27,9 @@ try {
 const env = {
   ...process.env,
   NODE_ENV: "test",
+  PUSH_PUBLIC_KEY: "",
+  PUSH_PRIVATE_KEY: "",
+  PUSH_SUBJECT: "",
   DATABASE_URL: test.href,
   APP_ORIGIN: "http://127.0.0.1:3000",
   PORT: "3000",
@@ -51,4 +54,6 @@ run("--test", [
   "tests/schedule-dates.test.js",
   "tests/crm.test.js",
   "tests/schedule.test.js",
+  "tests/push.test.js",
+  "tests/push-sw.test.js",
 ]);

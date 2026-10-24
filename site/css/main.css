@@ -214,7 +214,7 @@ body.menu-open {
 
 .header__menu-toggle {
   position: relative;
-  display: grid;
+  display: none;
   align-content: center;
   justify-items: center;
   gap: 7px;
@@ -844,6 +844,9 @@ body.menu-open {
   }
 }
 @media (max-width: 1180px) {
+  .header__menu-toggle {
+    display: grid;
+  }
   .header {
     grid-template-columns: 1fr auto;
   }

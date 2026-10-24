@@ -1,3 +1,4 @@
+import { enqueueSchedulePush } from "../push/events.js";
 import { createHash, randomUUID } from "node:crypto";
 import { accessLock } from "../../db/client.js";
 import { audit } from "../audit/service.js";
@@ -7,6 +8,7 @@ import {
   attendanceBody,
   bookBody,
   cancelBody,
+  deleteBody,
   gymVisitBody,
   lessonCreate,
   lessonMove,
@@ -433,7 +435,10 @@ export function scheduleService(prisma) {
         orderBy: [{ name: "asc" }, { id: "asc" }],
         take: 100,
       });
-      return { lesson, candidates, query: q };
+      const canDeleteLesson = context.role === "OWNER" && lesson.status === "CANCELLED" &&
+        lesson.bookings.every(b => b.status === "CANCELLED") &&
+        !(await prisma.visit.count({ where: { lessonId: lesson.id } }));
+      return { lesson, candidates, query: q, canDeleteLesson };
     },
     async trainers() {
       return prisma.user.findMany({
@@ -500,6 +505,7 @@ export function scheduleService(prisma) {
             check(await findMembership(tx, booking.clientId, "GROUP", startsAt, endsAt), `Абонемент клиента «${booking.client.name}» не допускает перенесённое занятие.`);
         }
         await tx.lesson.update({ where: { id }, data: { startsAt, endsAt, room: data.room, version: { increment: 1 } } });
+        await enqueueSchedulePush(tx, ctx, "LESSON_MOVED", id, participants.length > 0);
         await scheduleHistory(tx, ctx, "LESSON_MOVED", id, data.reason, { before: { startsAt: lesson.startsAt, endsAt: lesson.endsAt, room: lesson.room }, after: { startsAt, endsAt, room: data.room } });
         return { id };
       });
@@ -517,8 +523,52 @@ export function scheduleService(prisma) {
           data: { status: "CANCELLED", cancelledAt: new Date(), cancelReason: data.reason, version: { increment: 1 } },
         });
         await tx.lesson.update({ where: { id }, data: { status: "CANCELLED", cancelledAt: new Date(), cancelReason: data.reason, version: { increment: 1 } } });
+        await enqueueSchedulePush(tx, ctx, "LESSON_CANCELLED", id, lesson.bookings.some(b => ["BOOKED", "ATTENDED"].includes(b.status)));
         await scheduleHistory(tx, ctx, "LESSON_CANCELLED", id, data.reason, { compensatedVisits: visits.length });
         return { id };
+      });
+    },
+    async deleteBooking(ctx, id, bookingId, input) {
+      const data = deleteBody.parse(input);
+      uuid.parse(id);
+      uuid.parse(bookingId);
+      const expected = version.parse(ctx.version);
+      return mutate(ctx, "BOOKING_DELETED", bookingId, { ...input, lessonId: id }, ["OWNER"], async (tx, actor) => {
+        const lesson = await lessonForActor(tx, actor, id);
+        const booking = await tx.lessonBooking.findFirst({ where: { id: bookingId, lessonId: id } });
+        if (!booking) throw fail(404, "Запись не найдена.");
+        check(booking.version === expected);
+        check(booking.status === "CANCELLED", "Сначала отмените запись клиента.");
+        check(!(await tx.visit.count({ where: { bookingId } })), "Запись связана с посещением. Удаление запрещено, даже если посещение исправлено.");
+        await clientHistory(tx, ctx, "BOOKING_DELETED", booking.clientId, null, data.reason, { lessonId: id, bookingId });
+        await scheduleHistory(tx, ctx, "BOOKING_DELETED", id, data.reason, { bookingId, clientId: booking.clientId });
+        await tx.lessonBooking.delete({ where: { id: bookingId } });
+        return { id: lesson.id, bookingId };
+      });
+    },
+    async deleteLesson(ctx, id, input) {
+      const data = deleteBody.parse(input);
+      const expected = version.parse(ctx.version);
+      return mutate(ctx, "LESSON_DELETED", id, input, ["OWNER"], async (tx, actor) => {
+        const lesson = await lessonForActor(tx, actor, id, expected);
+        check(lesson.status === "CANCELLED", "Сначала отмените занятие и уведомите участников.");
+        check(lesson.bookings.every(b => b.status === "CANCELLED"), "У занятия есть записи, которые нельзя удалить.");
+        const bookingIds = lesson.bookings.map(b => b.id);
+        check(!(await tx.visit.count({ where: { OR: [{ lessonId: id }, { bookingId: { in: bookingIds } }] } })),
+          "Занятие связано с посещениями. Удаление запрещено, даже если посещения исправлены.");
+        for (const booking of lesson.bookings)
+          await clientHistory(tx, ctx, "BOOKING_DELETED", booking.clientId, null, data.reason, { lessonId: id, bookingId: booking.id });
+        await scheduleHistory(tx, ctx, "LESSON_DELETED", id, data.reason, {
+          deletedLessonId: id, title: lesson.title, startsAt: lesson.startsAt, endsAt: lesson.endsAt,
+          trainerId: lesson.trainerId, bookingIds,
+        });
+        // Keep the historical journal while removing the operational entity. No schema change.
+        await tx.$executeRaw`UPDATE "ScheduleEvent" SET "lessonId"=NULL,
+          "details"="details" || jsonb_build_object('deletedLessonId', ${id}::text)
+          WHERE "lessonId"=${id}::uuid`;
+        await tx.lessonBooking.deleteMany({ where: { lessonId: id } });
+        await tx.lesson.delete({ where: { id } });
+        return { id, deleted: true };
       });
     },
     async book(ctx, id, input) {
@@ -545,6 +595,7 @@ export function scheduleService(prisma) {
           check(existing.status === "CANCELLED", "Клиент уже находится в составе занятия.");
           booking = await tx.lessonBooking.update({ where: { id: existing.id }, data: { status: "BOOKED", bookedById: actor.id, cancelledAt: null, cancelReason: "", version: { increment: 1 } } });
         }
+        await enqueueSchedulePush(tx, ctx, "LESSON_BOOKED", lesson.id);
         await scheduleHistory(tx, ctx, "LESSON_BOOKED", lesson.id, data.reason, { bookingId: booking.id, clientId: client.id });
         await clientHistory(tx, ctx, "LESSON_BOOKED", client.id, null, data.reason, { lessonId: lesson.id, bookingId: booking.id });
         return { id: lesson.id, bookingId: booking.id };
@@ -564,6 +615,7 @@ export function scheduleService(prisma) {
           check(allowed, "Тренер может отменять запись только назначенного ему клиента.");
         }
         await tx.lessonBooking.update({ where: { id: booking.id }, data: { status: "CANCELLED", cancelledAt: new Date(), cancelReason: data.reason, version: { increment: 1 } } });
+        await enqueueSchedulePush(tx, ctx, "BOOKING_CANCELLED", lesson.id);
         await scheduleHistory(tx, ctx, "BOOKING_CANCELLED", lesson.id, data.reason, { bookingId: booking.id, clientId: booking.clientId });
         await clientHistory(tx, ctx, "BOOKING_CANCELLED", booking.clientId, null, data.reason, { lessonId: lesson.id, bookingId: booking.id });
         return { id: lesson.id, bookingId: booking.id };

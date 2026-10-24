@@ -99,6 +99,8 @@ export function scheduleRoutes({ config, prisma }) {
   });
 
   post(["/crm/schedule", "/api/crm/schedule"], ["OWNER", "ADMIN"], (_req, ctx, input) => service.create(ctx, input), (_req, result) => `/crm/schedule/${result.id}`);
+  post(["/crm/schedule/:id/delete", "/api/crm/schedule/:id/delete"], ["OWNER"], (req, ctx, input) => service.deleteLesson(ctx, req.params.id, input), () => "/crm/schedule");
+  post(["/crm/schedule/:id/bookings/:bookingId/delete", "/api/crm/schedule/:id/bookings/:bookingId/delete"], ["OWNER"], (req, ctx, input) => service.deleteBooking(ctx, req.params.id, req.params.bookingId, input), (req) => `/crm/schedule/${uuid.parse(req.params.id)}`);
   post(["/crm/schedule/:id/move", "/api/crm/schedule/:id/move"], ["OWNER", "ADMIN"], (req, ctx, input) => service.move(ctx, req.params.id, input), (req) => `/crm/schedule/${uuid.parse(req.params.id)}`);
   post(["/crm/schedule/:id/cancel", "/api/crm/schedule/:id/cancel"], ["OWNER", "ADMIN"], (req, ctx, input) => service.cancelLesson(ctx, req.params.id, input), (req) => `/crm/schedule/${uuid.parse(req.params.id)}`);
   post(["/crm/schedule/:id/book", "/api/crm/schedule/:id/book"], ["OWNER", "ADMIN"], (req, ctx, input) => service.book(ctx, req.params.id, input), (req) => `/crm/schedule/${uuid.parse(req.params.id)}`);

@@ -1,6 +1,10 @@
+import { createECDH } from "node:crypto";
 import "dotenv/config";
 import { z } from "zod";
 const shape = z.object({
+  PUSH_PUBLIC_KEY: z.string().default(""),
+  PUSH_PRIVATE_KEY: z.string().default(""),
+  PUSH_SUBJECT: z.string().default(""),
   NODE_ENV: z
     .enum(["development", "test", "production"])
     .default("development"),
@@ -19,6 +23,19 @@ export function readConfig(input = process.env) {
       `Проверьте переменные: ${[...new Set(result.error.issues.map((i) => i.path[0]))].join(", ")}`,
     );
   const c = result.data;
+  const push = [c.PUSH_PUBLIC_KEY, c.PUSH_PRIVATE_KEY, c.PUSH_SUBJECT];
+  if (push.some(Boolean) && (!push.every(Boolean) ||
+      !/^[A-Za-z0-9_-]{87}$/.test(c.PUSH_PUBLIC_KEY) || Buffer.from(c.PUSH_PUBLIC_KEY,"base64url")[0] !== 4 ||
+      !/^[A-Za-z0-9_-]{43}$/.test(c.PUSH_PRIVATE_KEY) ||
+      !/^(mailto:[^\s@]+@[^\s@]+|https:\/\/[^\s]+)$/.test(c.PUSH_SUBJECT)))
+    throw new Error("Проверьте переменные: PUSH_PUBLIC_KEY, PUSH_PRIVATE_KEY, PUSH_SUBJECT");
+  if (c.PUSH_PRIVATE_KEY) {
+    try {
+      const pair = createECDH("prime256v1");
+      pair.setPrivateKey(Buffer.from(c.PUSH_PRIVATE_KEY, "base64url"));
+      if (pair.getPublicKey().toString("base64url") !== c.PUSH_PUBLIC_KEY) throw new Error();
+    } catch { throw new Error("Проверьте переменные: PUSH_PUBLIC_KEY, PUSH_PRIVATE_KEY"); }
+  }
   const origin = new URL(c.APP_ORIGIN),
     db = new URL(c.DATABASE_URL);
   if (

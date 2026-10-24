@@ -63,3 +63,5 @@ export const operation = z.object({
   key: uuid,
   version: version.optional(),
 });
+
+export const deleteBody = z.object({ reason, confirm: z.literal("DELETE") }).strict();

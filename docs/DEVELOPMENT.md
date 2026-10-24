@@ -16,15 +16,11 @@ Node 24.19.0, npm 11.8.0; PostgreSQL 18.6 — сведения пользова�
 npm run dev
 ```
 
-Этап 12 добавляет миграцию `20261024140000_schedule_attendance`. После распаковки патча:
-
-```bat
-npm run db:deploy
-npm run db:generate
-npm run db:status
-npm test
-npm run dev
-```
+Этап 13 добавляет `20261024170000_web_push` и зависимость web-push.
+Сначала `npm ci`, затем `npm test` (миграции только на `ideal_auth_test`).
+Только после успешных тестов `npm run db:deploy`, `npm run db:generate`,
+`npm run db:status` для `ideal_dev` и `npm run dev`. Подробно: [PUSH.md](PUSH.md).
+Существующий `.env` не заменяется; VAPID настраивается вручную по инструкции.
 
 `npm ci` требуется при установке зависимостей с нуля или изменении lock-файла.
 Dev БД — `ideal_dev` / `ideal_app`. Test — `ideal_auth_test` / `ideal_test`.
@@ -89,3 +85,16 @@ git diff --check
 Добавлять только файлы задачи. Проверить `git diff --cached --check` и
 `git diff --cached --stat`, затем коммит на русском и `git push origin main`.
 Не использовать reset/clean/force push для обычного завершения этапа.
+
+## Проверки этапа 13
+
+Наборы `tests/push.test.js` и `tests/push-sw.test.js` входят в `npm test`.
+Worker тестируется через внедряемый transport без реальных сетевых рассылок.
+Результаты текущего прогона и недоступные проверки — `archive/WEB_PUSH_STAGE13.md`.
+
+## Общая навигация кабинетов
+
+Меню OWNER/ADMIN/TRAINER формируется в `server/views/partials/panel-nav.ejs`.
+Порядок един для всех страниц одной роли; текущий путь передаёт приложение в
+`res.locals.currentPath`. Не копировать меню в отдельные шаблоны. Формы удаления
+ошибочных записей описаны в `SCHEDULE.md`, доступны только OWNER и работают без JS.

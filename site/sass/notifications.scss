@@ -1,0 +1,19 @@
+.notifications {
+  margin: 0; background: #fbfaf6; color: #20221f; font-family: Arial, sans-serif; line-height: 1.6;
+  &__card { box-sizing: border-box; max-width: 760px; margin: 48px auto; padding: 32px; background: #fff; border: 1px solid #dedfd8; border-radius: 20px; overflow-wrap: anywhere; }
+  &__controls { margin: 28px 0; padding: 20px; border: 1px solid #dedfd8; border-radius: 12px; }
+  &__actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
+  &__actions button { flex: 1 1 250px; margin: 0; }
+  &__hint { font-size: 14px; color: #555c53; margin: 16px 0 0; }
+  &__status { min-height: 52px; margin: 0 0 20px; }
+  button[hidden] { display: none; }
+  button { font: inherit; font-weight: 700; color: #fff; background: #263c2b; border: 0; border-radius: 10px; padding: 14px 20px; cursor: pointer; margin: 4px 0; transition: background .2s, transform .2s;
+    &:hover { background: #395e40; }
+    &:active { transform: scale(.98); }
+    &:disabled { opacity: .55; cursor: wait; }
+  }
+  a { color: #263c2b; text-underline-offset: 4px; &:hover { color: #547044; } &:active { display: inline-block; transform: scale(.98); } }
+  button:focus-visible, a:focus-visible { outline: 3px solid #a36b18; outline-offset: 4px; }
+  @media (max-width: 600px) { &__card { margin: 16px; padding: 24px; } button { width: 100%; } h1 { font-size: 28px; } }
+  @media (prefers-reduced-motion: reduce) { button, a { transition: none; } }
+}

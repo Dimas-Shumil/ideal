@@ -247,3 +247,91 @@ test("attendance: cancelling a lesson compensates confirmed visits and cancels r
   assert.equal(finalBooking.status, "CANCELLED");
   assert.equal(visit.status, "REVERSED");
 });
+
+test("schedule delete: OWNER only; guest, CSRF, Origin, confirm and DTO guards", async () => {
+  const o = await login("schedowner"), a = await login("schedadmin"), t = await login("schedta");
+  const l = await directLesson({ kind: "PERSONAL", date: addDays(today(), 10) });
+  const path = `/crm/schedule/${l.id}/delete`, input = { version: 1, reason: "Тестовое удаление", confirm: "DELETE" };
+  await request(app).post('/api' + path).send(input).expect(401);
+  await request(app).post(path).send(input).expect(303);
+  await post(a, path, input, 403); await post(t, path, input, 403);
+  await o.agent.post('/api' + path).set('Origin', origin).send({ key: randomUUID(), ...input }).expect(403);
+  await o.agent.post('/api' + path).set('Origin', 'https://evil.example').send({ _csrf: o.token, key: randomUUID(), ...input }).expect(403);
+  await post(o, path, { ...input, confirm: "" }, 400);
+  await post(o, path, { ...input, userId: owner.id }, 400);
+  await post(o, path, input, 409); // Must cancel first.
+  assert.ok(await db.prisma.lesson.findUnique({ where: { id: l.id } }));
+});
+
+test("schedule delete: cancelled booking removed, replay stable, history/client retained", async () => {
+  const o = await login("schedowner"), a = await login("schedadmin");
+  const clientId = await makeClient(a), l = await directLesson({ kind: "PERSONAL", date: addDays(today(), 11) });
+  const b = await directBooking(l.id, clientId), path = `/crm/schedule/${l.id}/bookings/${b.id}/delete`;
+  const data = { version: 1, reason: "Тестовая запись", confirm: "DELETE" };
+  await post(o, path, data, 409);
+  await post(a, `/crm/schedule/${l.id}/bookings/${b.id}/cancel`, { reason: "Тестовая отмена" });
+  await post(o, path, data, 409); // stale version
+  await post(a, path, { ...data, version: 2 }, 403);
+  const key = randomUUID(); const first = await post(o, path, { ...data, version: 2 }, 200, key);
+  const replay = await post(o, path, { ...data, version: 2 }, 200, key);
+  assert.deepEqual(replay.body, first.body);
+  assert.equal(await db.prisma.lessonBooking.findUnique({ where: { id: b.id } }), null);
+  assert.ok(await db.prisma.client.findUnique({ where: { id: clientId } }));
+  assert.equal(await db.prisma.auditEvent.count({ where: { action: "BOOKING_DELETED", targetId: b.id } }), 1);
+  assert.equal(await db.prisma.crmEvent.count({ where: { action: "BOOKING_DELETED", clientId } }), 1);
+  const detail = await o.agent.get('/crm/schedule/' + l.id).expect(200);
+  assert.ok(!detail.text.includes(`/bookings/${b.id}/delete`));
+});
+
+test("schedule delete: cancelled lesson and bookings removed atomically; journals and series retained", async () => {
+  const o = await login("schedowner"), a = await login("schedadmin");
+  const clientId = await makeClient(a), l = await directLesson({ kind: "PERSONAL", date: addDays(today(), 12) });
+  const seriesId = randomUUID();await db.prisma.lesson.update({ where: { id: l.id }, data: { seriesId } });
+  const sibling = await directLesson({ kind: "PERSONAL", date: addDays(today(), 13) });
+  await db.prisma.lesson.update({ where: { id: sibling.id }, data: { seriesId } });
+  const b = await directBooking(l.id, clientId);
+  await post(a, `/crm/schedule/${l.id}/cancel`, { version: 1, reason: "Тестовая отмена" });
+  const page = await o.agent.get('/crm/schedule/' + l.id).expect(200);assert.match(page.text, /Удалить занятие навсегда/);
+  const path = `/crm/schedule/${l.id}/delete`, data = { version: 2, reason: "Очистка тестового занятия", confirm: "DELETE" }, key = randomUUID();
+  const first = await post(o, path, data, 200, key);const replay = await post(o, path, data, 200, key);assert.deepEqual(first.body,replay.body);
+  assert.equal(await db.prisma.lesson.findUnique({ where: { id: l.id } }), null);
+  assert.equal(await db.prisma.lessonBooking.findUnique({ where: { id: b.id } }), null);
+  assert.ok(await db.prisma.lesson.findUnique({ where: { id: sibling.id } }));
+  assert.equal(await db.prisma.auditEvent.count({ where: { action: "LESSON_DELETED", targetId: l.id } }), 1);
+  const events = await db.prisma.scheduleEvent.findMany({ where: { details: { path: ['deletedLessonId'], equals: l.id } } });
+  assert.ok(events.length >= 2);assert.ok(events.every(e => e.lessonId === null));
+  await o.agent.get('/api/crm/schedule/' + l.id).expect(404);
+});
+
+test("schedule delete: visits including reversed protect both lesson and booking", async () => {
+  const o = await login("schedowner"), a = await login("schedadmin"), clientId = await makeClient(a);
+  const l = await directLesson({ kind: "PERSONAL", date: addDays(today(), 14) }), b = await directBooking(l.id,clientId);
+  await db.prisma.visit.create({ data: { clientId,lessonId:l.id,bookingId:b.id,kind:'PERSONAL',entitlement:'NONE',occurredAt:new Date(),recordedById:owner.id,status:'REVERSED',reversedAt:new Date(),reversedById:owner.id,reversedReason:'Исправлено' } });
+  await db.prisma.lessonBooking.update({ where:{id:b.id},data:{status:'CANCELLED'} });
+  await db.prisma.lesson.update({ where:{id:l.id},data:{status:'CANCELLED'} });
+  const data={version:1,reason:'Удаление теста',confirm:'DELETE'};
+  await post(o,`/crm/schedule/${l.id}/bookings/${b.id}/delete`,data,409);
+  await post(o,`/crm/schedule/${l.id}/delete`,data,409);
+  assert.ok(await db.prisma.lesson.findUnique({where:{id:l.id}}));assert.ok(await db.prisma.lessonBooking.findUnique({where:{id:b.id}}));
+});
+
+test("schedule delete: audit failure rolls back physical deletion; no-JS POST redirects", async () => {
+  const o=await login('schedowner');const l=await directLesson({kind:'PERSONAL',date:addDays(today(),15)});
+  await db.prisma.lesson.update({where:{id:l.id},data:{status:'CANCELLED'}});
+  await db.pool.query(`CREATE FUNCTION reject_delete_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action = 'LESSON_DELETED' THEN RAISE EXCEPTION 'audit unavailable'; END IF; RETURN NEW; END $$`);
+  await db.pool.query(`CREATE TRIGGER reject_delete_audit BEFORE INSERT ON "AuditEvent" FOR EACH ROW EXECUTE FUNCTION reject_delete_audit()`);
+  try{await post(o,`/crm/schedule/${l.id}/delete`,{version:1,reason:'Удаление теста',confirm:'DELETE'},500);assert.ok(await db.prisma.lesson.findUnique({where:{id:l.id}}));}
+  finally{await db.pool.query('DROP TRIGGER reject_delete_audit ON "AuditEvent"');await db.pool.query('DROP FUNCTION reject_delete_audit()');}
+  await o.agent.post(`/crm/schedule/${l.id}/delete`).set('Origin',origin).type('form').send({_csrf:o.token,key:randomUUID(),version:1,reason:'Удаление теста',confirm:'DELETE'}).expect(303).expect('Location','/crm/schedule');
+});
+
+test("panel navigation: identical order and one active item across OWNER CRM and schedule", async () => {
+  const o=await login('schedowner');let expected;
+  for(const path of ['/admin','/crm/clients','/crm/plans','/crm/schedule','/crm/visits','/admin/employees','/admin/account']){
+    const r=await o.agent.get(path).expect(200);const nav=r.text.match(/<nav class="panel__nav"[\s\S]*?<\/nav>/)[0];
+    const links=[...nav.matchAll(/href="([^"]+)"/g)].map(m=>m[1]);
+    if(!expected)expected=links;else assert.deepEqual(links,expected);
+    assert.equal((nav.match(/aria-current="page"/g)||[]).length,1,path);
+    assert.ok(nav.includes(`href="${path}" aria-current="page"`),path);
+  }
+});

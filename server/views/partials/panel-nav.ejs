@@ -1,0 +1,19 @@
+<%
+  const navPath = typeof currentPath === 'string' ? currentPath : '';
+  const navItems = user.role === 'OWNER' ? [
+    ['/admin','Обзор',true], ['/crm/clients','Клиенты'], ['/crm/plans','Тарифы'],
+    ['/crm/schedule','Расписание'], ['/crm/visits','Посещения'],
+    ['/admin/employees','Сотрудники'], ['/admin/account','Мой аккаунт'],
+  ] : user.role === 'TRAINER' ? [
+    ['/trainer','Обзор',true], ['/trainer/clients','Назначенные клиенты'],
+    ['/trainer/lessons','Мои занятия'], ['/trainer/account','Мой аккаунт'],
+  ] : [ ['/crm/clients','Клиенты'], ['/crm/plans','Тарифы'],
+    ['/crm/schedule','Расписание'], ['/crm/visits','Посещения'] ];
+  navItems.push(['/notifications','Уведомления'], ['/','Открыть сайт клуба',true]);
+%>
+<nav class="panel__nav" aria-label="Рабочие разделы">
+  <% for (const [url,label,exact] of navItems) {
+    const selected = exact ? navPath === url : navPath === url || navPath.startsWith(url + '/'); %>
+    <a href="<%= url %>" <%- selected ? 'aria-current="page"' : '' %>><%= label %></a>
+  <% } %>
+</nav>

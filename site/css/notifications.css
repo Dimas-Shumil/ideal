@@ -1,0 +1,99 @@
+.notifications {
+  margin: 0;
+  background: #fbfaf6;
+  color: #20221f;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+.notifications__card {
+  box-sizing: border-box;
+  max-width: 760px;
+  margin: 48px auto;
+  padding: 32px;
+  background: #fff;
+  border: 1px solid #dedfd8;
+  border-radius: 20px;
+  overflow-wrap: anywhere;
+}
+.notifications__controls {
+  margin: 28px 0;
+  padding: 20px;
+  border: 1px solid #dedfd8;
+  border-radius: 12px;
+}
+.notifications__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: stretch;
+}
+.notifications__actions button {
+  flex: 1 1 250px;
+  margin: 0;
+}
+.notifications__hint {
+  font-size: 14px;
+  color: #555c53;
+  margin: 16px 0 0;
+}
+.notifications__status {
+  min-height: 52px;
+  margin: 0 0 20px;
+}
+.notifications button[hidden] {
+  display: none;
+}
+.notifications button {
+  font: inherit;
+  font-weight: 700;
+  color: #fff;
+  background: #263c2b;
+  border: 0;
+  border-radius: 10px;
+  padding: 14px 20px;
+  cursor: pointer;
+  margin: 4px 0;
+  transition: background 0.2s, transform 0.2s;
+}
+.notifications button:hover {
+  background: #395e40;
+}
+.notifications button:active {
+  transform: scale(0.98);
+}
+.notifications button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.notifications a {
+  color: #263c2b;
+  text-underline-offset: 4px;
+}
+.notifications a:hover {
+  color: #547044;
+}
+.notifications a:active {
+  display: inline-block;
+  transform: scale(0.98);
+}
+.notifications button:focus-visible, .notifications a:focus-visible {
+  outline: 3px solid #a36b18;
+  outline-offset: 4px;
+}
+@media (max-width: 600px) {
+  .notifications__card {
+    margin: 16px;
+    padding: 24px;
+  }
+  .notifications button {
+    width: 100%;
+  }
+  .notifications h1 {
+    font-size: 28px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .notifications button, .notifications a {
+    transition: none;
+  }
+}

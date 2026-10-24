@@ -28,6 +28,8 @@ model User {
   bookingsCreated LessonBooking[] @relation("BookingCreatedBy")
   visitsRecorded Visit[] @relation("VisitRecordedBy")
   visitsReversed Visit[] @relation("VisitReversedBy")
+  pushSubscriptions PushSubscription[]
+  pushDeliveries PushDelivery[]
   scheduleEvents ScheduleEvent[]
 }
 model AuthSession {
@@ -264,4 +266,39 @@ model ScheduleEvent {
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   @@index([lessonId, createdAt])
   @@index([createdAt])
+}
+
+model PushSubscription {
+  id String @id @default(uuid()) @db.Uuid
+  endpoint String @unique @db.VarChar(2048)
+  p256dh String @db.VarChar(100)
+  auth String @db.VarChar(32)
+  userId String @db.Uuid
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role
+  authVersion Int
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  lastSuccessAt DateTime? @db.Timestamptz(3)
+  lastFailureAt DateTime? @db.Timestamptz(3)
+  deliveries PushDelivery[]
+  @@index([userId])
+}
+model PushDelivery {
+  id String @id @default(uuid()) @db.Uuid
+  eventKey String @db.VarChar(160)
+  subscriptionId String @db.Uuid
+  subscription PushSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role
+  authVersion Int
+  payload Json
+  status String @default("PENDING") @db.VarChar(12)
+  attempts Int @default(0)
+  availableAt DateTime @default(now()) @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  lastStatus Int?
+  @@unique([eventKey, subscriptionId])
+  @@index([status, availableAt])
 }

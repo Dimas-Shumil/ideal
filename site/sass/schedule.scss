@@ -119,3 +119,14 @@
     transition: none;
   }
 }
+
+.schedule__delete { border: 1px solid #b86a53; }
+.schedule .schedule__delete-button { background: #803c2c; color: #fff; }
+.schedule .schedule__delete-button:hover { background: #632c20; }
+.schedule .schedule__delete-button:active { transform: scale(.98); }
+.schedule .schedule__delete-button:focus-visible, .schedule__delete-booking summary:focus-visible { outline: 3px solid #a36b18; outline-offset: 4px; }
+.schedule__delete-booking { width: 100%; }
+.schedule__delete-booking summary { cursor: pointer; padding: 12px 0; color: #753a2b; }
+.schedule__delete-booking summary:hover { text-decoration: underline; }
+.schedule .schedule__confirm { display: flex; align-items: flex-start; gap: 12px; }
+.schedule .schedule__confirm input { width: 20px; min-width: 20px; height: 20px; margin-top: 3px; }

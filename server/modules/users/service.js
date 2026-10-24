@@ -122,7 +122,10 @@ export function userService(prisma) {
             ...(revoke ? { authVersion: { increment: 1 } } : {}),
           },
         });
-        if (revoke) await tx.authSession.deleteMany({ where: { userId: id } });
+        if (revoke) {
+          await tx.authSession.deleteMany({ where: { userId: id } });
+          await tx.pushSubscription.deleteMany({ where: { userId: id } });
+        }
         if (user.role === "TRAINER" && (data.active === false || (data.role && data.role !== "TRAINER"))) {
           await tx.trainerAssignment.updateMany({
             where: { trainer: { userId: id }, active: true },

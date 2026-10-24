@@ -242,7 +242,7 @@ body.menu-open {
 .header {
   &__menu-toggle {
     position: relative;
-    display: grid;
+    display: none;
     align-content: center;
     justify-items: center;
     gap: 7px;
@@ -922,6 +922,7 @@ body.menu-open {
 }
 @media (max-width: 1180px) {
   .header {
+    &__menu-toggle { display: grid; }
     grid-template-columns: 1fr auto;
     &__navigation {
       display: none;

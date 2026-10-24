@@ -1,3 +1,4 @@
+import { pushRoutes } from "./modules/push/routes.js";
 import express from "express";
 import session from "express-session";
 import helmet from "helmet";
@@ -90,6 +91,10 @@ export async function createApp({
         fallthrough: false,
       }),
     );
+  app.get("/push-sw.js", (req, res) => {
+    res.set("Cache-Control", "no-cache");
+    res.sendFile(path.join(root, "server/modules/push/sw.js"));
+  });
   const pages = [
     "index",
     "about",
@@ -132,8 +137,10 @@ export async function createApp({
     }),
   );
   app.use(loadUser(db.prisma));
+  app.use((req, res, next) => { res.locals.currentPath = req.path; next(); });
   const users = userService(db.prisma);
   app.use(await authRoutes({ config, prisma: db.prisma, store, users }));
+  app.use(pushRoutes({ config, prisma: db.prisma }));
   app.use(crmRoutes({config,prisma:db.prisma}));
   app.use(scheduleRoutes({ config, prisma: db.prisma }));
   app.use(ownerRoutes({ config, prisma: db.prisma, users }));

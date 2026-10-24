@@ -25,16 +25,7 @@
   <form method="post" action="/logout"><input type="hidden" name="_csrf" value="<%= csrf %>"><button>Выйти</button></form>
 </header>
 <div class="panel__layout">
-<nav class="panel__nav" aria-label="Рабочие разделы">
-  <% if (isTrainer) { %>
-    <a href="/trainer">Обзор</a><a href="/trainer/clients">Назначенные клиенты</a><a href="/trainer/lessons" aria-current="page">Мои занятия</a><a href="/trainer/account">Мой аккаунт</a>
-  <% } else if (isOwner) { %>
-    <a href="/admin">Обзор</a><a href="/crm/clients">Клиенты</a><a href="/crm/plans">Тарифы</a><a href="/crm/schedule" <%- page !== 'visits' ? 'aria-current="page"' : '' %>>Расписание</a><a href="/crm/visits" <%- page === 'visits' ? 'aria-current="page"' : '' %>>Посещения</a><a href="/admin/employees">Сотрудники</a><a href="/admin/account">Мой аккаунт</a>
-  <% } else { %>
-    <a href="/crm/clients">Клиенты</a><a href="/crm/plans">Тарифы</a><a href="/crm/schedule" <%- page !== 'visits' ? 'aria-current="page"' : '' %>>Расписание</a><a href="/crm/visits" <%- page === 'visits' ? 'aria-current="page"' : '' %>>Посещения</a>
-  <% } %>
-  <a href="/">Открыть сайт клуба</a>
-</nav>
+<%- include('../partials/panel-nav') %>
 <main id="content" class="panel__main">
 <% if (page === 'error') { %>
   <div class="panel__error" role="alert" tabindex="-1"><%= error %></div>
@@ -119,6 +110,21 @@
     </section>
   <% } %>
 
+  <% if (isOwner && current.status === 'CANCELLED') { %>
+    <section class="panel__card schedule__delete">
+      <h2>Удалить занятие навсегда</h2>
+      <% if (canDeleteLesson) { %>
+      <p>Занятие и отменённые записи исчезнут из расписания. Отменить удаление нельзя. Журнал действий сохраняется. Другие занятия серии останутся.</p>
+      <form class="panel__form" method="post" action="/crm/schedule/<%= current.id %>/delete">
+        <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><input type="hidden" name="version" value="<%= current.version %>">
+        <label>Причина удаления<input name="reason" minlength="3" maxlength="500" required></label>
+        <label class="schedule__confirm"><input type="checkbox" name="confirm" value="DELETE" required>Подтверждаю безвозвратное удаление занятия и его отменённых записей</label>
+        <button class="schedule__delete-button">Удалить занятие навсегда</button>
+      </form>
+      <% } else { %><p>Удаление недоступно: есть посещения, включая исправленные, или записи со статусом, отличным от «Отменено».</p><% } %>
+    </section>
+  <% } %>
+
   <section class="panel__card">
     <div class="panel__heading"><div><h2>Состав занятия</h2><p><%= current.bookings.filter((item) => item.status !== 'CANCELLED').length %> / <%= current.capacity %></p></div></div>
     <% for (const booking of current.bookings) { const activeVisit = booking.visits?.find((visit) => visit.status === 'CONFIRMED'); %>
@@ -142,6 +148,15 @@
             <form method="post" action="<%= isTrainer ? '/trainer/lessons' : '/crm/schedule' %>/<%= current.id %>/bookings/<%= booking.id %>/attendance">
               <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><input type="hidden" name="status" value="ATTENDED"><input type="hidden" name="reason" value="Исправление неявки"><button>Исправить: посетил</button>
             </form>
+          <% } %>
+          <% if (isOwner && booking.status === 'CANCELLED' && !booking.visits.length) { %>
+            <details class="schedule__delete-booking"><summary>Удалить отменённую запись</summary>
+            <form method="post" action="/crm/schedule/<%= current.id %>/bookings/<%= booking.id %>/delete">
+              <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><input type="hidden" name="version" value="<%= booking.version %>">
+              <label>Причина удаления<input name="reason" minlength="3" maxlength="500" required></label>
+              <label class="schedule__confirm"><input type="checkbox" name="confirm" value="DELETE" required>Удалить запись безвозвратно. Карточка клиента сохранится.</label>
+              <button class="schedule__delete-button">Удалить запись навсегда</button>
+            </form></details>
           <% } %>
           <% if (activeVisit) { %>
             <form method="post" action="<%= isTrainer ? '/trainer' : '/crm' %>/visits/<%= activeVisit.id %>/reverse">
