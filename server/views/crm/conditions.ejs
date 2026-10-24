@@ -1,0 +1,1 @@
+<p>Срок: <%= p.months?p.months+' мес.':p.days?p.days+' дн.':'без ограничения срока' %> · <%= p.visits?p.visits+' посещений':'безлимит' %></p><p>Дни: <%= p.weekdays.split(',').map(d=>({1:'Пн',2:'Вт',3:'Ср',4:'Чт',5:'Пт',6:'Сб',7:'Вс'})[d]).join(', ') %> · <%= p.fromTime %>–<%= p.toTime %></p><% if(p.giftGym){ %><p class="panel__badge">Тренажёрный зал в подарок</p><% } %>

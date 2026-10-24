@@ -44,3 +44,19 @@ export function scopedRead(
   if (operation === "get") return found.find((r) => r.id === id) || null;
   return found; // list/search/export use the same scope and field allowlist
 }
+
+// Production scope: apply in the database for BOTH collections and objects.
+// The related user is checked in the same SQL query, including authVersion.
+export function trainerClientWhere(context) {
+  if(!context?.active || context.role !== 'TRAINER' || !context.id || !Number.isInteger(context.authVersion))
+    return { id: { in: [] } };
+  return {
+    archived: false,
+    assignments: { some: {
+      active: true,
+      trainer: { userId: context.id, user: {
+        active: true, role: 'TRAINER', authVersion: context.authVersion,
+      } },
+    } },
+  };
+}

@@ -123,6 +123,12 @@ export function userService(prisma) {
           },
         });
         if (revoke) await tx.authSession.deleteMany({ where: { userId: id } });
+        if (user.role === "TRAINER" && (data.active === false || (data.role && data.role !== "TRAINER"))) {
+          await tx.trainerAssignment.updateMany({
+            where: { trainer: { userId: id }, active: true },
+            data: { active: false, revokedAt: new Date() },
+          });
+        }
         for (const key of allowed)
           await audit(tx, `USER_${key.toUpperCase()}_CHANGED`, {
             actorId,

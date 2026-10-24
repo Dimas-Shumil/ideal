@@ -19,6 +19,9 @@ model User {
   authVersion Int @default(1)
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  trainerProfile TrainerProfile?
+  crmEvents CrmEvent[]
+  crmOperations CrmOperation[]
   sessions AuthSession[]
   audit AuditEvent[]
 }
@@ -42,4 +45,125 @@ model AuditEvent {
   requestId String? @db.Uuid
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   @@index([createdAt])
+}
+
+model Client {
+  id String @id @default(uuid()) @db.Uuid
+  name String @db.VarChar(150)
+  phone String @db.VarChar(15)
+  birthDate DateTime @db.Date
+  comment String @default("") @db.VarChar(1000)
+  archived Boolean @default(false)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  assignments TrainerAssignment[]
+  memberships Membership[]
+  events CrmEvent[]
+  @@index([phone])
+  @@index([archived, name, id])
+}
+model TrainerProfile {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @unique @db.Uuid
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignments TrainerAssignment[]
+}
+model TrainerAssignment {
+  id String @id @default(uuid()) @db.Uuid
+  clientId String @db.Uuid
+  trainerId String @db.Uuid
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  trainer TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  active Boolean @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  revokedAt DateTime? @db.Timestamptz(3)
+  @@index([trainerId, active, clientId])
+}
+model MembershipPlan {
+  id String @id @default(uuid()) @db.Uuid
+  name String @db.VarChar(100)
+  kind String @db.VarChar(10)
+  priceCents Int
+  months Int
+  days Int
+  visits Int?
+  weekdays String @db.VarChar(13)
+  fromTime String @db.VarChar(5)
+  toTime String @db.VarChar(5)
+  giftGym Boolean
+  duo Boolean
+  active Boolean @default(true)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+}
+model MembershipPurchase {
+  id String @id @default(uuid()) @db.Uuid
+  totalCents Int
+  method String @db.VarChar(10)
+  paidAt DateTime @default(now()) @db.Timestamptz(3)
+  memberships Membership[]
+}
+model Membership {
+  id String @id @default(uuid()) @db.Uuid
+  clientId String @db.Uuid
+  client Client @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  purchaseId String @db.Uuid
+  purchase MembershipPurchase @relation(fields: [purchaseId], references: [id], onDelete: Restrict)
+  pairId String? @db.Uuid
+  snapshot Json
+  priceCents Int
+  startDate DateTime? @db.Date
+  endDate DateTime? @db.Date
+  remaining Int?
+  cancelledAt DateTime? @db.Timestamptz(3)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  freezes MembershipFreeze[]
+  refunds MembershipRefund[]
+  events CrmEvent[]
+  @@index([clientId, cancelledAt, startDate])
+  @@index([pairId])
+}
+model MembershipFreeze {
+  id String @id @default(uuid()) @db.Uuid
+  membershipId String @db.Uuid
+  membership Membership @relation(fields: [membershipId], references: [id], onDelete: Restrict)
+  startDate DateTime @db.Date
+  endDate DateTime @db.Date
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([membershipId, startDate])
+}
+model MembershipRefund {
+  id String @id @default(uuid()) @db.Uuid
+  membershipId String @db.Uuid
+  membership Membership @relation(fields: [membershipId], references: [id], onDelete: Restrict)
+  amountCents Int
+  method String @db.VarChar(10)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+}
+model CrmEvent {
+  id String @id @default(uuid()) @db.Uuid
+  clientId String? @db.Uuid
+  client Client? @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  membershipId String? @db.Uuid
+  membership Membership? @relation(fields: [membershipId], references: [id], onDelete: Restrict)
+  actorId String? @db.Uuid
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action String @db.VarChar(64)
+  reason String @default("") @db.VarChar(500)
+  details Json
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([clientId, createdAt])
+}
+model CrmOperation {
+  id String @id @default(uuid()) @db.Uuid
+  actorId String @db.Uuid
+  actor User @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  key String @db.Uuid
+  fingerprint String @db.VarChar(64)
+  result Json
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@unique([actorId,key])
 }

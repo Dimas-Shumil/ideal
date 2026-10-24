@@ -6,6 +6,7 @@ import { readFile } from "node:fs/promises";
 import { readConfig } from "../server/config/env.js";
 import { createDatabase } from "../server/db/client.js";
 import { createApp } from "../server/app.js";
+import { clearCrm } from "./helpers/crm.js";
 const config = readConfig();
 if (
   config.NODE_ENV !== "test" ||
@@ -41,6 +42,7 @@ const login = async (name, pw = secret) => {
 };
 before(async () => {
   secret = randomBytes(24).toString("hex");
+  await clearCrm(db.prisma);
   await db.prisma.auditEvent.deleteMany();
   await db.prisma.authSession.deleteMany();
   await db.prisma.user.deleteMany();
@@ -75,13 +77,13 @@ after(async () => {
   store?.close();
   await db.close();
 });
-test("schema: only auth entities and explicit FK; bootstrap cannot repeat", async () => {
+test("schema: auth and approved CRM entities; bootstrap cannot repeat", async () => {
   const rows = await db.pool.query(
     `SELECT tablename FROM pg_tables WHERE schemaname='public'`,
   );
   assert.deepEqual(
     rows.rows.map((x) => x.tablename).sort(),
-    ["AuditEvent", "AuthSession", "User", "_prisma_migrations"].sort(),
+    ["AuditEvent", "AuthSession", "User", "_prisma_migrations", "Client", "TrainerProfile", "TrainerAssignment", "MembershipPlan", "MembershipPurchase", "Membership", "MembershipFreeze", "MembershipRefund", "CrmEvent", "CrmOperation"].sort(),
   );
   await assert.rejects(() =>
     users.create(
@@ -197,7 +199,8 @@ test("roles are enforced independently for pages/API; cookie and fixation", asyn
   ]) {
     const { agent, cookie, beforeCookie } = await login(name);
     assert.notEqual(cookie, beforeCookie);
-    const r = await agent.get(`/${path}`).expect(200);
+    const r = await agent.get(`/${path}`).expect(path === "staff" ? 303 : 200);
+    if(path === "staff") { assert.equal(r.headers.location,"/crm/clients"); await agent.get(r.headers.location).expect(200); }
     assert.equal(r.headers["cache-control"], "no-store");
     await agent.get(`/api/${path}/check`).expect(200);
     for (const other of ["admin", "staff", "trainer"].filter(
@@ -744,7 +747,8 @@ test("TRAINER shell: every page is private, roles exclusive, identity server-own
   }
   const s = await login("trainer");
   for (const path of paths) {
-    const r = await s.agent.get(`${path}?userId=${owner.id}&trainerId=foreign&id=${admin.id}`).expect(200);
+    if(path === "/trainer/clients") await s.agent.get(`${path}?userId=${owner.id}&trainerId=foreign&id=${admin.id}`).expect(400);
+    const r = await s.agent.get(path === "/trainer/clients" ? path : `${path}?userId=${owner.id}&trainerId=foreign&id=${admin.id}`).expect(200);
     assert.equal(r.headers["cache-control"], "no-store");
     assert.match(r.text, /Кабинет тренера/);
     assert.ok(!r.text.includes(secret));
@@ -756,14 +760,14 @@ test("TRAINER shell: every page is private, roles exclusive, identity server-own
   assert.match(account.text, /Логин: trainer/);
   assert.match(account.text, /Роль: тренер/);
   assert.ok(!account.text.includes('name="userId"'));
-  for (const [path, message] of [["clients", /Модуль клиентов ещё не подключён/], ["lessons", /Расписание ещё не подключено/]]) {
+  for (const [path, message] of [["clients", /Клиентов не найдено/], ["lessons", /Расписание ещё не подключено/]]) {
     const r = await s.agent.get(`/trainer/${path}`);
     assert.match(r.text, message);
-    assert.ok(!r.text.includes('type="search"'));
+    assert.equal(r.text.includes('type="search"'),path==='clients');
   }
-  // No fabricated CRM API; namespace still applies authorization to unknown paths.
+  // Real scoped clients API; unknown namespace routes remain protected.
   await request(app).get("/api/trainer/clients").expect(401);
-  await s.agent.get("/api/trainer/clients").expect(404);
+  await s.agent.get("/api/trainer/clients").expect(200);
   await s.agent.get(`/trainer/account/${owner.id}`).expect(404);
   await s.agent.post("/trainer/clients").send({ userId: owner.id }).expect(404);
 });

@@ -1,0 +1,15 @@
+<% const d=event.details;const fields={name:'ФИО',phone:'телефон',birthDate:'дата рождения',comment:'комментарий'}; %>
+<dl class="crm__details">
+<% if(d.fields){ %><div><dt>Сохранены поля</dt><dd><%= d.fields.map(f=>fields[f]).filter(Boolean).join(', ') %></dd></div><% } %>
+<% if(d.duplicatePhone){ %><div><dt>Проверка телефона</dt><dd>Совпадает с другой карточкой</dd></div><% } %>
+<% if(d.archived!==undefined){ %><div><dt>Состояние клиента</dt><dd><%= d.archived?'В архиве':'Восстановлен' %></dd></div><% } %>
+<% if(d.priceCents!==undefined){ %><div><dt>Полностью оплачено</dt><dd><%= money(d.priceCents) %> ₽</dd></div><% } %>
+<% if(d.amountCents!==undefined){ %><div><dt>Возвращено</dt><dd><%= money(d.amountCents) %> ₽</dd></div><% } %>
+<% if(d.method){ %><div><dt>Способ расчёта</dt><dd><%= methods[d.method] %></dd></div><% } %>
+<% if(d.before!==undefined){ %><div><dt>До изменения</dt><dd><%= d.before %><%= event.action==='MEMBERSHIP_ADJUST'?' посещений':'' %></dd></div><div><dt>После изменения</dt><dd><%= d.after %><%= event.action==='MEMBERSHIP_ADJUST'?' посещений':'' %></dd></div><% } %>
+<% if(d.startDate!==undefined){ %><div><dt>Начало</dt><dd><%= d.startDate||'С первого посещения' %></dd></div><% } %>
+<% if(d.endDate!==undefined){ %><div><dt>Окончание</dt><dd><%= d.endDate||'Без даты окончания' %></dd></div><% } %>
+<% if(d.days!==undefined){ %><div><dt>Дней заморозки</dt><dd><%= d.days %></dd></div><% } %>
+<% if(d.removedDays!==undefined){ %><div><dt>Неиспользованных дней заморозки</dt><dd><%= d.removedDays %></dd></div><% } %>
+<% if(d.pairId){ %><div><dt>Условия</dt><dd>Связанный абонемент «Дуэт»</dd></div><% } %>
+</dl>

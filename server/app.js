@@ -13,6 +13,7 @@ import { inlineScriptHashes } from "./middleware/security.js";
 import { userService } from "./modules/users/service.js";
 import { ownerRoutes } from "./modules/owner/routes.js";
 import { trainerRoutes } from "./modules/trainer/routes.js";
+import { crmRoutes } from "./modules/crm/routes.js";
 const root = fileURLToPath(new URL("../", import.meta.url));
 export async function createApp({
   config,
@@ -108,7 +109,7 @@ export async function createApp({
     next();
   });
   app.use(
-    express.urlencoded({ extended: false, limit: "8kb", parameterLimit: 10 }),
+    express.urlencoded({ extended: false, limit: "8kb", parameterLimit: 24 }),
   );
   app.use(express.json({ limit: "8kb", strict: true }));
   const store = new AuthStore(db.pool, config);
@@ -132,6 +133,7 @@ export async function createApp({
   app.use(loadUser(db.prisma));
   const users = userService(db.prisma);
   app.use(await authRoutes({ config, prisma: db.prisma, store, users }));
+  app.use(crmRoutes({config,prisma:db.prisma}));
   app.use(ownerRoutes({ config, prisma: db.prisma, users }));
   app.use(trainerRoutes());
   for (const [route, role, label] of [
