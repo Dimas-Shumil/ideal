@@ -77,13 +77,13 @@ after(async () => {
   store?.close();
   await db.close();
 });
-test("schema: auth and approved CRM entities; bootstrap cannot repeat", async () => {
+test("schema: auth, CRM and schedule entities; bootstrap cannot repeat", async () => {
   const rows = await db.pool.query(
     `SELECT tablename FROM pg_tables WHERE schemaname='public'`,
   );
   assert.deepEqual(
     rows.rows.map((x) => x.tablename).sort(),
-    ["AuditEvent", "AuthSession", "User", "_prisma_migrations", "Client", "TrainerProfile", "TrainerAssignment", "MembershipPlan", "MembershipPurchase", "Membership", "MembershipFreeze", "MembershipRefund", "CrmEvent", "CrmOperation"].sort(),
+    ["AuditEvent", "AuthSession", "User", "_prisma_migrations", "Client", "TrainerProfile", "TrainerAssignment", "MembershipPlan", "MembershipPurchase", "Membership", "MembershipFreeze", "MembershipRefund", "CrmEvent", "CrmOperation", "Lesson", "LessonBooking", "ScheduleEvent", "Visit"].sort(),
   );
   await assert.rejects(() =>
     users.create(
@@ -747,8 +747,10 @@ test("TRAINER shell: every page is private, roles exclusive, identity server-own
   }
   const s = await login("trainer");
   for (const path of paths) {
-    if(path === "/trainer/clients") await s.agent.get(`${path}?userId=${owner.id}&trainerId=foreign&id=${admin.id}`).expect(400);
-    const r = await s.agent.get(path === "/trainer/clients" ? path : `${path}?userId=${owner.id}&trainerId=foreign&id=${admin.id}`).expect(200);
+    const injected = `${path}?userId=${owner.id}&trainerId=foreign&id=${admin.id}`;
+    if (["/trainer/clients", "/trainer/lessons"].includes(path))
+      await s.agent.get(injected).expect(400);
+    const r = await s.agent.get(["/trainer/clients", "/trainer/lessons"].includes(path) ? path : injected).expect(200);
     assert.equal(r.headers["cache-control"], "no-store");
     assert.match(r.text, /Кабинет тренера/);
     assert.ok(!r.text.includes(secret));
@@ -760,7 +762,7 @@ test("TRAINER shell: every page is private, roles exclusive, identity server-own
   assert.match(account.text, /Логин: trainer/);
   assert.match(account.text, /Роль: тренер/);
   assert.ok(!account.text.includes('name="userId"'));
-  for (const [path, message] of [["clients", /Клиентов не найдено/], ["lessons", /Расписание ещё не подключено/]]) {
+  for (const [path, message] of [["clients", /Клиентов не найдено/], ["lessons", /Занятий нет/]]) {
     const r = await s.agent.get(`/trainer/${path}`);
     assert.match(r.text, message);
     assert.equal(r.text.includes('type="search"'),path==='clients');

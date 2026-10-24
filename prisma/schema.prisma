@@ -24,6 +24,11 @@ model User {
   crmOperations CrmOperation[]
   sessions AuthSession[]
   audit AuditEvent[]
+  lessonsCreated Lesson[] @relation("LessonCreatedBy")
+  bookingsCreated LessonBooking[] @relation("BookingCreatedBy")
+  visitsRecorded Visit[] @relation("VisitRecordedBy")
+  visitsReversed Visit[] @relation("VisitReversedBy")
+  scheduleEvents ScheduleEvent[]
 }
 model AuthSession {
   sid String @id @db.VarChar(128)
@@ -59,6 +64,8 @@ model Client {
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
   assignments TrainerAssignment[]
   memberships Membership[]
+  bookings LessonBooking[]
+  visits Visit[]
   events CrmEvent[]
   @@index([phone])
   @@index([archived, name, id])
@@ -68,6 +75,7 @@ model TrainerProfile {
   userId String @unique @db.Uuid
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   assignments TrainerAssignment[]
+  lessons Lesson[]
 }
 model TrainerAssignment {
   id String @id @default(uuid()) @db.Uuid
@@ -122,6 +130,7 @@ model Membership {
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   freezes MembershipFreeze[]
   refunds MembershipRefund[]
+  visits Visit[]
   events CrmEvent[]
   @@index([clientId, cancelledAt, startDate])
   @@index([pairId])
@@ -166,4 +175,93 @@ model CrmOperation {
   result Json
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   @@unique([actorId,key])
+}
+
+model Lesson {
+  id String @id @default(uuid()) @db.Uuid
+  seriesId String? @db.Uuid
+  kind String @db.VarChar(10)
+  title String @db.VarChar(100)
+  startsAt DateTime @db.Timestamptz(3)
+  endsAt DateTime @db.Timestamptz(3)
+  trainerId String @db.Uuid
+  trainer TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Restrict)
+  room String @default("") @db.VarChar(100)
+  capacity Int
+  status String @default("SCHEDULED") @db.VarChar(12)
+  createdById String @db.Uuid
+  createdBy User @relation("LessonCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  cancelledAt DateTime? @db.Timestamptz(3)
+  cancelReason String @default("") @db.VarChar(500)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  bookings LessonBooking[]
+  visits Visit[]
+  events ScheduleEvent[]
+  @@index([trainerId, startsAt])
+  @@index([status, startsAt])
+  @@index([seriesId])
+}
+
+model LessonBooking {
+  id String @id @default(uuid()) @db.Uuid
+  lessonId String @db.Uuid
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Restrict)
+  clientId String @db.Uuid
+  client Client @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  status String @default("BOOKED") @db.VarChar(12)
+  bookedById String @db.Uuid
+  bookedBy User @relation("BookingCreatedBy", fields: [bookedById], references: [id], onDelete: Restrict)
+  cancelledAt DateTime? @db.Timestamptz(3)
+  cancelReason String @default("") @db.VarChar(500)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  visits Visit[]
+  @@unique([lessonId, clientId])
+  @@index([clientId, status])
+}
+
+model Visit {
+  id String @id @default(uuid()) @db.Uuid
+  clientId String @db.Uuid
+  client Client @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  membershipId String? @db.Uuid
+  membership Membership? @relation(fields: [membershipId], references: [id], onDelete: Restrict)
+  lessonId String? @db.Uuid
+  lesson Lesson? @relation(fields: [lessonId], references: [id], onDelete: Restrict)
+  bookingId String? @db.Uuid
+  booking LessonBooking? @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  kind String @db.VarChar(10)
+  entitlement String @db.VarChar(12)
+  occurredAt DateTime @db.Timestamptz(3)
+  status String @default("CONFIRMED") @db.VarChar(12)
+  recordedById String @db.Uuid
+  recordedBy User @relation("VisitRecordedBy", fields: [recordedById], references: [id], onDelete: Restrict)
+  reversedById String? @db.Uuid
+  reversedBy User? @relation("VisitReversedBy", fields: [reversedById], references: [id], onDelete: SetNull)
+  reason String @default("") @db.VarChar(500)
+  reversedReason String @default("") @db.VarChar(500)
+  reversedAt DateTime? @db.Timestamptz(3)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([clientId, occurredAt])
+  @@index([bookingId])
+  @@index([membershipId, status])
+  @@index([lessonId, status])
+}
+
+model ScheduleEvent {
+  id String @id @default(uuid()) @db.Uuid
+  lessonId String? @db.Uuid
+  lesson Lesson? @relation(fields: [lessonId], references: [id], onDelete: Restrict)
+  actorId String? @db.Uuid
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action String @db.VarChar(64)
+  reason String @default("") @db.VarChar(500)
+  details Json
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([lessonId, createdAt])
+  @@index([createdAt])
 }

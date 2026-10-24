@@ -16,7 +16,7 @@ Node 24.19.0, npm 11.8.0; PostgreSQL 18.6 — сведения пользова�
 npm run dev
 ```
 
-После изменений схемы и получения новой миграции:
+Этап 12 добавляет миграцию `20261024140000_schedule_attendance`. После распаковки патча:
 
 ```bat
 npm run db:deploy
@@ -40,7 +40,7 @@ Dev БД — `ideal_dev` / `ideal_app`. Test — `ideal_auth_test` / `ideal_test
 ADMIN: `/staff` → `/crm/clients`; TRAINER: `/trainer`.
 Argon2id, серверные PostgreSQL-сессии, CSRF + строгий Origin, CSP, no-store,
 rate limits, проверка authVersion и отзыв сессий должны сохраняться.
-Каждую страницу/API защищать независимо. UI не является границей доступа.
+Каждую страницу/API защищать независимо. UI не является границей доступа. Расписание: OWNER/ADMIN — `/crm/schedule` и `/crm/visits`, TRAINER — `/trainer/lessons`; CRM- и trainer-POST-маршруты разделены по ролям.
 Корень репозитория, `docs/`, исходники и секреты нельзя раздавать express.static.
 
 ## Интерфейс
@@ -53,6 +53,14 @@ focus-visible, active scale(.98), reduced motion и мобильный адап�
 Header/footer синхронизируются через `tools/sync_components.py`; Python для
 просмотра через Go Live не нужен. Семь публичных страниц и их механики сохранять.
 Демо-корзина/localStorage не являются источником CRM или реального магазина.
+
+## Проверки этапа 12
+
+Для этапа 12 добавлены `tests/schedule-dates.test.js` и `tests/schedule.test.js`; общий runner
+применяет миграции только к отдельной `TEST_DATABASE_URL`, затем запускает старые и новые
+наборы. Результаты текущего контейнера фиксируются в `docs/archive/SCHEDULE_ATTENDANCE_NOTES.txt`.
+На Windows после распаковки обязательно заново выполнить `npm run db:deploy`, `npm run db:generate`,
+`npm run db:status`, `npm test` и браузерную проверку desktop/mobile и режима без JavaScript.
 
 ## Подтверждённые проверки этапа 11
 

@@ -13,7 +13,7 @@ export function trainerRoutes() {
   router.use(["/trainer", "/api/trainer"], requireAuth, requireRole("TRAINER"));
   for (const [path, page] of [
     ["/trainer", "overview"],
-    ["/trainer/lessons", "lessons"], ["/trainer/account", "account"],
+    ["/trainer/account", "account"],
   ]) router.get(path, (req, res) => renderTrainer(req, res, page));
   return router;
 }

@@ -7,9 +7,7 @@
 <% if(page === 'overview') { %>
 <p class="panel__eyebrow">Работа с вашими клиентами</p><h1>Кабинет тренера</h1><section class="panel__card"><h2><%= user.displayName %></h2><p>Логин: <%= user.login %></p><p>Роль: тренер (TRAINER)</p><a href="/trainer/account">Настройки моего аккаунта</a></section>
 <section class="panel__card"><h2>Назначенные клиенты</h2><p>В разделе доступны ваши назначенные клиенты и сведения об их абонементах.</p><a href="/trainer/clients">Открыть клиентов</a></section>
-<section class="panel__card"><h2>Мои занятия</h2><p>Данные пока недоступны: расписание ещё не подключено. Количество занятий не рассчитывается.</p><a href="/trainer/lessons">О разделе занятий</a></section>
-<% } else if(page === 'lessons') { %>
-<h1>Мои занятия</h1><section class="panel__card"><h2>Расписание ещё не подключено</h2><p>Список ваших занятий пока недоступен. Это не означает, что занятия отсутствуют.</p><p>После подключения здесь будут только ваши занятия. Состав занятия не открывает полную карточку клиента.</p></section>
+<section class="panel__card"><h2>Мои занятия</h2><p>Откройте своё расписание, состав групп и отметку фактических посещений.</p><a href="/trainer/lessons">О разделе занятий</a></section>
 <% } else if(page === 'account') { %>
 <h1>Мой аккаунт</h1><section class="panel__card"><h2><%= user.displayName %></h2><p>Логин: <%= user.login %></p><p>Роль: тренер (TRAINER)</p></section>
 <form class="panel__card panel__form" method="post" action="/trainer/account/password"><h2>Сменить пароль</h2><p>Все ваши сессии будут завершены. После сохранения войдите заново.</p><input type="hidden" name="_csrf" value="<%= csrf %>"><label>Текущий пароль<input name="currentPassword" type="password" required maxlength="128" autocomplete="current-password"></label><label>Новый пароль<input name="newPassword" type="password" required minlength="12" maxlength="128" autocomplete="new-password"><small>12–128 символов, до 256 байт.</small></label><button>Сменить пароль и выйти</button></form><p>Если вы забыли пароль, обратитесь к владельцу клуба. Восстановление выполняет оператор ShumDev.</p>

@@ -386,7 +386,7 @@ export function crmService(prisma) {
               clientId: id,
               purchaseId: sale.id,
               pairId,
-              snapshot: { ...snapshot, planId },
+              snapshot: { ...snapshot, planId, activation: data.activation },
               priceCents: data.price,
               startDate: start ? dbDate(start) : null,
               endDate: end ? dbDate(end) : null,

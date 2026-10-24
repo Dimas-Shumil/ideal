@@ -14,6 +14,7 @@ import { userService } from "./modules/users/service.js";
 import { ownerRoutes } from "./modules/owner/routes.js";
 import { trainerRoutes } from "./modules/trainer/routes.js";
 import { crmRoutes } from "./modules/crm/routes.js";
+import { scheduleRoutes } from "./modules/schedule/routes.js";
 const root = fileURLToPath(new URL("../", import.meta.url));
 export async function createApp({
   config,
@@ -134,6 +135,7 @@ export async function createApp({
   const users = userService(db.prisma);
   app.use(await authRoutes({ config, prisma: db.prisma, store, users }));
   app.use(crmRoutes({config,prisma:db.prisma}));
+  app.use(scheduleRoutes({ config, prisma: db.prisma }));
   app.use(ownerRoutes({ config, prisma: db.prisma, users }));
   app.use(trainerRoutes());
   for (const [route, role, label] of [

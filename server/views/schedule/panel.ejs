@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>ИДЕАЛ — расписание и посещения</title>
+  <link rel="stylesheet" href="/site/css/owner.css">
+  <link rel="stylesheet" href="/site/css/schedule.css">
+  <script src="/site/scripts/owner.js" defer></script>
+</head>
+<body class="panel schedule">
+<a class="panel__skip" href="#content">К содержимому</a>
+<%
+  const isTrainer = user.role === 'TRAINER';
+  const isOwner = user.role === 'OWNER';
+  const base = isTrainer ? '/trainer/lessons' : '/crm/schedule';
+  const kindName = { GROUP: 'Групповое', PERSONAL: 'Персональное', GYM: 'Тренажёрный зал' };
+  const statusName = { SCHEDULED: 'Запланировано', CANCELLED: 'Отменено', BOOKED: 'Записан', ATTENDED: 'Посетил', NO_SHOW: 'Неявка', CONFIRMED: 'Подтверждено', REVERSED: 'Отменено' };
+  const entitlementName = { MEMBER: 'Абонемент', GIFT_GYM: 'Подарок зала', NONE: 'Без списания' };
+%>
+<header class="panel__header">
+  <a class="panel__brand" href="<%= isTrainer ? '/trainer' : isOwner ? '/admin' : '/crm/clients' %>">ИДЕАЛ<span><%= isTrainer ? 'Кабинет тренера' : isOwner ? 'Панель владельца' : 'Панель администратора' %></span></a>
+  <span><%= user.displayName %></span>
+  <form method="post" action="/logout"><input type="hidden" name="_csrf" value="<%= csrf %>"><button>Выйти</button></form>
+</header>
+<div class="panel__layout">
+<nav class="panel__nav" aria-label="Рабочие разделы">
+  <% if (isTrainer) { %>
+    <a href="/trainer">Обзор</a><a href="/trainer/clients">Назначенные клиенты</a><a href="/trainer/lessons" aria-current="page">Мои занятия</a><a href="/trainer/account">Мой аккаунт</a>
+  <% } else if (isOwner) { %>
+    <a href="/admin">Обзор</a><a href="/crm/clients">Клиенты</a><a href="/crm/plans">Тарифы</a><a href="/crm/schedule" <%- page !== 'visits' ? 'aria-current="page"' : '' %>>Расписание</a><a href="/crm/visits" <%- page === 'visits' ? 'aria-current="page"' : '' %>>Посещения</a><a href="/admin/employees">Сотрудники</a><a href="/admin/account">Мой аккаунт</a>
+  <% } else { %>
+    <a href="/crm/clients">Клиенты</a><a href="/crm/plans">Тарифы</a><a href="/crm/schedule" <%- page !== 'visits' ? 'aria-current="page"' : '' %>>Расписание</a><a href="/crm/visits" <%- page === 'visits' ? 'aria-current="page"' : '' %>>Посещения</a>
+  <% } %>
+  <a href="/">Открыть сайт клуба</a>
+</nav>
+<main id="content" class="panel__main">
+<% if (page === 'error') { %>
+  <div class="panel__error" role="alert" tabindex="-1"><%= error %></div>
+  <p><a href="<%= back %>">Вернуться в расписание</a></p>
+
+<% } else if (page === 'list') { %>
+  <div class="panel__heading">
+    <div><p class="panel__eyebrow"><%= isTrainer ? 'Только ваши занятия' : 'Время клуба — Asia/Krasnoyarsk' %></p><h1><%= isTrainer ? 'Мои занятия' : 'Расписание' %></h1></div>
+    <% if (!isTrainer) { %><a class="panel__button" href="/crm/schedule/new">Создать занятие</a><% } %>
+  </div>
+  <form class="schedule__filters" method="get" action="<%= base %>">
+    <label>С даты<input type="date" name="from" value="<%= filters.from %>"></label>
+    <label>По дату<input type="date" name="to" value="<%= filters.to %>"></label>
+    <label>Тип<select name="kind"><option value="">Все</option><option value="GROUP" <%= filters.kind === 'GROUP' ? 'selected' : '' %>>Групповые</option><option value="PERSONAL" <%= filters.kind === 'PERSONAL' ? 'selected' : '' %>>Персональные</option></select></label>
+    <% if (!isTrainer) { %>
+      <label>Тренер<select name="trainer"><option value="">Все</option><% for (const trainer of trainers) { %><option value="<%= trainer.id %>" <%= filters.trainer === trainer.id ? 'selected' : '' %>><%= trainer.displayName %></option><% } %></select></label>
+      <label>Статус<select name="status"><option value="">Все</option><option value="SCHEDULED" <%= filters.status === 'SCHEDULED' ? 'selected' : '' %>>Запланированные</option><option value="CANCELLED" <%= filters.status === 'CANCELLED' ? 'selected' : '' %>>Отменённые</option></select></label>
+    <% } %>
+    <button>Показать</button>
+  </form>
+  <div class="schedule__list">
+    <% for (const item of items) { const start = club(item.startsAt), end = club(item.endsAt); %>
+      <article class="panel__card schedule__lesson">
+        <div class="panel__heading"><div><p class="panel__eyebrow"><%= start.date %> · <%= start.time %>–<%= end.time %></p><h2><%= item.title %></h2></div><span class="panel__badge"><%= statusName[item.status] %></span></div>
+        <p><%= kindName[item.kind] %> · <%= item.trainer.user.displayName %><%= item.room ? ' · ' + item.room : '' %></p>
+        <p>Участников: <%= item._count.bookings %> / <%= item.capacity %></p>
+        <a href="<%= base %>/<%= item.id %>">Открыть занятие</a>
+      </article>
+    <% } %>
+  </div>
+  <% if (!items.length) { %><section class="panel__card"><h2>Занятий нет</h2><p>В выбранном диапазоне расписание пусто.</p></section><% } %>
+
+<% } else if (page === 'new') { %>
+  <a href="/crm/schedule">Все занятия</a><h1>Создать занятие</h1>
+  <p>Можно создать одно занятие или серию еженедельных занятий. Перенос и отмена выполняются у конкретного занятия.</p>
+  <form class="panel__card panel__form schedule__form" method="post" action="/crm/schedule">
+    <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>">
+    <div class="schedule__grid">
+      <label>Тип<select name="kind" required><option value="GROUP">Групповое</option><option value="PERSONAL">Персональное</option></select></label>
+      <label>Название<input name="title" required maxlength="100"></label>
+      <label>Дата первого занятия<input type="date" name="date" min="<%= today %>" value="<%= today %>" required></label>
+      <label>Начало<input type="time" name="startTime" required></label>
+      <label>Окончание<input type="time" name="endTime" required></label>
+      <label>Тренер<select name="trainerId" required><% for (const trainer of trainers) { %><option value="<%= trainer.id %>"><%= trainer.displayName %></option><% } %></select></label>
+      <label>Помещение<input name="room" maxlength="100" placeholder="Необязательно"></label>
+      <label>Вместимость<input type="number" name="capacity" min="1" max="500" value="12" required><small>Для персонального занятия сервер использует 1 место.</small></label>
+      <label>Повторение<select name="repeat"><option value="NONE">Одно занятие</option><option value="WEEKLY">Еженедельно</option></select></label>
+      <label>До даты<input type="date" name="repeatUntil"></label>
+      <label class="schedule__wide">Дни недели для серии<input name="weekdays" maxlength="13" placeholder="Например: 1,3,5"><small>1 — понедельник, 7 — воскресенье. Для одного занятия оставьте пустым.</small></label>
+    </div>
+    <button>Создать расписание</button>
+  </form>
+
+<% } else if (page === 'detail') { const current = lesson; const start = club(current.startsAt), end = club(current.endsAt); const started = new Date(current.startsAt) <= new Date(); %>
+  <a href="<%= base %>">Все занятия</a>
+  <div class="panel__heading"><div><p class="panel__eyebrow"><%= start.date %> · <%= start.time %>–<%= end.time %></p><h1><%= current.title %></h1></div><span class="panel__badge"><%= statusName[current.status] %></span></div>
+  <section class="panel__card">
+    <h2>Параметры</h2>
+    <dl class="schedule__details">
+      <div><dt>Тип</dt><dd><%= kindName[current.kind] %></dd></div><div><dt>Тренер</dt><dd><%= current.trainer.user.displayName %></dd></div><div><dt>Помещение</dt><dd><%= current.room || 'Не указано' %></dd></div><div><dt>Вместимость</dt><dd><%= current.capacity %></dd></div>
+      <% if (current.seriesId) { %><div><dt>Серия</dt><dd>Это отдельное занятие внутри еженедельной серии</dd></div><% } %>
+    </dl>
+    <% if (current.status === 'CANCELLED') { %><p class="panel__notice">Отменено: <%= current.cancelReason %></p><% } %>
+  </section>
+
+  <% if (!isTrainer && current.status === 'SCHEDULED' && !started) { %>
+    <section class="panel__card">
+      <h2>Перенести это занятие</h2>
+      <form class="panel__form schedule__inline" method="post" action="/crm/schedule/<%= current.id %>/move">
+        <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><input type="hidden" name="version" value="<%= current.version %>">
+        <label>Дата<input type="date" name="date" min="<%= today %>" value="<%= start.date %>" required></label><label>Начало<input type="time" name="startTime" value="<%= start.time %>" required></label><label>Окончание<input type="time" name="endTime" value="<%= end.time %>" required></label><label>Помещение<input name="room" maxlength="100" value="<%= current.room %>"></label><label class="schedule__wide">Причина переноса<input name="reason" minlength="3" maxlength="500" required></label><button>Сохранить перенос</button>
+      </form>
+    </section>
+  <% } %>
+  <% if (!isTrainer && current.status === 'SCHEDULED') { %>
+    <section class="panel__card">
+      <h2>Отменить занятие</h2><p>Действующие записи будут отменены. Уже отмеченные посещения будут компенсированы атомарно.</p>
+      <form class="panel__form" method="post" action="/crm/schedule/<%= current.id %>/cancel">
+        <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><input type="hidden" name="version" value="<%= current.version %>">
+        <label>Причина<textarea name="reason" minlength="3" maxlength="500" required></textarea></label><button>Отменить занятие</button>
+      </form>
+    </section>
+  <% } %>
+
+  <section class="panel__card">
+    <div class="panel__heading"><div><h2>Состав занятия</h2><p><%= current.bookings.filter((item) => item.status !== 'CANCELLED').length %> / <%= current.capacity %></p></div></div>
+    <% for (const booking of current.bookings) { const activeVisit = booking.visits?.find((visit) => visit.status === 'CONFIRMED'); %>
+      <article class="schedule__participant">
+        <div><h3><%= booking.client.name %></h3><p><%= statusName[booking.status] %></p></div>
+        <div class="schedule__actions">
+          <% if (current.status === 'SCHEDULED' && booking.status === 'BOOKED' && !started) { %>
+            <form method="post" action="<%= isTrainer ? '/trainer/lessons' : '/crm/schedule' %>/<%= current.id %>/bookings/<%= booking.id %>/cancel">
+              <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><label>Причина отмены записи<input name="reason" minlength="3" maxlength="500" required></label><button class="panel__secondary">Отменить запись</button>
+            </form>
+          <% } %>
+          <% if (current.status === 'SCHEDULED' && booking.status === 'BOOKED' && started) { %>
+            <form method="post" action="<%= isTrainer ? '/trainer/lessons' : '/crm/schedule' %>/<%= current.id %>/bookings/<%= booking.id %>/attendance">
+              <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><input type="hidden" name="status" value="ATTENDED"><input type="hidden" name="reason" value=""><button>Подтвердить посещение</button>
+            </form>
+            <form method="post" action="<%= isTrainer ? '/trainer/lessons' : '/crm/schedule' %>/<%= current.id %>/bookings/<%= booking.id %>/attendance">
+              <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><input type="hidden" name="status" value="NO_SHOW"><input type="hidden" name="reason" value=""><button class="panel__secondary">Отметить неявку</button>
+            </form>
+          <% } %>
+          <% if (current.status === 'SCHEDULED' && booking.status === 'NO_SHOW') { %>
+            <form method="post" action="<%= isTrainer ? '/trainer/lessons' : '/crm/schedule' %>/<%= current.id %>/bookings/<%= booking.id %>/attendance">
+              <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><input type="hidden" name="status" value="ATTENDED"><input type="hidden" name="reason" value="Исправление неявки"><button>Исправить: посетил</button>
+            </form>
+          <% } %>
+          <% if (activeVisit) { %>
+            <form method="post" action="<%= isTrainer ? '/trainer' : '/crm' %>/visits/<%= activeVisit.id %>/reverse">
+              <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><label>Причина исправления<input name="reason" minlength="3" maxlength="500" required></label><button class="panel__secondary">Отменить посещение</button>
+            </form>
+          <% } %>
+        </div>
+      </article>
+    <% } %>
+    <% if (!current.bookings.length) { %><p>Пока никто не записан.</p><% } %>
+  </section>
+
+  <% if (current.status === 'SCHEDULED' && !started) { %>
+    <section class="panel__card">
+      <h2>Записать клиента</h2>
+      <form class="schedule__search" method="get" action="<%= base %>/<%= current.id %>"><label>Поиск по ФИО<input type="search" name="q" maxlength="100" value="<%= query.q %>"></label><button>Найти</button></form>
+      <form class="panel__form" method="post" action="<%= base %>/<%= current.id %>/book">
+        <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><label>Клиент<select name="clientId" required><% for (const client of candidates) { %><option value="<%= client.id %>"><%= client.name %></option><% } %></select></label><input type="hidden" name="reason" value=""><button <%= candidates.length ? '' : 'disabled' %>>Записать</button>
+      </form>
+      <% if (!candidates.length) { %><p>Подходящие клиенты не найдены.</p><% } %>
+      <% if (isTrainer) { %><p>Тренеру доступны для новой записи только назначенные ему клиенты. Состав занятия при этом может содержать других клиентов без доступа к их полной карточке.</p><% } %>
+    </section>
+  <% } %>
+
+  <section class="panel__card">
+    <h2>История занятия</h2>
+    <% for (const event of current.events) { %><article class="schedule__event"><strong><%= event.action %></strong><span><%= club(event.createdAt).date %> <%= club(event.createdAt).time %> · <%= event.actor?.displayName || 'Система' %></span><% if (event.reason) { %><p><%= event.reason %></p><% } %></article><% } %>
+    <% if (!current.events.length) { %><p>История пуста.</p><% } %>
+  </section>
+
+<% } else if (page === 'visits') { %>
+  <div class="panel__heading"><div><p class="panel__eyebrow">Фактические визиты</p><h1>Посещения</h1></div><a href="/crm/schedule">Расписание</a></div>
+  <section class="panel__card">
+    <h2>Отметить посещение тренажёрного зала</h2>
+    <p>Списание выполняется только после подтверждения визита. Если у группового абонемента доступен подарок зала, сервер использует его как отдельный однократный визит без уменьшения группового остатка.</p>
+    <form class="panel__form schedule__inline" method="post" action="/crm/visits/gym">
+      <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>">
+      <label>Клиент<select name="clientId" required><% for (const client of clients) { %><option value="<%= client.id %>"><%= client.name %></option><% } %></select></label><label>Дата<input type="date" name="date" value="<%= today %>" required></label><label>Время<input type="time" name="time" value="<%= nowTime %>" required></label><label>Комментарий<input name="reason" maxlength="500"></label><button>Подтвердить визит</button>
+    </form>
+  </section>
+  <form class="schedule__search" method="get" action="/crm/visits"><label>Поиск по клиенту<input type="search" name="q" maxlength="100" value="<%= query.q %>"></label><button>Найти</button></form>
+  <div class="schedule__list">
+    <% for (const visit of items) { const when = club(visit.occurredAt); %>
+      <article class="panel__card schedule__visit">
+        <div class="panel__heading"><div><h2><%= visit.client.name %></h2><p><%= when.date %> · <%= when.time %></p></div><span class="panel__badge"><%= statusName[visit.status] %></span></div>
+        <p><%= kindName[visit.kind] %> · <%= entitlementName[visit.entitlement] %><%= visit.lesson ? ' · ' + visit.lesson.title : '' %></p><p>Отметил: <%= visit.recordedBy.displayName %></p>
+        <% if (visit.status === 'CONFIRMED') { %>
+          <form class="panel__form" method="post" action="/crm/visits/<%= visit.id %>/reverse"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><label>Причина исправления<input name="reason" minlength="3" maxlength="500" required></label><button class="panel__secondary">Отменить посещение и компенсировать</button></form>
+        <% } else { %><p>Причина отмены: <%= visit.reversedReason %></p><% } %>
+      </article>
+    <% } %>
+  </div>
+  <% if (!items.length) { %><section class="panel__card"><h2>Посещений нет</h2><p>По выбранному поиску ничего не найдено.</p></section><% } %>
+<% } %>
+<p class="panel__busy" role="status" aria-live="polite"></p>
+</main></div></body></html>

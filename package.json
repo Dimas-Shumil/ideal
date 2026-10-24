@@ -17,7 +17,7 @@
     "password:reset": "node tools/reset-password.mjs",
     "user:manage": "node tools/manage-user.mjs",
     "test": "node tools/run-tests.mjs",
-    "test:unit": "node --test tests/policy.test.js",
+    "test:unit": "node --test tests/policy.test.js tests/schedule-dates.test.js",
     "css:auth": "sass --no-source-map site/sass/auth.scss site/css/auth.css"
   },
   "dependencies": {

@@ -1,0 +1,75 @@
+ЭТАП 12 — РАСПИСАНИЕ, ЗАПИСЬ И ПОСЕЩЕНИЯ
+Дата: 24.10.2026
+
+Статус документа: исторический отчёт текущего патча. Актуальные правила находятся в
+../SCHEDULE.md, ../CRM.md, ../ROADMAP.md и ../DEVELOPMENT.md.
+
+РЕАЛИЗОВАНО
+- Lesson: GROUP/PERSONAL, дата/время, тренер, помещение, вместимость, серия, перенос/отмена.
+- Еженедельная генерация конкретных занятий по выбранным дням, до 366 дней.
+- LessonBooking: запись, отмена, ATTENDED/NO_SHOW, защита вместимости и пересечений клиента.
+- Visit: GROUP/PERSONAL/GYM, связь с абонементом и занятием, подтверждение/компенсация.
+- ScheduleEvent + CrmEvent + AuditEvent для истории и аудита.
+- OWNER/ADMIN: /crm/schedule, /crm/visits и соответствующие API.
+- TRAINER: /trainer/lessons и соответствующий API; только собственные занятия.
+- TRAINER может добавлять/отменять запись только назначенного клиента на собственное занятие.
+- Состав собственного занятия не даёт доступ к полной карточке неназначенного клиента.
+- GROUP/GYM проверяют snapshot: тип, дни, часы, срок, заморозку, остаток и дату оформления.
+- Списание только на подтверждённом визите; NO_SHOW не списывает.
+- FIRST_VISIT активирует обычный абонемент фактическим визитом соответствующего вида.
+- «Дуэт» активируется одновременно первым визитом любого участника; остатки раздельные.
+- giftGym: один визит зала после активации группы, без уменьшения группового остатка.
+- Отмена/исправление визита восстанавливает списание и пересчитывает FIRST_VISIT.
+- Отмена занятия клубом компенсирует подтверждённые посещения в той же транзакции.
+- TRAINER: окно исправления день занятия + следующий календарный день.
+- OWNER/ADMIN: окно исправления — текущая дата клуба и шесть предыдущих (7 дат).
+- Все мутации используют accessLock, authVersion, действующую сессию, CSRF/Origin,
+  CrmOperation для идемпотентности и транзакционный аудит.
+- Публичные страницы, демо-магазин и localStorage не переводились на новые сущности.
+
+НОВЫЕ ФАЙЛЫ
+- prisma/migrations/20261024140000_schedule_attendance/migration.sql
+- server/modules/schedule/schema.js
+- server/modules/schedule/dates.js
+- server/modules/schedule/service.js
+- server/modules/schedule/routes.js
+- server/views/schedule/panel.ejs
+- site/sass/schedule.scss
+- site/css/schedule.css
+- tests/schedule-dates.test.js
+- tests/schedule.test.js
+- docs/SCHEDULE.md
+- docs/archive/SCHEDULE_ATTENDANCE_NOTES.txt
+
+ИЗМЕНЁННЫЕ ФАЙЛЫ
+- prisma/schema.prisma
+- server/app.js
+- server/modules/crm/service.js
+- server/modules/trainer/routes.js
+- server/views/owner/panel.ejs
+- server/views/crm/panel.ejs
+- server/views/trainer/panel.ejs
+- tests/helpers/crm.js
+- tools/run-tests.mjs
+- package.json
+- README.md
+- docs/ROADMAP.md
+- docs/DEVELOPMENT.md
+- docs/CRM.md
+
+УДАЛЕНИЯ
+Нет.
+
+ПРОВЕРКИ
+В текущем контейнере:
+- `node --check` для всех изменённых JS/MJS: PASS.
+- `node --test tests/schedule-dates.test.js`: 4/4 PASS.
+- синтаксическая проверка JS-фрагментов изменённых EJS-шаблонов: PASS.
+- проверка новых schedule.scss/schedule.css: нет !important, :root и CSS custom properties.
+- полный `npm test` не запускался: контейнер имеет Node 22.16.0/npm 10.9.2 вместо
+  закреплённых Node 24.19.x/npm 11.x; `npm ci --ignore-scripts` не завершился в доступный
+  прогон. Это не считается падением тестов приложения и не считается PASS.
+- миграция не применялась к dev/test БД в контейнере; обязательна проверка на Windows
+  через отдельную TEST_DATABASE_URL перед dev.
+
+Старые результаты этапа 11 не считаются результатами этапа 12.
