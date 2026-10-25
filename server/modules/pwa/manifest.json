@@ -1,9 +1,9 @@
 {
   "id": "/employee-app",
-  "name": "ИДЕАЛ — сотрудники",
+  "name": "ИДЕАЛ — спортивный клуб",
   "short_name": "ИДЕАЛ",
   "lang": "ru",
-  "start_url": "/login",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#fbfaf6",

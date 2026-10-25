@@ -14,9 +14,9 @@ function worker({network=async()=>new Response('network'),stored=new Map(),names
 function request(w,{method='GET',path='/admin',mode='navigate'}={}) {
  let response;w.listeners.fetch({request:{method,url:'https://ideal.example'+path,mode},respondWith:p=>response=p});return response;
 }
-test('PWA manifest: stable identity, employee start, root scope and real PNG dimensions',async()=>{
+test('PWA manifest: stable identity, public start, root scope and real PNG dimensions',async()=>{
  const m=JSON.parse(await read('server/modules/pwa/manifest.json'));
- assert.equal(m.start_url,'/login');assert.equal(m.scope,'/');assert.equal(m.display,'standalone');assert.equal(m.id,'/employee-app');
+ assert.equal(m.start_url,'/');assert.equal(m.scope,'/');assert.equal(m.display,'standalone');assert.equal(m.id,'/employee-app');
  for(const i of [...m.icons,{src:'/site/img/pwa/apple-touch-180.png',sizes:'180x180'}]){
   const b=await readFile(new URL('..'+i.src,import.meta.url));assert.equal(b.subarray(1,4).toString(),'PNG');assert.equal(b.readUInt32BE(16),Number(i.sizes.split('x')[0]));
  }
@@ -45,7 +45,7 @@ test('PWA does not intercept mutations, API fetches, images or cross-origin requ
  let intercepted=false;w.listeners.fetch({request:{method:'GET',url:'https://evil.example/',mode:'navigate'},respondWith:()=>intercepted=true});assert.equal(intercepted,false);
 });
 test('PWA activation cleans only older own caches; update never forces takeover',async()=>{
- const w=worker({names:['other-app-v1','ideal-pwa-offline-v0','ideal-pwa-offline-v1']});let p;w.listeners.activate({waitUntil:v=>p=v});await p;assert.deepEqual(w.deleted,['ideal-pwa-offline-v0']);
+ const w=worker({names:['other-app-v1','ideal-pwa-offline-v0','ideal-pwa-offline-v1','ideal-pwa-offline-v2']});let p;w.listeners.activate({waitUntil:v=>p=v});await p;assert.deepEqual(w.deleted,['ideal-pwa-offline-v0','ideal-pwa-offline-v1']);
  assert.doesNotMatch(source,/self\.skipWaiting\s*\(|clients\.claim\s*\(/);
 });
 test('PWA client uses same root worker and has no Push consent, subscription or reload',async()=>{

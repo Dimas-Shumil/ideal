@@ -1,1 +1,6 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,follow"><title><%= title %> — ИДЕАЛ</title><link rel="stylesheet" href="/site/css/main.css"><link rel="stylesheet" href="/site/css/<%= pageClass %>.css"></head><body class="<%= pageClass %>-page"><a class="<%= pageClass %>-page__skip" href="#content">К содержимому</a><%- include('header') %>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,follow"><title><%= title %> — ИДЕАЛ</title><link rel="stylesheet" href="/site/css/main.css"><link rel="stylesheet" href="/site/css/<%= pageClass %>.css"><link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/site/img/pwa/apple-touch-180.png">
+<link rel="stylesheet" href="/site/css/pwa-install.css">
+<script src="/site/scripts/pwa.js" defer></script>
+<script src="/site/scripts/pwa-install.js" defer></script>
+</head><body class="<%= pageClass %>-page"><a class="<%= pageClass %>-page__skip" href="#content">К содержимому</a><%- include('header') %>

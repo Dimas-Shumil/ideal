@@ -1,6 +1,6 @@
 /* One root worker: PWA fallback and existing explicit-consent Push. */
 const CACHE_PREFIX = 'ideal-pwa-offline-';
-const CACHE_NAME = CACHE_PREFIX + 'v1';
+const CACHE_NAME = CACHE_PREFIX + 'v2';
 const OFFLINE = '/offline.html';
 const STATIC = new Set([OFFLINE, '/site/css/pwa.css']);
 function cacheable(response) {
