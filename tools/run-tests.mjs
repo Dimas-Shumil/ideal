@@ -48,6 +48,8 @@ run("node_modules/prisma/build/index.js", ["migrate", "deploy"]); // Idempotency
 run("node_modules/prisma/build/index.js", ["generate"]);
 run("--test", [
   "--test-concurrency=1",
+  "tests/content-unit.test.js",
+  "tests/content.test.js",
   "tests/auth.test.js",
   "tests/policy.test.js",
   "tests/seo.test.js",

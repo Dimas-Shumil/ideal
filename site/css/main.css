@@ -3244,3 +3244,108 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   white-space: normal;
   overflow-wrap: anywhere;
 }
+
+/* Stage 19: content supplied by OWNER, with existing composition retained. */
+.header__appointment, .menu-panel__appointment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.header__appointment:focus-visible, .menu-panel__appointment:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 5px;
+}
+
+.directions__empty {
+  line-height: 1.7;
+  padding: 30px 0;
+}
+
+.direction-card__content h3, .direction-card__content p {
+  overflow-wrap: anywhere;
+}
+
+.direction-card__content h3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.direction-card__content p {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.directions__schedule {
+  display: inline-flex;
+  padding: 16px 24px;
+  margin-top: 18px;
+  background: #25282a;
+  color: #fff;
+  text-decoration: none;
+  transition: background-color 750ms ease, transform 750ms ease;
+}
+
+.directions__schedule:hover {
+  background: #454b4e;
+}
+
+.directions__schedule:active, .trainer-cta__caption a:active {
+  transform: scale(0.98);
+}
+
+.directions__schedule:focus-visible, .trainer-cta__caption a:focus-visible {
+  outline: 2px solid #b6c2c7;
+  outline-offset: 5px;
+}
+
+.trainer-cta__caption a {
+  color: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  text-underline-offset: 5px;
+  transition: color 750ms ease, transform 750ms ease;
+}
+
+.trainer-cta__caption a:hover {
+  color: #fff;
+}
+
+.ideal-footer__hours {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.hero__address, .hero__hours, .ideal-footer__contacts, .menu-panel__footnote {
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .directions__schedule, .trainer-cta__caption a, .header__appointment, .menu-panel__appointment {
+    transition: none;
+  }
+}
+.hero__cta {
+  text-decoration: none;
+}
+
+.menu-panel__appointment, .header.is-scrolled .header__appointment, body.menu-open .header__appointment {
+  background: #25282a;
+  color: #fff;
+  border-color: #4f575c;
+}
+
+.menu-panel__appointment:hover, .header.is-scrolled .header__appointment:hover, body.menu-open .header__appointment:hover {
+  background: #454b4e;
+  color: #fff;
+}
+
+.directions__programs-head {
+  grid-column: 1/-1;
+}

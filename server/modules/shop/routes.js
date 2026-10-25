@@ -1,3 +1,4 @@
+import { renderHomeContent } from '../content/public.js';
 import ejs from "ejs";
 import { publicPlans, planTerms } from "../public/plans.js";
 import { applySeo, seoFor } from "../public/seo.js";
@@ -84,10 +85,11 @@ export function shopRoutes({ prisma, config, indexHtml }) {
       fileURLToPath(new URL("../../views/shop/nutrition.ejs", import.meta.url)),
       { items: items.slice(0, 5), money },
     );
+    const contentHtml = await renderHomeContent(prisma, indexHtml, res.locals.siteContacts);
     res
       .type("html")
       .send(
-        applySeo(res, config, "/", indexHtml, req.query)
+        applySeo(res, config, "/", contentHtml, req.query)
           .replace(/<section\s+class="memberships"[\s\S]*?<\/section>/, () => memberships)
           .replace(
             /<section class="nutrition"[\s\S]*?<\/section>/,

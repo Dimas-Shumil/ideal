@@ -83,7 +83,7 @@ test("schema: auth, CRM and schedule entities; bootstrap cannot repeat", async (
   );
   assert.deepEqual(
     rows.rows.map((x) => x.tablename).sort(),
-    ["AuditEvent", "AuthSession", "User", "_prisma_migrations", "Client", "TrainerProfile", "TrainerPhoto", "TrainerAssignment", "MembershipPlan", "MembershipPurchase", "Membership", "MembershipFreeze", "MembershipRefund", "CrmEvent", "CrmOperation", "Lesson", "LessonBooking", "ScheduleEvent", "Visit", "PushSubscription", "PushDelivery", "ShopProduct", "ShopVariant", "ShopImage", "ShopOrder", "ShopOrderEvent"].sort(),
+    ["ContentEntry", "ContentPhoto", "AuditEvent", "AuthSession", "User", "_prisma_migrations", "Client", "TrainerProfile", "TrainerPhoto", "TrainerAssignment", "MembershipPlan", "MembershipPurchase", "Membership", "MembershipFreeze", "MembershipRefund", "CrmEvent", "CrmOperation", "Lesson", "LessonBooking", "ScheduleEvent", "Visit", "PushSubscription", "PushDelivery", "ShopProduct", "ShopVariant", "ShopImage", "ShopOrder", "ShopOrderEvent"].sort(),
   );
   await assert.rejects(() =>
     users.create(

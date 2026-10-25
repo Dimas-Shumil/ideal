@@ -82,13 +82,7 @@
         </a>
       </nav>
       <div class="header__actions">
-        <button
-          class="header__appointment"
-          type="button"
-          data-preview="Записаться"
-        >
-          <span>Записаться</span>
-        </button>
+        <a class="header__appointment" href="/#contacts"><span>Связаться</span></a>
         <button
           class="header__menu-toggle"
           id="menu-toggle"
@@ -151,26 +145,12 @@
 
         <div class="hero__cta-block">
           <p class="hero__mobile-subtitle">Больше<br />чем тренировки</p>
-          <button type="button" class="hero__cta" data-preview="Абонементы">
+          <a class="hero__cta" href="#memberships">
             <span>Выбрать абонемент</span>
-          </button>
+          </a>
         </div>
 
-        <button
-          class="hero__video"
-          type="button"
-          data-preview="Видео о клубе"
-          aria-label="Посмотреть видео о клубе"
-        >
-          <span class="hero__play" aria-hidden="true"
-            ><svg viewBox="0 0 20 20"><path d="m7 4 8 6-8 6z" /></svg></span>
-          <span class="hero__video-label"
-            >Посмотреть<br />видео о клубе<span
-              class="hero__video-rule"
-              aria-hidden="true"
-            ></span
-          ></span>
-        </button>
+
 
         <p class="hero__address">
           Бограда, 135 <span aria-hidden="true"></span>
@@ -190,131 +170,7 @@
 
       <!-- IDEAL / MONO — два новых блока. Существующий hero выше без изменений. -->
       <div class="ideal-flow" data-ideal-flow>
-        <section
-          class="directions"
-          id="next"
-          aria-labelledby="directions-title"
-        >
-          <div class="directions__shell">
-            <div class="directions__intro">
-              <p class="directions__eyebrow">
-                <span>01</span><i aria-hidden="true"></i>Направления
-              </p>
-              <h2 class="directions__heading" id="directions-title">
-                ВЫБЕРИ<br /><strong>СВОЙ ПУТЬ</strong>
-              </h2>
-              <p class="directions__lead">
-                Разные форматы тренировок, одна цель — лучшая версия тебя.
-              </p>
-              <a class="directions__explore" href="#directions-cards"
-                ><span>Узнать больше<br />о направлениях</span></a
-              >
-              <p class="directions__count">
-                <strong>01</strong><span></span>02&nbsp;&nbsp;03
-              </p>
-            </div>
-            <div class="directions__cards" id="directions-cards">
-              <article class="direction-card">
-                <img
-                  src="site/img/direction-gym.webp"
-                  alt="Гантели и оборудование тренажёрного зала"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div class="direction-card__scrim" aria-hidden="true"></div>
-                <span class="direction-card__number"
-                  >01 <span aria-hidden="true"></span
-                ></span>
-                <div class="direction-card__content">
-                  <h3>ТРЕНАЖЁРНЫЙ<br />ЗАЛ</h3>
-                  <p>Силовые и кардиотренировки в твоём ритме.</p>
-                  <button
-                    type="button"
-                    data-preview="Тренажёрный зал"
-                    aria-label="Подробнее: тренажёрный зал"
-                  >
-                    <span>Подробнее</span>
-                  </button>
-                </div>
-              </article>
-              <article class="direction-card">
-                <img
-                  src="site/img/direction-group.webp"
-                  alt="Спортсменка во время групповой тренировки"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div class="direction-card__scrim" aria-hidden="true"></div>
-                <span class="direction-card__number"
-                  >02 <span aria-hidden="true"></span
-                ></span>
-                <div class="direction-card__content">
-                  <h3>ГРУППОВЫЕ<br />ЗАНЯТИЯ</h3>
-                  <p>HOT-IRON, Pilates, Stretching и Fitness MIX.</p>
-                  <a class="direction-card__details" href="#group-programs"
-                    >Расписание программ</a
-                  >
-                </div>
-              </article>
-              <article class="direction-card">
-                <img
-                  src="site/img/direction-personal.webp"
-                  alt="Тренер помогает спортсмену во время силового упражнения"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div class="direction-card__scrim" aria-hidden="true"></div>
-                <span class="direction-card__number"
-                  >03 <span aria-hidden="true"></span
-                ></span>
-                <div class="direction-card__content">
-                  <h3>ПЕРСОНАЛЬНЫЕ<br />ТРЕНИРОВКИ</h3>
-                  <p>Индивидуальный подход и внимание к технике.</p>
-                  <button
-                    type="button"
-                    data-preview="Персональные тренировки"
-                    aria-label="Подробнее: персональные тренировки"
-                  >
-                    <span>Подробнее</span>
-                  </button>
-                </div>
-              </article>
-            </div>
-            <div
-              class="directions__programs"
-              id="group-programs"
-              aria-labelledby="group-programs-heading"
-            >
-              <div class="directions__programs-head">
-                <span class="directions__programs-label"
-                  >ГРУППОВЫЕ ПРОГРАММЫ / РАСПИСАНИЕ</span
-                >
-                <h3 id="group-programs-heading">Движение по расписанию</h3>
-                <p>
-                  Проводятся HOT-IRON, Pilates, Pilates + Stretching и Fitness
-                  MIX.
-                </p>
-              </div>
-              <div class="directions__programs-days">
-                <div class="directions__programs-day">
-                  <strong>ПН · СР · ПТ</strong>
-                  <p><span>12:00</span> HOT-IRON</p>
-                </div>
-                <div class="directions__programs-day">
-                  <strong>ВТ · ЧТ</strong>
-                  <p><span>18:15</span> PILATES</p>
-                  <p><span>19:15</span> PILATES + Stretching</p>
-                  <p><span>18:30</span> Fitness MIX</p>
-                  <p><span>19:30</span> HOT-IRON</p>
-                </div>
-              </div>
-              <p class="directions__programs-foot">
-                Время указано по информации клуба. Актуальность и распределение
-                занятий по дням уточняйте перед записью.
-              </p>
-            </div>
-          </div>
-        </section>
+        <section class="directions" id="next" aria-labelledby="directions-title"><div class="directions__shell"><div class="directions__intro"><h2 class="directions__heading" id="directions-title">НАПРАВЛЕНИЯ</h2><p class="directions__lead">Актуальные направления доступны при запуске через Node / Express.</p></div></div></section>
 
         <section
           class="memberships"
@@ -492,13 +348,7 @@
         </nav>
         <div class="menu-panel__bottom">
           <p class="menu-panel__footnote">ИДЕАЛ · АБАКАН<br />БОГРАДА, 135</p>
-          <button
-            class="menu-panel__appointment"
-            type="button"
-            data-preview="Записаться"
-          >
-            <span>Записаться</span>
-          </button>
+          <a class="menu-panel__appointment" href="/#contacts"><span>Связаться</span></a>
         </div>
       </div>
     </div>
@@ -517,10 +367,10 @@
       >
         ×
       </button>
-      <span class="preview-dialog__eyebrow">IDEAL / PREVIEW</span>
-      <h2 id="preview-dialog-title">Раздел в разработке</h2>
+      <span class="preview-dialog__eyebrow">ИДЕАЛ / ИНФОРМАЦИЯ</span>
+      <h2 id="preview-dialog-title">Информация</h2>
       <p id="preview-dialog-description">
-        Пока мы собираем первый экран. Этот раздел подключим на следующем этапе.
+        Актуальную информацию можно уточнить в клубе.
       </p>
       <button class="preview-dialog__ok" type="button" id="preview-dialog-ok">
         Понятно
