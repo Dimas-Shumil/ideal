@@ -79,6 +79,18 @@ model TrainerProfile {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   publicName String @default("") @db.VarChar(100)
   publicVersion Int @default(1)
+  publicKey String @unique @default(dbgenerated("replace(gen_random_uuid()::text, '-', '')")) @db.VarChar(32)
+  publicVisible Boolean @default(false)
+  publicOrder Int @default(0)
+  specialty String @default("") @db.VarChar(300)
+  summary String @default("") @db.VarChar(1000)
+  biography String @default("") @db.VarChar(5000)
+  experience String @default("") @db.VarChar(500)
+  qualification String @default("") @db.VarChar(3000)
+  approach String @default("") @db.VarChar(3000)
+  directions String @default("") @db.VarChar(2000)
+  achievements String @default("") @db.VarChar(3000)
+  photo TrainerPhoto?
   assignments TrainerAssignment[]
   lessons Lesson[]
 }
@@ -375,4 +387,10 @@ model ShopOrderEvent {
   reason String @db.VarChar(500)
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   @@index([orderId, createdAt])
+}
+
+model TrainerPhoto {
+  trainerId String @id @db.Uuid
+  trainer TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  data Bytes
 }

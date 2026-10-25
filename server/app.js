@@ -1,3 +1,5 @@
+import { publicTrainerRoutes } from './modules/public/trainers.js';
+import { trainerManagementRoutes } from './modules/trainers/routes.js';
 import { publicScheduleRoutes } from "./modules/public/schedule.js";
 import { applySeo, robotsText, sitemapXml } from "./modules/public/seo.js";
 import { shopRoutes } from "./modules/shop/routes.js";
@@ -115,14 +117,13 @@ export async function createApp({
   });
   const pages = [
     "about",
-    "trainers",
-    "trainer",
   ];
   for (const name of pages)
     app.get(
       `/${name}.html`,
       async (req, res) => res.type("html").send(applySeo(res, config, `/${name}.html`, await readFile(path.join(root, `${name}.html`), "utf8"), req.query)),
     );
+  app.use(publicTrainerRoutes({ config, prisma: db.prisma }));
   app.use(publicScheduleRoutes({ config, prisma: db.prisma }));
   // Private/auth responses always no-store, even errors and unknown API routes.
   app.use((req, res, next) => {
@@ -136,6 +137,7 @@ export async function createApp({
   app.use(["/shop-panel/products", "/api/shop-panel/products"],
     express.urlencoded({ extended: false, limit: "128kb", parameterLimit: 12 }),
     express.json({ limit: "48kb", strict: true }));
+  app.use("/admin/public-trainers", express.urlencoded({ extended: false, limit: "256kb", parameterLimit: 20 }));
   app.use(
     express.urlencoded({ extended: false, limit: "8kb", parameterLimit: 24 }),
   );
@@ -167,6 +169,7 @@ export async function createApp({
   app.use(pushRoutes({ config, prisma: db.prisma }));
   app.use(crmRoutes({config,prisma:db.prisma}));
   app.use(scheduleRoutes({ config, prisma: db.prisma }));
+  app.use(trainerManagementRoutes({ config, prisma: db.prisma }));
   app.use(ownerRoutes({ config, prisma: db.prisma, users }));
   app.use(trainerRoutes());
   for (const [route, role, label] of [

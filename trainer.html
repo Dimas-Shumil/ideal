@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#f7f7f5" />
   <meta name="robots" content="noindex, follow" />
-  <meta name="description" content="Демонстрационный шаблон профиля тренера клуба ИДЕАЛ. Реальные данные ожидают наполнения, запись недоступна." />
-  <title>Демо-профиль тренера — ИДЕАЛ / Абакан</title>
+  <meta name="description" content="Профили тренеров клуба ИДЕАЛ доступны через сервер приложения." />
+  <title>Тренеры клуба — ИДЕАЛ / Абакан</title>
   <link rel="stylesheet" href="site/css/main.css" />
   <link rel="stylesheet" href="site/css/trainer.css" />
 <link rel="manifest" href="/manifest.webmanifest">
@@ -64,42 +64,7 @@
       </div>
     </header>
     <!-- component:header:end -->
-<main class="trainer" id="trainer" tabindex="-1">
-  <div class="trainer__shell">
-    <nav class="trainer__breadcrumb" aria-label="Хлебные крошки"><a href="/">Главная</a><span aria-hidden="true">/</span><a href="/trainers.html">Тренеры</a><span aria-hidden="true">/</span><span aria-current="page">Демо-профиль</span></nav>
-    <p class="trainer__notice"><strong>Демонстрационный профиль.</strong> Это общий шаблон для всех четырёх карточек каталога, а не страница реального сотрудника клуба. Данные ожидают наполнения.</p>
-    <section class="trainer__hero" aria-labelledby="trainer-name">
-      <figure class="trainer__portrait" data-trainer-field="photo">
-        <img src="site/img/trainer-placeholder.svg" alt="" width="800" height="1000" />
-        <figcaption><span>ФОТО ОЖИДАЕТСЯ</span><strong>МЕСТО<br />ДЛЯ ТРЕНЕРА.</strong><span>Фотографию добавим после согласования с клубом.</span></figcaption>
-      </figure>
-      <div class="trainer__intro" data-trainer-reveal>
-        <p class="trainer__eyebrow">IDEAL / PERSONAL / DEMO</p>
-        <h1 id="trainer-name" data-trainer-field="name">ИМЯ<br /><span>ТРЕНЕРА.</span></h1>
-        <p class="trainer__specialty" data-trainer-field="specialty">Специализация ожидает наполнения</p>
-        <p class="trainer__description">Здесь появится знакомство с тренером: его опыт, подход и направления работы. Информацию предоставит клуб.</p>
-        <a class="trainer__button" href="#booking">К записи на тренировку</a>
-        <a class="trainer__link" href="/trainers.html">Вернуться в каталог тренеров</a>
-      </div>
-    </section>
-    <section class="trainer__section" aria-labelledby="experience-title" data-trainer-reveal>
-      <div class="trainer__section-head"><span class="trainer__eyebrow">01 / О ТРЕНЕРЕ</span><h2 id="experience-title">Опыт.<br /><span>Квалификация.</span></h2></div>
-      <dl class="trainer__facts"><div><dt>Опыт работы</dt><dd data-trainer-field="experience">Стаж будет указан после подтверждения клубом.</dd></div><div><dt>Образование и квалификация</dt><dd data-trainer-field="qualification">Сведения об образовании, подготовке и сертификатах ожидаются.</dd></div></dl>
-    </section>
-    <section class="trainer__section" aria-labelledby="approach-title" data-trainer-reveal>
-      <div class="trainer__section-head"><span class="trainer__eyebrow">02 / ПОДХОД</span><h2 id="approach-title">Тренировки.<br /><span>Своим путём.</span></h2></div>
-      <div class="trainer__details"><div><h3>Подход к тренировкам</h3><p data-trainer-field="approach">Здесь будет описание методики тренера и принципов построения занятий. Текст ожидает согласования.</p></div><div><h3>Направления работы</h3><p data-trainer-field="directions">Направления и задачи, с которыми работает тренер, ещё не указаны.</p></div></div>
-    </section>
-    <section class="trainer__schedule" aria-labelledby="schedule-title" data-trainer-reveal>
-      <div class="trainer__section-head"><span class="trainer__eyebrow">03 / РАСПИСАНИЕ</span><h2 id="schedule-title">Время<br /><span>для себя.</span></h2></div>
-      <div class="trainer__schedule-note" data-trainer-field="schedule"><h3>Расписание ещё не опубликовано</h3><p>Дни и часы тренировок появятся после получения данных клуба. Сейчас это информационный блок: свободные места не отображаются, бронирование недоступно.</p><span class="trainer__status">ОЖИДАЕМ ДАННЫЕ КЛУБА</span></div>
-    </section>
-    <section class="trainer__section trainer__booking" id="booking" aria-labelledby="booking-title" data-trainer-reveal>
-      <div class="trainer__section-head"><span class="trainer__eyebrow">04 / ПЕРСОНАЛЬНАЯ ТРЕНИРОВКА</span><h2 id="booking-title">Твой шаг.<br /><span>К результату.</span></h2></div>
-      <div class="trainer__details"><dl class="trainer__facts"><div><dt>Стоимость</dt><dd data-trainer-field="price">Цена ожидает подтверждения клубом.</dd></div><div><dt>Продолжительность и условия</dt><dd data-trainer-field="terms">Длительность, оплата, перенос и отмена занятия будут указаны после согласования.</dd></div></dl><p id="booking-note">Запись пока недоступна. Это демо-профиль: заявки не отправляются и места не бронируются.</p><button class="trainer__button" type="button" data-preview="Записаться" aria-describedby="booking-note" aria-haspopup="dialog">Записаться на тренировку</button><noscript><p>Пояснение в диалоге требует JavaScript. Запись ещё не подключена.</p></noscript><a class="trainer__link" href="/trainers.html">Вернуться в каталог тренеров</a></div>
-    </section>
-  </div>
-</main>
+<main class="trainer" id="trainer" tabindex="-1"><div class="trainer__shell"><h1>Тренеры клуба</h1><p class="trainer__notice">Профили тренеров доступны при запуске через Node/Express. Откройте /trainers.html на сервере приложения. Go Live показывает только статическую вёрстку.</p><a href="/">На главную</a></div></main>
 
 <!-- component:footer:start -->
 <footer class="ideal-footer" id="contacts">

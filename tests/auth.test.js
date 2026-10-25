@@ -83,7 +83,7 @@ test("schema: auth, CRM and schedule entities; bootstrap cannot repeat", async (
   );
   assert.deepEqual(
     rows.rows.map((x) => x.tablename).sort(),
-    ["AuditEvent", "AuthSession", "User", "_prisma_migrations", "Client", "TrainerProfile", "TrainerAssignment", "MembershipPlan", "MembershipPurchase", "Membership", "MembershipFreeze", "MembershipRefund", "CrmEvent", "CrmOperation", "Lesson", "LessonBooking", "ScheduleEvent", "Visit", "PushSubscription", "PushDelivery", "ShopProduct", "ShopVariant", "ShopImage", "ShopOrder", "ShopOrderEvent"].sort(),
+    ["AuditEvent", "AuthSession", "User", "_prisma_migrations", "Client", "TrainerProfile", "TrainerPhoto", "TrainerAssignment", "MembershipPlan", "MembershipPurchase", "Membership", "MembershipFreeze", "MembershipRefund", "CrmEvent", "CrmOperation", "Lesson", "LessonBooking", "ScheduleEvent", "Visit", "PushSubscription", "PushDelivery", "ShopProduct", "ShopVariant", "ShopImage", "ShopOrder", "ShopOrderEvent"].sort(),
   );
   await assert.rejects(() =>
     users.create(
@@ -102,7 +102,6 @@ test("public pages, static boundaries, CSP hash, errors and no root static", asy
     "/",
     "/about.html",
     "/trainers.html",
-    "/trainer.html",
     "/shop.html",
     "/product.html",
     "/cart.html",
@@ -112,6 +111,7 @@ test("public pages, static boundaries, CSP hash, errors and no root static", asy
     if (!["/shop.html", "/product.html", "/cart.html"].includes(p)) assert.ok(!r.headers["set-cookie"]);
     else { assert.ok(r.headers["set-cookie"]); assert.equal(r.headers["cache-control"],"no-store"); }
   }
+  await request(app).get("/trainer.html").expect(301).expect("Location", "/trainers.html");
   const alias = await request(app).get("/index.html?source=check").expect(301);
   assert.equal(alias.headers.location, "/?source=check");
   const home = await request(app).get("/");

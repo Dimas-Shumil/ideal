@@ -1,72 +1,389 @@
+@charset "UTF-8";
 /* IDEAL / MONO — profile. Valid SCSS without build-time dependencies. */
-.trainer-page { background: #f7f7f5; }
-.trainer { padding-top: 130px; }
-.trainer:focus { outline: none; }
-.trainer__shell { max-width: 1720px; width: calc(100% - 160px); margin: 0 auto; }
-.trainer__skip { position: fixed; top: 8px; left: 16px; z-index: 120; padding: 16px 22px; color: #fff; background: #191c1e; transform: translateY(-160%); }
-.trainer__skip:focus { transform: none; }
-.trainer__breadcrumb { display: flex; flex-wrap: wrap; gap: 10px 14px; font-size: 12px; color: #555b5e; line-height: 1.7; }
-.trainer__breadcrumb a, .trainer__link { text-underline-offset: 6px; transition: color 750ms ease, transform 750ms ease; }
-.trainer__breadcrumb a:hover, .trainer__link:hover { color: #191c1e; }
-.trainer__notice { margin: 35px 0 48px; max-width: 780px; padding-left: 20px; border-left: 2px solid #74797b; font-size: 13px; line-height: 1.8; color: #555b5e; }
-.trainer__hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 7%; align-items: center; padding-bottom: 110px; }
-.trainer__portrait { margin: 0; position: relative; background: #222629; color: #e8e9e8; aspect-ratio: 4 / 5; }
-.trainer__portrait img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.trainer__portrait figcaption { position: absolute; inset: 30px; display: flex; flex-direction: column; align-items: start; justify-content: end; gap: 20px; }
-.trainer__portrait figcaption span { font-size: 11px; line-height: 1.7; max-width: 260px; }
-.trainer__portrait figcaption span:first-child { margin-bottom: auto; letter-spacing: .1em; }
-.trainer__portrait figcaption strong { font-size: clamp(30px, 4vw, 68px); font-weight: 500; letter-spacing: -.05em; line-height: .98; }
-.trainer__intro, .trainer__details, .trainer__section-head { min-width: 0; }
-.trainer__eyebrow { display: block; font-size: 10px; letter-spacing: .12em; line-height: 1.8; margin: 0 0 30px; }
-.trainer h1, .trainer h2 { margin: 0; font-weight: 450; letter-spacing: -.06em; line-height: 1.04; overflow-wrap: anywhere; }
-.trainer h1 { font-size: clamp(48px, 6.4vw, 118px); }
-.trainer h2 { font-size: clamp(34px, 4.2vw, 72px); }
-.trainer h1 span, .trainer h2 span { color: #74797b; }
-.trainer h3 { font-size: 20px; font-weight: 500; letter-spacing: -.025em; line-height: 1.4; margin: 0 0 16px; }
-.trainer__specialty { font-size: 19px; line-height: 1.5; margin: 26px 0 18px; }
-.trainer__description, .trainer__details p, .trainer__schedule-note p { font-size: 14px; line-height: 1.85; color: #555b5e; max-width: 510px; }
-.trainer__intro .trainer__button { margin-top: 24px; }
-.trainer__button { display: inline-flex; align-items: center; justify-content: center; border: 0; padding: 20px 28px; min-height: 58px; max-width: 100%; background: #25282a; color: #fff; text-align: center; text-decoration: none; font-size: 13px; line-height: 1.6; transition: background-color 750ms ease, transform 750ms ease; }
-.trainer__button:hover { background: #464b4e; }
-.trainer__button:active, .trainer__link:active, .trainer__breadcrumb a:active { transform: scale(.98); }
-.trainer__button:focus-visible { outline: 2px solid #191c1e; outline-offset: 5px; }
-.trainer__link { display: block; width: fit-content; max-width: 100%; margin-top: 24px; font-size: 13px; line-height: 1.8; color: #555b5e; }
-.trainer__section, .trainer__schedule { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 7%; padding: 52px 0 90px; border-top: 1px solid #bfc2c2; }
-.trainer__facts { margin: 0; }
-.trainer__facts > div { padding: 0 0 26px; margin-bottom: 26px; border-bottom: 1px solid #c8ccca; }
-.trainer__facts dt { font-size: 13px; font-weight: 600; margin-bottom: 12px; }
-.trainer__facts dd { margin: 0; color: #555b5e; font-size: 14px; line-height: 1.85; }
-.trainer__details > div + div { margin-top: 36px; }
-.trainer__schedule { padding: 45px; background: #222629; color: #f7f7f5; margin-bottom: 90px; border: 0; }
-.trainer__schedule h2 span { color: #b9bcbe; }
-.trainer__schedule-note p { color: #c4c6c7; }
-.trainer__status { display: inline-block; padding: 12px 0; border-top: 1px solid #646b6e; margin-top: 18px; font-size: 10px; letter-spacing: .09em; line-height: 1.8; }
-.trainer__booking { padding-bottom: 110px; }
-.trainer [data-trainer-reveal].is-reveal-enabled { opacity: 0; transform: translateY(28px) scale(.98); transition: opacity 1500ms cubic-bezier(.22,1,.36,1), transform 1500ms cubic-bezier(.22,1,.36,1); }
-.trainer [data-trainer-reveal].is-visible { opacity: 1; transform: none; }
+.trainer-page {
+  background: #f7f7f5;
+}
+
+.trainer {
+  padding-top: 130px;
+}
+
+.trainer:focus {
+  outline: none;
+}
+
+.trainer__shell {
+  max-width: 1720px;
+  width: calc(100% - 160px);
+  margin: 0 auto;
+}
+
+.trainer__skip {
+  position: fixed;
+  top: 8px;
+  left: 16px;
+  z-index: 120;
+  padding: 16px 22px;
+  color: #fff;
+  background: #191c1e;
+  transform: translateY(-160%);
+}
+
+.trainer__skip:focus {
+  transform: none;
+}
+
+.trainer__breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  font-size: 12px;
+  color: #555b5e;
+  line-height: 1.7;
+}
+
+.trainer__breadcrumb a, .trainer__link {
+  text-underline-offset: 6px;
+  transition: color 750ms ease, transform 750ms ease;
+}
+
+.trainer__breadcrumb a:hover, .trainer__link:hover {
+  color: #191c1e;
+}
+
+.trainer__notice {
+  margin: 35px 0 48px;
+  max-width: 780px;
+  padding-left: 20px;
+  border-left: 2px solid #74797b;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #555b5e;
+}
+
+.trainer__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 7%;
+  align-items: center;
+  padding-bottom: 110px;
+}
+
+.trainer__portrait {
+  margin: 0;
+  position: relative;
+  background: #222629;
+  color: #e8e9e8;
+  aspect-ratio: 4/5;
+}
+
+.trainer__portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.trainer__portrait figcaption {
+  position: absolute;
+  inset: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: end;
+  gap: 20px;
+}
+
+.trainer__portrait figcaption span {
+  font-size: 11px;
+  line-height: 1.7;
+  max-width: 260px;
+}
+
+.trainer__portrait figcaption span:first-child {
+  margin-bottom: auto;
+  letter-spacing: 0.1em;
+}
+
+.trainer__portrait figcaption strong {
+  font-size: clamp(30px, 4vw, 68px);
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 0.98;
+}
+
+.trainer__intro, .trainer__details, .trainer__section-head {
+  min-width: 0;
+}
+
+.trainer__eyebrow {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  line-height: 1.8;
+  margin: 0 0 30px;
+}
+
+.trainer h1, .trainer h2 {
+  margin: 0;
+  font-weight: 450;
+  letter-spacing: -0.06em;
+  line-height: 1.04;
+  overflow-wrap: anywhere;
+}
+
+.trainer h1 {
+  font-size: clamp(48px, 6.4vw, 118px);
+}
+
+.trainer h2 {
+  font-size: clamp(34px, 4.2vw, 72px);
+}
+
+.trainer h1 span, .trainer h2 span {
+  color: #74797b;
+}
+
+.trainer h3 {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.4;
+  margin: 0 0 16px;
+}
+
+.trainer__specialty {
+  font-size: 19px;
+  line-height: 1.5;
+  margin: 26px 0 18px;
+}
+
+.trainer__description, .trainer__details p, .trainer__schedule-note p {
+  font-size: 14px;
+  line-height: 1.85;
+  color: #555b5e;
+  max-width: 510px;
+}
+
+.trainer__intro .trainer__button {
+  margin-top: 24px;
+}
+
+.trainer__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  padding: 20px 28px;
+  min-height: 58px;
+  max-width: 100%;
+  background: #25282a;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  font-size: 13px;
+  line-height: 1.6;
+  transition: background-color 750ms ease, transform 750ms ease;
+}
+
+.trainer__button:hover {
+  background: #464b4e;
+}
+
+.trainer__button:active, .trainer__link:active, .trainer__breadcrumb a:active {
+  transform: scale(0.98);
+}
+
+.trainer__button:focus-visible {
+  outline: 2px solid #191c1e;
+  outline-offset: 5px;
+}
+
+.trainer__link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 24px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #555b5e;
+}
+
+.trainer__section, .trainer__schedule {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 7%;
+  padding: 52px 0 90px;
+  border-top: 1px solid #bfc2c2;
+}
+
+.trainer__facts {
+  margin: 0;
+}
+
+.trainer__facts > div {
+  padding: 0 0 26px;
+  margin-bottom: 26px;
+  border-bottom: 1px solid #c8ccca;
+}
+
+.trainer__facts dt {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.trainer__facts dd {
+  margin: 0;
+  color: #555b5e;
+  font-size: 14px;
+  line-height: 1.85;
+}
+
+.trainer__details > div + div {
+  margin-top: 36px;
+}
+
+.trainer__schedule {
+  padding: 45px;
+  background: #222629;
+  color: #f7f7f5;
+  margin-bottom: 90px;
+  border: 0;
+}
+
+.trainer__schedule h2 span {
+  color: #b9bcbe;
+}
+
+.trainer__schedule-note p {
+  color: #c4c6c7;
+}
+
+.trainer__status {
+  display: inline-block;
+  padding: 12px 0;
+  border-top: 1px solid #646b6e;
+  margin-top: 18px;
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  line-height: 1.8;
+}
+
+.trainer__booking {
+  padding-bottom: 110px;
+}
+
+.trainer [data-trainer-reveal].is-reveal-enabled {
+  opacity: 0;
+  transform: translateY(28px) scale(0.98);
+  transition: opacity 1500ms cubic-bezier(0.22, 1, 0.36, 1), transform 1500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.trainer [data-trainer-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
 @media (max-width: 1100px) {
-  .trainer__shell { width: calc(100% - 64px); }
-  .trainer__hero, .trainer__section, .trainer__schedule { gap: 32px; }
-  .trainer__schedule { padding: 32px; }
+  .trainer__shell {
+    width: calc(100% - 64px);
+  }
+  .trainer__hero, .trainer__section, .trainer__schedule {
+    gap: 32px;
+  }
+  .trainer__schedule {
+    padding: 32px;
+  }
 }
 @media (max-width: 767px) {
-  .trainer { padding-top: 105px; }
-  .trainer__hero, .trainer__section, .trainer__schedule { grid-template-columns: minmax(0, 1fr); }
-  .trainer__hero { padding-bottom: 65px; }
-  .trainer__notice { margin: 26px 0 32px; font-size: 12px; }
-  .trainer__portrait { max-width: 520px; width: 100%; }
-  .trainer h1 { font-size: clamp(46px, 11vw, 80px); }
-  .trainer h2 { font-size: clamp(32px, 8vw, 54px); }
-  .trainer__eyebrow { font-size: 9px; margin-bottom: 22px; letter-spacing: .08em; }
-  .trainer__portrait figcaption { inset: 22px; }
-  .trainer__portrait figcaption strong { font-size: clamp(30px, 8vw, 52px); }
-  .trainer__portrait figcaption span { font-size: 10px; }
-  .trainer__section { padding: 36px 0 60px; }
-  .trainer__schedule { padding: 26px 22px; margin-bottom: 60px; }
-  .trainer__button { width: 100%; padding: 19px 16px; }
-  .trainer__booking { padding-bottom: 70px; }
+  .trainer {
+    padding-top: 105px;
+  }
+  .trainer__hero, .trainer__section, .trainer__schedule {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .trainer__hero {
+    padding-bottom: 65px;
+  }
+  .trainer__notice {
+    margin: 26px 0 32px;
+    font-size: 12px;
+  }
+  .trainer__portrait {
+    max-width: 520px;
+    width: 100%;
+  }
+  .trainer h1 {
+    font-size: clamp(46px, 11vw, 80px);
+  }
+  .trainer h2 {
+    font-size: clamp(32px, 8vw, 54px);
+  }
+  .trainer__eyebrow {
+    font-size: 9px;
+    margin-bottom: 22px;
+    letter-spacing: 0.08em;
+  }
+  .trainer__portrait figcaption {
+    inset: 22px;
+  }
+  .trainer__portrait figcaption strong {
+    font-size: clamp(30px, 8vw, 52px);
+  }
+  .trainer__portrait figcaption span {
+    font-size: 10px;
+  }
+  .trainer__section {
+    padding: 36px 0 60px;
+  }
+  .trainer__schedule {
+    padding: 26px 22px;
+    margin-bottom: 60px;
+  }
+  .trainer__button {
+    width: 100%;
+    padding: 19px 16px;
+  }
+  .trainer__booking {
+    padding-bottom: 70px;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .trainer [data-trainer-reveal].is-reveal-enabled { opacity: 1; transform: none; transition: none; }
-  .trainer__button, .trainer__link, .trainer__breadcrumb a { transition: none; }
+  .trainer [data-trainer-reveal].is-reveal-enabled {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .trainer__button, .trainer__link, .trainer__breadcrumb a {
+    transition: none;
+  }
+}
+.trainer__hero {
+  padding-top: 40px;
+}
+
+.trainer__facts dd, .trainer__description, .trainer__specialty {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.trainer-page a:focus-visible {
+  outline: 3px solid #82662c;
+  outline-offset: 5px;
+}
+
+.trainer__notice h1 {
+  font-size: clamp(30px, 5vw, 64px);
+}
+
+.trainer-page .header__appointment {
+  background: #25282a;
+  border-color: #25282a;
+  color: #fff;
+}
+
+.trainer-page .header__appointment:hover {
+  background: #464b4e;
+  color: #fff;
 }

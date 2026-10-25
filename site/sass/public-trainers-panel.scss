@@ -1,0 +1,74 @@
+.public-trainers-panel {
+  &__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+  &__card,
+  &__section {
+    padding: 24px;
+    border: 1px solid #bfc8bd;
+    border-radius: 12px;
+    margin: 24px 0;
+    min-width: 0;
+  }
+  &__form,
+  &__section form {
+    display: grid;
+    gap: 20px;
+    max-width: 900px;
+  }
+  &__form button,
+  &__section button {
+    justify-self: start;
+  }
+  textarea {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    resize: vertical;
+    padding: 12px;
+    border: 1px solid #a7b1a6;
+    border-radius: 8px;
+    font: inherit;
+    color: #20251f;
+    background: #fff;
+  }
+  &__confirm {
+    display: flex;
+    align-items: start;
+    gap: 12px;
+  }
+  &__confirm input {
+    width: 24px;
+    min-height: 24px;
+    flex-shrink: 0;
+  }
+  &__photo {
+    display: block;
+    max-width: 100%;
+    width: 320px;
+    height: 400px;
+    object-fit: contain;
+    margin-bottom: 24px;
+    background: #e8ebe6;
+  }
+  &__section form + form {
+    margin-top: 32px;
+  }
+  @media (max-width: 800px) {
+    &__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    &__card,
+    &__section {
+      padding: 18px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    button,
+    a.panel__button {
+      transition: none;
+    }
+  }
+}

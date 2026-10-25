@@ -563,7 +563,9 @@ test('SEO HTTP: public canonicals, filtered noindex, private headers, sitemap an
     const item=await request(result.app).get('/product.html?id='+product.id).expect(200);
     assert.equal(item.headers['x-robots-tag'],'index,follow');assert.ok(item.text.includes('https://club.example/product.html?id='+product.id));
     assert.match((await request(result.app).get('/shop.html?category=Protein').expect(200)).headers['x-robots-tag'],/noindex/);
-    for(const path of ['/login','/cart.html','/about.html','/trainers.html','/trainer.html'])assert.match((await request(result.app).get(path).expect(200)).headers['x-robots-tag'],/noindex/);
+    for(const path of ['/login','/cart.html','/about.html','/trainers.html'])assert.match((await request(result.app).get(path).expect(200)).headers['x-robots-tag'],/noindex/);
+    const legacyTrainer=await request(result.app).get('/trainer.html').expect(301).expect('Location','/trainers.html');
+    assert.match(legacyTrainer.headers['x-robots-tag'],/noindex/);
     const xml=(await request(result.app).get('/sitemap.xml').expect(200)).text;
     assert.ok(xml.includes(product.id));assert.doesNotMatch(xml,/cart.html|trainer.html|login|shop-panel|localhost/);
     await p.shopProduct.update({where:{id:product.id},data:{active:false}});

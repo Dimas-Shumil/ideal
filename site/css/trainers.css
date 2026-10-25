@@ -366,5 +366,39 @@
     transform: none;
   }
 }
+/* Catalog links now open the shared demonstration template. */
+.trainer-card__profile {
+  text-decoration: none;
+}
 
-.trainer-card__profile { text-decoration: none; }
+.trainer-card__info h2, .trainer-card__specialty {
+  overflow-wrap: anywhere;
+}
+
+.trainer-card__profile {
+  padding: 19px 22px;
+  background: #25282a;
+  color: #fff;
+  border-color: #25282a;
+}
+
+.trainer-card__profile:hover {
+  background: #464b4e;
+  color: #fff;
+}
+
+.trainers-page a:focus-visible {
+  outline: 3px solid #82662c;
+  outline-offset: 5px;
+}
+
+.trainers-page .header__appointment {
+  background: #25282a;
+  border-color: #25282a;
+  color: #fff;
+}
+
+.trainers-page .header__appointment:hover {
+  background: #464b4e;
+  color: #fff;
+}

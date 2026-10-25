@@ -252,3 +252,77 @@ Go Live не является источником CRM: для страницы 
 Итоги и ограничения: archive/PUBLIC_SCHEDULE_STAGE17.md.
 После локальной приёмки — remotes/status/diff/staged, русский commit и push origin main.
 Новый коммит в контейнере не создавался, деплой не выполнялся.
+
+## Этап 18: публичные тренеры
+
+Правила: [TRAINERS.md](TRAINERS.md). Этап 17 принят пользователем, подтверждён
+commit de861bd в origin/main. Исторические разделы выше не отменяют это состояние.
+Новая миграция — 20261025140000_public_trainers. Существующие publicName,
+publicVersion и флаги расписания сохраняются. Старые миграции не изменены.
+Зависимости/lock и обязательные env-переменные не менялись. Готовый CSS включён.
+
+### Применение на компьютере папы
+
+1. Остановить npm run dev (Ctrl+C) и все процессы/worker, изменяющие эту БД.
+2. Сделать штатный pg_dump ideal_dev в файл вне проекта. Проверить код завершения,
+   читаемость архива через pg_restore --list. Это ещё не проверка восстановления:
+   для неё нужен успешный restore в отдельную БД. Старый backup с exit code 0
+   не объявляется проверенным восстановлением.
+   При стандартных dev-настройках проекта (127.0.0.1:5432, ideal_app/ideal_dev),
+   если PostgreSQL bin уже доступен в PATH:
+
+```bat
+pg_dump -h 127.0.0.1 -p 5432 -U ideal_app -d ideal_dev -Fc -f ..\ideal-before-stage18.dump
+echo %ERRORLEVEL%
+pg_restore --list ..\ideal-before-stage18.dump > ..\ideal-before-stage18-list.txt
+echo %ERRORLEVEL%
+```
+
+   Пароль вводится локально по приглашению PostgreSQL, его не присылать.
+   При иных host/port/user использовать существующие настройки; .env не менять.
+   Продолжать только при коде 0 обеих команд и непустом списке архива.
+
+3. Распаковать ZIP-патч поверх IDEAL с заменой. .env, БД и node_modules патч не содержит.
+4. Выполнить в CMD из корня проекта:
+
+```bat
+cd /d "C:\Users\ШУМ\LITLE WORKS\IDEAL"
+npm test
+```
+
+Если node_modules отсутствует — сначала npm ci. Runner применяет миграции только
+к отдельной TEST_DATABASE_URL (БД _test и отдельный пользователь), повторяет deploy,
+генерирует Prisma Client и запускает все наборы. Он удаляет только тестовые данные.
+Существующие 169 случаев сохранены; ожидания общего trainer.html обновлены на 301,
+состав таблиц дополнен TrainerPhoto. Добавлены три новых набора. При ошибке остановиться,
+не применять миграцию к dev. Новые DB-тесты tests/trainers.test.js в контейнере не выполнены.
+
+После успешного полного npm test и при остановленных dev/worker:
+
+```bat
+node tools/stage18-db-check.mjs snapshot > ..\ideal-before-stage18.json
+npm run db:deploy
+npm run db:generate
+npm run db:status
+node tools/stage18-db-check.mjs snapshot > ..\ideal-after-stage18.json
+node tools/stage18-db-check.mjs compare ..\ideal-before-stage18.json ..\ideal-after-stage18.json
+```
+
+Каждая команда должна завершиться с кодом 0. При неуспешном snapshot не продолжать.
+Ожидается совпадение прежних данных всех 24 таблиц. Исключены только новая TrainerPhoto,
+новые поля TrainerProfile и служебная история миграций. В отличие от инструмента
+этапа 17 здесь publicName/publicVersion и публичные настройки занятий входят в digest.
+Снимки не содержат строки БД, но не являются backup. При различиях не продолжать
+приёмку автоматически: выяснить причину. Не выполнять db push/reset и не откатывать
+миграцию удалением столбцов. Затем:
+
+```bat
+npm run dev
+```
+
+OWNER → Публичные тренеры. Ручная приёмка — TRAINERS.md. Без подтверждённого полного
+npm test/сравнения dev нельзя объявлять этап принятым. Отчёт контейнера содержит
+только фактически выполненные проверки и ограничения.
+
+После локальной приёмки отдельно проверяются remotes, main, diff и staged-файлы,
+затем русский commit и git push origin main. Автоматического деплоя нет.
