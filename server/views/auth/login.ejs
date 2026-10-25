@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Вход сотрудников — ИДЕАЛ</title><link rel="stylesheet" href="/site/css/auth.css"></head>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Вход сотрудников — ИДЕАЛ</title><link rel="stylesheet" href="/site/css/auth.css"><%- include('../partials/pwa-head') %></head>
 <body class="auth"><main class="auth__card"><a class="auth__brand" href="/index.html">ИДЕАЛ.</a><h1 class="auth__title">Вход сотрудников</h1><p>Введите личный логин и пароль.</p>
 <% if (error) { %><p class="auth__error" role="alert"><%= error %></p><% } %>
 <form class="auth__form" action="/login" method="post"><input type="hidden" name="_csrf" value="<%= csrf %>">

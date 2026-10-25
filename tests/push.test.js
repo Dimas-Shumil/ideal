@@ -138,8 +138,8 @@ test('push: userService access changes revoke subscriptions and deliveries',asyn
 test('push: concurrent worker claims deliver once per device',async()=>{
  await seed();await event(await lesson());let calls=0;await Promise.all([deliver(async()=>{calls++;}),deliver(async()=>{calls++;})]);assert.equal(calls,1);
 });
-test('push: service worker route is JS only and has no offline caching',async()=>{
- const r=await request(app).get('/push-sw.js').expect(200);assert.match(r.headers['content-type'],/javascript/);assert.match(r.text,/notificationclick/);assert.ok(!r.text.includes('caches.open'));
+test('push: service worker route is JS only and retains Push with bounded PWA caching',async()=>{
+ const r=await request(app).get('/push-sw.js').expect(200);assert.match(r.headers['content-type'],/javascript/);assert.match(r.text,/notificationclick/);assert.match(r.text,/ideal-pwa-offline-/);assert.match(r.text,/request.method !== 'GET'/);
 });
 test('push: disabled configuration keeps page available but refuses new registration',async()=>{
  store.close();({app,store,users}=await createApp({config:{...config,PUSH_PUBLIC_KEY:'',PUSH_PRIVATE_KEY:''},db}));

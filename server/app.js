@@ -94,7 +94,15 @@ export async function createApp({
     );
   app.get("/push-sw.js", (req, res) => {
     res.set("Cache-Control", "no-cache");
-    res.sendFile(path.join(root, "server/modules/push/sw.js"));
+    res.sendFile(path.join(root, "server/modules/push/sw.js"), { lastModified: false, etag: false });
+  });
+  app.get('/manifest.webmanifest', (req, res) => {
+    res.set('Cache-Control', 'no-cache');
+    res.type('application/manifest+json').sendFile(path.join(root, 'server/modules/pwa/manifest.json'));
+  });
+  app.get('/offline.html', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+    res.sendFile(path.join(root, 'server/modules/pwa/offline.html'));
   });
   const pages = [
     "about",
@@ -142,6 +150,7 @@ export async function createApp({
   const users = userService(db.prisma);
   app.use(await authRoutes({ config, prisma: db.prisma, store, users }));
   app.use(shopRoutes({config,prisma:db.prisma,indexHtml:index}));
+  app.get('/application', requireAuth, requireRole('OWNER', 'ADMIN', 'TRAINER'), (req, res) => res.render('pwa/panel', {user: req.user}));
   app.use(pushRoutes({ config, prisma: db.prisma }));
   app.use(crmRoutes({config,prisma:db.prisma}));
   app.use(scheduleRoutes({ config, prisma: db.prisma }));

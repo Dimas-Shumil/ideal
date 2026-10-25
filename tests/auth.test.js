@@ -148,7 +148,14 @@ test("no-JS form, CSRF/Origin prelogin, strict input, uniform credentials failur
   const page = await agent.get("/login").expect(200);
   const token = page.text.match(/name="_csrf" value="([a-f0-9]+)"/)[1];
   assert.match(page.text, /method="post"/);
-  assert.ok(!page.text.includes("<script"));
+  // No-JS means the HTML form works without script execution, not that the
+  // page cannot load a progressive enhancement such as PWA registration.
+  assert.match(page.text, /<form[^>]*action="\/login"[^>]*method="post"/);
+  assert.deepEqual(
+    page.text.match(/<script\b[^>]*>[\s\S]*?<\/script>/gi) || [],
+    ['<script src="/site/scripts/pwa.js" defer></script>'],
+  );
+  assert.doesNotMatch(page.text, /\son[a-z]+\s*=/i);
   const body = { login: "owner", password: secret, _csrf: token };
   await agent.post("/login").type("form").send(body).expect(403);
   await agent
