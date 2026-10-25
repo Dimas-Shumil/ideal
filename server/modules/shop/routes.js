@@ -1,4 +1,6 @@
 import ejs from "ejs";
+import { publicPlans, planTerms } from "../public/plans.js";
+import { applySeo, seoFor } from "../public/seo.js";
 import { fileURLToPath } from "node:url";
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
@@ -7,7 +9,7 @@ import { z } from "zod";
 import { requireAuth, requireRole } from "../../middleware/auth.js";
 import { csrf, newCsrf } from "../../middleware/csrf.js";
 import { shopService, fail, guestHash } from "./service.js";
-import { parseImage, normalizeImage } from "./images.js";
+import { parseImage, parseProductImage, normalizeImage } from "./images.js";
 import * as s from "./schema.js";
 const money = (n) =>
   (n / 100).toLocaleString("ru-RU", {
@@ -52,8 +54,10 @@ export function shopRoutes({ prisma, config, indexHtml }) {
     }
     next();
   };
-  const render = (req, res, page, data = {}) =>
-    res.render("shop/" + page, {
+  const render = (req, res, page, data = {}) => {
+    if (data.seo) res.set("X-Robots-Tag", data.seo.robots);
+    return res.render("shop/" + page, {
+      seo: null,
       csrf: req.session.csrf,
       key: randomUUID,
       money,
@@ -61,6 +65,7 @@ export function shopRoutes({ prisma, config, indexHtml }) {
       statuses: s.statuses,
       ...data,
     });
+  };
   const body = (req) => {
     const { _csrf, ...data } = req.body || {};
     return data;
@@ -69,8 +74,12 @@ export function shopRoutes({ prisma, config, indexHtml }) {
     new Promise((resolve, reject) =>
       req.session.save((e) => (e ? reject(e) : resolve())),
     );
-  r.get(["/", "/index.html"], async (req, res) => {
-    const { items } = await service.catalog();
+  r.get("/", async (req, res) => {
+    const [{ items }, plans] = await Promise.all([service.catalog(), publicPlans(prisma)]);
+    const memberships = await ejs.renderFile(
+      fileURLToPath(new URL("../../views/public/memberships.ejs", import.meta.url)),
+      { plans, money, planTerms },
+    );
     const nutrition = await ejs.renderFile(
       fileURLToPath(new URL("../../views/shop/nutrition.ejs", import.meta.url)),
       { items: items.slice(0, 5), money },
@@ -78,7 +87,8 @@ export function shopRoutes({ prisma, config, indexHtml }) {
     res
       .type("html")
       .send(
-        indexHtml
+        applySeo(res, config, "/", indexHtml, req.query)
+          .replace(/<section\s+class="memberships"[\s\S]*?<\/section>/, () => memberships)
           .replace(
             /<section class="nutrition"[\s\S]*?<\/section>/,
             () => nutrition,
@@ -93,12 +103,13 @@ export function shopRoutes({ prisma, config, indexHtml }) {
     const data = await service.catalog(req.query);
     return req.path.startsWith("/api/")
       ? res.json(data)
-      : render(req, res, "catalog", data);
+      : render(req, res, "catalog", { ...data, seo: seoFor(config, req.path, req.query) });
   });
   r.get("/product.html", init, async (req, res) => {
     const q = z.object({ id: s.uuid.optional() }).strict().parse(req.query);
+    const product = q.id ? await service.product(q.id) : null;
     render(req, res, "product", {
-      product: q.id ? await service.product(q.id) : null,
+      product, seo: seoFor(config, req.path, req.query, product),
     });
   });
   r.get("/api/shop/products/:id", async (req, res) =>
@@ -263,6 +274,19 @@ export function shopRoutes({ prisma, config, indexHtml }) {
           : res.redirect(303, result.url);
       },
     );
+  r.post("/shop-panel/products/new/with-photo", requireRole("OWNER"), imageLimit,
+    (req, res, next) => req.get("Origin") === config.APP_ORIGIN ? next() : next(fail(403, "Доступ запрещён.")),
+    parseProductImage, guard, async (req, res) => {
+      const { _csrf, key, version, ...data } = req.body;
+      const c = ctx(req, s.meta.parse({ _csrf, key, version }));
+      const image = req.shopImage ? await normalizeImage(req.shopImage) : null;
+      const result = await service.saveProduct(c, null, data, image);
+      res.redirect(303, "/shop-panel/products/" + result.id + "#product-variants");
+    });
+  post("/shop-panel/products/:id/delete", async (req, c, data) => {
+    const result = await service.deleteProduct(c, req.params.id, data);
+    return { ...result, url: "/shop-panel/products" };
+  }, true);
   post(
     "/shop-panel/products",
     async (req, c, d) => {

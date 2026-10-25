@@ -16,6 +16,7 @@ import {
 import {
   clientBody,
   planBody,
+  planDeleteBody,
   issueBody,
   actions,
   uuid,
@@ -333,6 +334,20 @@ export function crmService(prisma) {
         true,
       );
     },
+    async deletePlan(ctx, id, input) {
+      const data = planDeleteBody.parse(input);
+      return mutate(ctx, "PLAN_DELETED", id, data, async (tx) => {
+        const plan = await tx.membershipPlan.findUnique({ where: { id } });
+        if (!plan) throw fail(404, "Тариф не найден.");
+        check(plan.version === versionSchema.parse(ctx.version), "Тариф изменился. Обновите страницу перед удалением.");
+        await history(tx, ctx, "PLAN_DELETED", null, null, "", {
+          planId: id,
+          plan: JSON.parse(JSON.stringify(plan)),
+        });
+        await tx.membershipPlan.delete({ where: { id } });
+        return { id };
+      }, true);
+    },
     async issue(ctx, input) {
       const data = issueBody.parse(input);
       return mutate(ctx, "MEMBERSHIP_ISSUED", null, input, async (tx) => {
@@ -376,6 +391,8 @@ export function crmService(prisma) {
           createdAt,
           updatedAt,
           active,
+          publicVisible,
+          publicOrder,
           ...snapshot
         } = p;
         const pairId = p.duo ? randomUUID() : null;

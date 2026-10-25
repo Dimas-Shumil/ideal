@@ -100,7 +100,6 @@ test("schema: auth, CRM and schedule entities; bootstrap cannot repeat", async (
 test("public pages, static boundaries, CSP hash, errors and no root static", async () => {
   for (const p of [
     "/",
-    "/index.html",
     "/about.html",
     "/trainers.html",
     "/trainer.html",
@@ -113,6 +112,8 @@ test("public pages, static boundaries, CSP hash, errors and no root static", asy
     if (!["/shop.html", "/product.html", "/cart.html"].includes(p)) assert.ok(!r.headers["set-cookie"]);
     else { assert.ok(r.headers["set-cookie"]); assert.equal(r.headers["cache-control"],"no-store"); }
   }
+  const alias = await request(app).get("/index.html?source=check").expect(301);
+  assert.equal(alias.headers.location, "/?source=check");
   const home = await request(app).get("/");
   assert.match(home.headers["content-security-policy"], /sha256-/);
   assert.ok(!home.headers["content-security-policy"].includes("unsafe-inline"));

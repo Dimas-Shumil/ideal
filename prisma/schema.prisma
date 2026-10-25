@@ -105,6 +105,8 @@ model MembershipPlan {
   giftGym Boolean
   duo Boolean
   active Boolean @default(true)
+  publicVisible Boolean @default(false)
+  publicOrder Int @default(0)
   version Int @default(1)
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)

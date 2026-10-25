@@ -552,3 +552,76 @@ test("shop forms: long UTF-8 descriptions work without JS within bounded body li
   assert.equal(saved.description.length, 4000);
   assert.equal(saved.characteristics.length, 4000);
 });
+
+test('SEO HTTP: public canonicals, filtered noindex, private headers, sitemap and real 404',async()=>{
+  const seoConfig=readConfig({...process.env,NODE_ENV:'production',APP_ORIGIN:'https://club.example',SEO_ORIGIN:'https://club.example',SEO_INDEXABLE:'true'});
+  const result=await createApp({config:seoConfig,db});
+  try {
+    const home=await request(result.app).get('/').set('Host','attacker.invalid').expect(200);
+    assert.equal(home.headers['x-robots-tag'],'index,follow');assert.match(home.text,/rel="canonical" href="https:\/\/club.example\/"/);
+    assert.match(home.headers['content-security-policy'],/form-action 'self'/);
+    const item=await request(result.app).get('/product.html?id='+product.id).expect(200);
+    assert.equal(item.headers['x-robots-tag'],'index,follow');assert.ok(item.text.includes('https://club.example/product.html?id='+product.id));
+    assert.match((await request(result.app).get('/shop.html?category=Protein').expect(200)).headers['x-robots-tag'],/noindex/);
+    for(const path of ['/login','/cart.html','/about.html','/trainers.html','/trainer.html'])assert.match((await request(result.app).get(path).expect(200)).headers['x-robots-tag'],/noindex/);
+    const xml=(await request(result.app).get('/sitemap.xml').expect(200)).text;
+    assert.ok(xml.includes(product.id));assert.doesNotMatch(xml,/cart.html|trainer.html|login|shop-panel|localhost/);
+    await p.shopProduct.update({where:{id:product.id},data:{active:false}});
+    await request(result.app).get('/product.html?id='+product.id).expect(404);
+    assert.ok(!(await request(result.app).get('/sitemap.xml')).text.includes(product.id));
+    await request(result.app).get('/not-a-page').expect(404);
+    const robot=await request(result.app).get('/robots.txt').expect(200);assert.match(robot.text,/Sitemap: https:\/\/club.example\/sitemap.xml/);
+  } finally { result.store.close(); }
+});
+
+test('Shop create with photo: multipart, safe WebP, atomic validation and replay',async()=>{
+  const image=await sharp({create:{width:30,height:30,channels:3,background:'#fff'}}).png().toBuffer();
+  const fields={_csrf:os.csrf,key:randomUUID(),name:'Фото при создании',category:'Тест',description:'Описание',characteristics:'Состав',active:'false'};
+  const sendPhoto=(actor,values,buffer=image,type='image/png')=>{
+    let req=actor.agent.post('/shop-panel/products/new/with-photo').set('Origin',origin);
+    for(const [k,v] of Object.entries(values))req=req.field(k,String(v));
+    return req.attach('image',buffer,{filename:'photo.png',contentType:type});
+  };
+  const result=await sendPhoto(os,fields).expect(303);const id=result.headers.location.split('/').at(-1).split('#')[0];
+  const created=await p.shopProduct.findUnique({where:{id},include:{images:true}});
+  assert.equal(created.name,fields.name);assert.equal(created.images.length,1);assert.equal((await sharp(created.images[0].data).metadata()).format,'webp');
+  await sendPhoto(os,fields).expect(303);assert.equal(await p.shopProduct.count({where:{name:fields.name}}),1);
+  await sendPhoto(os,{...fields,key:randomUUID(),name:'Неверная фотография'},Buffer.from('<svg></svg>'),'image/svg+xml').expect(400);
+  assert.equal(await p.shopProduct.count({where:{name:'Неверная фотография'}}),0);
+  await sendPhoto(as,{...fields,_csrf:as.csrf,key:randomUUID()}).expect(403);
+  await sendPhoto(ts,{...fields,_csrf:ts.csrf,key:randomUUID()}).expect(403);
+  const bad={...fields,key:randomUUID()};delete bad._csrf;await sendPhoto(os,bad).expect(403);
+  let noImage=os.agent.post('/shop-panel/products/new/with-photo').set('Origin',origin);
+  for(const [k,v]of Object.entries({...fields,key:randomUUID(),name:'Без фото'}))noImage=noImage.field(k,v);
+  const empty=await noImage.expect(303);assert.match(empty.headers.location,/#product-variants$/);
+});
+
+test('Shop deletion: guards, version, snapshots, unavailable basket and replay',async()=>{
+  const g=await guest();await add(g);const submitted=await checkout(g);const receipt=await send(g,submitted);
+  const old=await p.shopOrder.findFirst({where:{id:receipt.headers.location.split('/').at(-1)}});
+  const g2=await guest();await add(g2);const pending=await checkout(g2);
+  await p.shopImage.create({data:{productId:product.id,data:await sharp({create:{width:5,height:5,channels:3,background:'#fff'}}).webp().toBuffer()}});
+  const path='/products/'+product.id+'/delete';
+  for(const actor of [as,ts])await post(actor,path,{version:1,confirm:'delete'},403);
+  await post(os,path,{version:1},400);await post(os,path,{version:2,confirm:'delete'},409);
+  await os.agent.post('/api/shop-panel'+path).set('Origin',origin).send({key:randomUUID(),version:1,confirm:'delete'}).expect(403);
+  const data={_csrf:os.csrf,key:randomUUID(),version:1,confirm:'delete'};
+  for(let i=0;i<2;i++)await os.agent.post('/api/shop-panel'+path).set('Origin',origin).send(data).expect(200);
+  assert.equal(await p.shopProduct.findUnique({where:{id:product.id}}),null);assert.equal(await p.shopImage.count({where:{productId:product.id}}),0);assert.equal(await p.shopVariant.count({where:{productId:product.id}}),0);
+  const saved=await p.shopOrder.findUnique({where:{id:old.id}});assert.deepEqual(saved,old);
+  await g.agent.get(receipt.headers.location).expect(200);await send(g2,pending,409);
+  await request(app).get('/product.html?id='+product.id).expect(404);
+  assert.equal(await p.auditEvent.count({where:{action:'SHOP_PRODUCT_DELETE',targetId:product.id}}),1);
+  assert.equal(await p.crmEvent.count({where:{action:'SHOP_PRODUCT_DELETE',details:{path:['product','id'],equals:product.id}}}),1);
+});
+
+test('Shop product delete: audit failure rolls back product, variants and images',async()=>{
+  const image=await p.shopImage.create({data:{productId:product.id,data:Buffer.from('fixture bytes')}});
+  await db.pool.query(`CREATE FUNCTION product_reject_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='SHOP_PRODUCT_DELETE' THEN RAISE EXCEPTION 'test audit unavailable'; END IF; RETURN NEW; END $$`);
+  await db.pool.query('CREATE TRIGGER product_reject_audit BEFORE INSERT ON "AuditEvent" FOR EACH ROW EXECUTE FUNCTION product_reject_audit()');
+  try{
+    await post(os,'/products/'+product.id+'/delete',{version:1,confirm:'delete'},500);
+    assert.ok(await p.shopProduct.findUnique({where:{id:product.id}}));assert.ok(await p.shopVariant.findUnique({where:{id:variant.id}}));assert.ok(await p.shopImage.findUnique({where:{id:image.id}}));
+    assert.equal(await p.crmEvent.count({where:{action:'SHOP_PRODUCT_DELETE',details:{path:['product','id'],equals:product.id}}}),0);
+  }finally{await db.pool.query('DROP TRIGGER product_reject_audit ON "AuditEvent"');await db.pool.query('DROP FUNCTION product_reject_audit()');}
+});

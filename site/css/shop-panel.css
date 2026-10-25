@@ -82,3 +82,13 @@
     transition: none;
   }
 }
+.shop-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin: 16px 0;
+}
+
+.shop-panel :is(#product-variants, #product-gallery, #delete-product) {
+  scroll-margin-top: 110px;
+}

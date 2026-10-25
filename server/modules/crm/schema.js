@@ -44,6 +44,8 @@ export const planBody = z
     giftGym: z.enum(["true", "false"]).transform((s) => s === "true"),
     duo: z.enum(["true", "false"]).transform((s) => s === "true"),
     active: z.enum(["true", "false"]).transform((s) => s === "true"),
+    publicVisible: z.enum(["true", "false"]).transform((s) => s === "true").optional(),
+    publicOrder: integer(0, 10000).optional(),
   })
   .strict()
   .refine(
@@ -55,6 +57,7 @@ export const planBody = z
     (p) => !p.giftGym || p.kind === "GROUP",
     "Подарок зала применяется к групповому тарифу.",
   );
+export const planDeleteBody = z.object({ confirm: z.literal("delete") }).strict();
 export const issueBody = z
   .object({
     planId: uuid,

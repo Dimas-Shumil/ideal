@@ -226,13 +226,13 @@ export function shopService(prisma, quoteSecret) {
     check(v.version === s.int(1, 2147483646).parse(expected));
     return v;
   }
-  async function saveProduct(ctx, id, raw) {
+  async function saveProduct(ctx, id, raw, image = null) {
     const data = s.productBody.parse(raw);
     return mutate(
       ctx,
       "SHOP_PRODUCT_SAVE",
       id,
-      data,
+      image ? { ...data, imageDigest: createHash("sha256").update(image).digest("hex") } : data,
       async (tx) => {
         if (id) await version(tx, "shopProduct", id, ctx.version);
         const p = id
@@ -241,10 +241,28 @@ export function shopService(prisma, quoteSecret) {
               data: { ...data, version: { increment: 1 } },
             })
           : await tx.shopProduct.create({ data });
+        if (image) await tx.shopImage.create({ data: { productId: p.id, data: image } });
         return { id: p.id };
       },
       true,
     );
+  }
+  async function deleteProduct(ctx, id, raw) {
+    const data = s.productDeleteBody.parse(raw);
+    return mutate(ctx, "SHOP_PRODUCT_DELETE", id, data, async (tx) => {
+      await version(tx, "shopProduct", id, ctx.version);
+      const product = await tx.shopProduct.findUnique({
+        where: { id }, include: { variants: true, images: { select: { id: true } } },
+      });
+      await tx.crmEvent.create({ data: {
+        actorId: ctx.actorId, action: "SHOP_PRODUCT_DELETE",
+        details: { product: JSON.parse(JSON.stringify(product)) },
+      } });
+      await tx.shopImage.deleteMany({ where: { productId: id } });
+      await tx.shopVariant.deleteMany({ where: { productId: id } });
+      await tx.shopProduct.delete({ where: { id } });
+      return { id };
+    }, true);
   }
   async function saveVariant(ctx, productId, id, raw) {
     s.uuid.parse(productId);
@@ -469,6 +487,7 @@ export function shopService(prisma, quoteSecret) {
     basket,
     quote,
     saveProduct,
+    deleteProduct,
     saveVariant,
     addImage,
     removeImage,

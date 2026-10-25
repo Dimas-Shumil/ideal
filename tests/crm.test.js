@@ -993,3 +993,96 @@ test("CRM: phone search normalizes Russian prefix and punctuation never matches 
     .expect(200);
   assert.equal(punctuation.body.total, 0);
 });
+
+test('Public tariffs: OWNER publication, ordering, escaping, live prices and preserved sales', async () => {
+  const o=await login('crmowner'), a=await login('crmadmin'), t=await login('crmta');
+  const prefix='PUBLIC16_'+randomUUID().slice(0,8);
+  const hidden=await makePlan(o,{name:prefix+'_HIDDEN'});
+  const pub=await makePlan(o,{name:prefix+'_VISIBLE',publicVisible:'true',publicOrder:'20'});
+  const first=await makePlan(o,{name:prefix+'_FIRST',publicVisible:'true',publicOrder:'1'});
+  await makePlan(o,{name:prefix+'_INACTIVE',active:'false',publicVisible:'true'});
+  const client=await makeClient(a);await issue(a,client,pub);
+  const old=await getMember(a,client);
+  let page=await request(app).get('/').expect(200);
+  assert.ok(page.text.indexOf(prefix+'_FIRST')<page.text.indexOf(prefix+'_VISIBLE'));
+  assert.doesNotMatch(page.text,new RegExp(prefix+'_(HIDDEN|INACTIVE)'));
+  assert.match(page.text,/Условия оформления/);assert.match(page.text,/Одно посещение/);
+  assert.equal(page.headers['cache-control'],'no-store');
+  await post(a,'/crm/plans/'+pub,{...planInput({publicVisible:'false'}),version:1},403);
+  await post(t,'/crm/plans/'+pub,{...planInput({publicVisible:'false'}),version:1},403);
+  await post(o,'/crm/plans/'+pub,{...planInput({name:prefix+'_<script>"',price:'4321.09',publicVisible:'true',publicOrder:'20'}),version:1});
+  page=await request(app).get('/').expect(200);
+  assert.match(page.text,/4\s?321,09/);assert.match(page.text,/&lt;script&gt;/);assert.doesNotMatch(page.text,/<script>"/);
+  const sold=await getMember(a,client);assert.deepEqual(sold.snapshot,old.snapshot);assert.equal(sold.priceCents,old.priceCents);
+  assert.equal('publicVisible' in sold.snapshot,false);
+  await post(o,'/crm/plans/'+pub,{...planInput({publicVisible:'false'}),version:1},409);
+  await post(o,'/crm/plans/'+pub,{...planInput({name:prefix+'_HIDE_AGAIN',publicVisible:'false'}),version:2});
+  assert.doesNotMatch((await request(app).get('/')).text,new RegExp(prefix+'_HIDE_AGAIN'));
+  await post(o,'/crm/plans/'+hidden,{...planInput({publicOrder:'-1'}),version:1},400);
+  await request(app).get('/api/crm/plans').expect(401);
+});
+
+test('Public tariffs: empty publication renders no fabricated prices or checkout',async()=>{
+  await db.prisma.membershipPlan.updateMany({data:{publicVisible:false}});
+  const r=await request(app).get('/').expect(200);
+  assert.match(r.text,/Абонементы готовятся к публикации/);
+  assert.doesNotMatch(r.text,/data-buy-plan=/);
+});
+
+test('Tariff deletion: OWNER only, independent guards and explicit confirmation',async()=>{
+  const o=await login('crmowner'),a=await login('crmadmin'),t=await login('crmta');
+  const id=await makePlan(o);
+  await o.agent.get('/crm/plans/'+id+'/delete').expect(404);
+  await request(app).post('/api/crm/plans/'+id+'/delete').send({confirm:'delete'}).expect(401);
+  for(const actor of [a,t])await post(actor,'/crm/plans/'+id+'/delete',{version:1,confirm:'delete'},403);
+  for(const fields of [{},{confirm:'yes'},{confirm:'delete',force:true}])await post(o,'/crm/plans/'+id+'/delete',{version:1,...fields},400);
+  await o.agent.post('/api/crm/plans/'+id+'/delete').set('Origin',origin).send({key:randomUUID(),version:1,confirm:'delete'}).expect(403);
+  await o.agent.post('/api/crm/plans/'+id+'/delete').set('Origin','https://wrong.example').send({_csrf:o.token,key:randomUUID(),version:1,confirm:'delete'}).expect(403);
+  assert.ok(await db.prisma.membershipPlan.findUnique({where:{id}}));
+  const page=await o.agent.get('/crm/plans/'+id).expect(200);assert.match(page.text,/id="delete-plan"/);assert.match(page.text,/type="checkbox" name="confirm" value="delete" required/);
+});
+
+test('Tariff deletion: sold snapshots/payments/history preserved, public removal and replay',async()=>{
+  const o=await login('crmowner'),a=await login('crmadmin');
+  const name='DELETE_'+randomUUID(),id=await makePlan(o,{name,publicVisible:'true'}),client=await makeClient(a);
+  await issue(a,client,id);const before=await getMember(a,client);
+  const events=await db.prisma.crmEvent.count({where:{membershipId:before.id}});
+  const data={_csrf:o.token,key:randomUUID(),version:1,confirm:'delete'};
+  const path='/api/crm/plans/'+id+'/delete';
+  for(let n=0;n<2;n++)await o.agent.post(path).set('Origin',origin).send(data).expect(200);
+  assert.equal(await db.prisma.membershipPlan.findUnique({where:{id}}),null);
+  const after=await getMember(a,client);assert.deepEqual(after.snapshot,before.snapshot);assert.equal(after.priceCents,before.priceCents);assert.deepEqual(after.purchase,before.purchase);
+  assert.equal(await db.prisma.crmEvent.count({where:{membershipId:before.id}}),events);
+  assert.equal(await db.prisma.auditEvent.count({where:{action:'PLAN_DELETED',targetId:id}}),1);
+  const history=await db.prisma.crmEvent.findMany({where:{action:'PLAN_DELETED',details:{path:['planId'],equals:id}}});assert.equal(history.length,1);assert.equal(history[0].details.plan.name,name);
+  assert.doesNotMatch((await request(app).get('/').expect(200)).text,new RegExp(name));
+  await o.agent.get('/crm/plans/'+id).expect(404);
+  await issue(a,await makeClient(a),id,{},409);
+});
+
+test('Tariff deletion: stale version cannot remove updated tariff; ordinary HTML form works',async()=>{
+  const o=await login('crmowner'),id=await makePlan(o);
+  await post(o,'/crm/plans/'+id,{...planInput(),version:1});
+  await post(o,'/crm/plans/'+id+'/delete',{version:1,confirm:'delete'},409);
+  assert.ok(await db.prisma.membershipPlan.findUnique({where:{id}}));
+  const page=await o.agent.get('/crm/plans/'+id).expect(200);
+  const form=page.text.match(/<form[^>]+action="[^"]+\/delete"[\s\S]*?<\/form>/)[0];
+  const key=form.match(/name="key" value="([^"]+)"/)[1];
+  const result=await o.agent.post('/crm/plans/'+id+'/delete').set('Origin',origin).type('form').send({_csrf:o.token,key,version:2,confirm:'delete'}).expect(303);
+  assert.equal(result.headers.location,'/crm/plans');assert.equal(await db.prisma.membershipPlan.findUnique({where:{id}}),null);
+});
+
+test('Tariff deletion: audit failure rolls back deletion and saved history atomically',async()=>{
+  const o=await login('crmowner'),id=await makePlan(o);
+  await db.pool.query(`CREATE FUNCTION tariff_reject_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='PLAN_DELETED' THEN RAISE EXCEPTION 'test audit unavailable'; END IF; RETURN NEW; END $$`);
+  await db.pool.query('CREATE TRIGGER tariff_reject_audit BEFORE INSERT ON "AuditEvent" FOR EACH ROW EXECUTE FUNCTION tariff_reject_audit()');
+  const key=randomUUID();
+  try{
+    await o.agent.post('/api/crm/plans/'+id+'/delete').set('Origin',origin).send({_csrf:o.token,key,version:1,confirm:'delete'}).expect(500);
+    assert.ok(await db.prisma.membershipPlan.findUnique({where:{id}}));
+    assert.equal(await db.prisma.crmOperation.count({where:{key}}),0);
+    assert.equal(await db.prisma.crmEvent.count({where:{action:'PLAN_DELETED',details:{path:['planId'],equals:id}}}),0);
+  }finally{
+    await db.pool.query('DROP TRIGGER tariff_reject_audit ON "AuditEvent"');await db.pool.query('DROP FUNCTION tariff_reject_audit()');
+  }
+});

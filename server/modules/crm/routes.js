@@ -188,6 +188,7 @@ export function crmRoutes({ prisma, config }) {
     (r, c, d) => service.savePlan(c, r.params.id, d),
     true,
   );
+  post("/crm/plans/:id/delete", (r, c, d) => service.deletePlan(c, r.params.id, d), true);
   post("/crm/memberships", (_r, c, d) => service.issue(c, d));
   for (const action of [
     "cancel",

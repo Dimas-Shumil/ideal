@@ -1,3 +1,4 @@
+import { applySeo, robotsText, sitemapXml } from "./modules/public/seo.js";
 import { shopRoutes } from "./modules/shop/routes.js";
 import { pushRoutes } from "./modules/push/routes.js";
 import express from "express";
@@ -35,6 +36,7 @@ export async function createApp({
   app.use((req, res, next) => {
     req.id = randomUUID();
     res.set("X-Request-ID", req.id);
+    res.set("X-Robots-Tag", "noindex,nofollow");
     next();
   });
   const index = await readFile(path.join(root, "index.html"), "utf8");
@@ -104,6 +106,12 @@ export async function createApp({
     res.set('Cache-Control', 'public, max-age=0, must-revalidate');
     res.sendFile(path.join(root, 'server/modules/pwa/offline.html'));
   });
+  app.get('/robots.txt', (req, res) => res.type('text/plain').send(robotsText(config)));
+  app.get('/sitemap.xml', async (req, res) => res.type('application/xml').send(await sitemapXml(config, db.prisma)));
+  app.get('/index.html', (req, res) => {
+    const query = req.originalUrl.indexOf('?');
+    res.redirect(301, '/' + (query < 0 ? '' : req.originalUrl.slice(query)));
+  });
   const pages = [
     "about",
     "trainers",
@@ -111,8 +119,8 @@ export async function createApp({
   ];
   for (const name of pages)
     app.get(
-      name === "index" ? ["/", "/index.html"] : `/${name}.html`,
-      (req, res) => res.sendFile(path.join(root, `${name}.html`)),
+      `/${name}.html`,
+      async (req, res) => res.type("html").send(applySeo(res, config, `/${name}.html`, await readFile(path.join(root, `${name}.html`), "utf8"), req.query)),
     );
   // Private/auth responses always no-store, even errors and unknown API routes.
   app.use((req, res, next) => {

@@ -12,3 +12,6 @@
 .shop-panel :is(a,button,input,select,textarea):focus-visible { outline:3px solid #496858;outline-offset:4px; }
 @media(max-width:680px){.shop-panel__grid,.shop-panel__gallery{grid-template-columns:minmax(0,1fr);}.shop-panel__filters{align-items:stretch;flex-direction:column;}}
 @media(prefers-reduced-motion:reduce){.shop-panel a,.shop-panel button{transition:none;}}
+
+.shop-panel__actions { display:flex;flex-wrap:wrap;gap:12px 20px;margin:16px 0; }
+.shop-panel :is(#product-variants,#product-gallery,#delete-product) { scroll-margin-top:110px; }

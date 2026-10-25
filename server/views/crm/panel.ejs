@@ -44,7 +44,7 @@
 <% }else if(page==='plans'){ %>
 <div class="panel__heading"><h1>Тарифы</h1><% if(isOwner){ %><a class="panel__button" href="/crm/plans/new">Добавить тариф</a><% } %></div><p>Условия оформленных абонементов сохраняются при изменении тарифа. Прайс вносится по подтверждённым данным клуба.</p>
 <% if(!plans.length){ %><section class="panel__card"><h2>Тарифы ещё не добавлены</h2><p>Владелец может внести действующий прайс клуба.</p></section><% } %>
-<div class="crm__grid"><% for(const p of plans){ %><article class="panel__card"><h2><%= p.name %></h2><p><%= money(p.priceCents) %> ₽<%= p.duo?' за человека · Дуэт':'' %></p><p><%= p.kind==='GYM'?'Тренажёрный зал':'Групповые занятия' %> · <%= p.active?'Доступен':'Отключён' %></p><%- include('conditions',{p}) %><% if(isOwner){ %><a href="/crm/plans/<%= p.id %>">Редактировать тариф</a><% } %></article><% } %></div>
+<div class="crm__grid"><% for(const p of plans){ %><article class="panel__card"><h2><%= p.name %></h2><p><%= money(p.priceCents) %> ₽<%= p.duo?' за человека · Дуэт':'' %></p><p><%= p.kind==='GYM'?'Тренажёрный зал':'Групповые занятия' %> · <%= p.active?'Доступен':'Отключён' %></p><p>На сайте: <%= p.active && p.publicVisible?'опубликован':'скрыт' %> · Порядок: <%= p.publicOrder %></p><%- include('conditions',{p}) %><% if(isOwner){ %><a href="/crm/plans/<%= p.id %>">Редактировать тариф</a> · <a href="/crm/plans/<%= p.id %>#delete-plan">Удалить тариф</a><% } %></article><% } %></div>
 <% }else if(page==='plan-form'){ %><%- include('plan-form',{plan}) %>
 <% }else if(page==='issue'){ %><%- include('issue',{client,plans,plan,partners,partnerQ,methods}) %>
 <% } %><p class="panel__busy" role="status" aria-live="polite"></p></main></div></body></html>

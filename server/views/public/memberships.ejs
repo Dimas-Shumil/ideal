@@ -1,0 +1,45 @@
+        <section
+          class="memberships memberships--crm"
+          id="memberships"
+          aria-labelledby="memberships-title"
+        >
+          <img
+            class="memberships__scene"
+            src="site/img/membership-scene.webp"
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
+          />
+          <div class="memberships__shell">
+            <div class="memberships__intro">
+              <p class="memberships__eyebrow">
+                <span>02</span><i aria-hidden="true"></i>Абонементы
+              </p>
+              <h2 class="memberships__heading" id="memberships-title">
+                БОЛЬШЕ<br />ВОЗМОЖНОСТЕЙ<br />ДЛЯ ТЕБЯ
+              </h2>
+              <p class="memberships__lead">
+                Выбери удобный формат и начни движение к своим целям уже
+                сегодня.
+              </p>
+              <a href="#plans" class="memberships__browse"
+                >Посмотреть<br />все абонементы</a
+              >
+            </div>
+<div class="memberships__content" id="plans">
+<% if(!plans.length){ %><p class="memberships__note">Абонементы готовятся к публикации. Условия можно уточнить в клубе.</p><% }else{ const initial=plans.some(p=>p.kind==='GYM')?'gym':'groups'; %>
+<div class="memberships__toolbar"><div class="memberships__tabs" role="group" aria-label="Вид абонемента">
+<% for(const [category,label] of [['gym','Тренажёрный зал'],['groups','Групповые занятия']]){ %><button type="button" data-plan-tab="<%= category %>" class="<%= initial===category?'is-active':'' %>" aria-pressed="<%= initial===category %>"><%= label %></button><% } %>
+</div><div class="memberships__arrows" aria-label="Прокрутить карточки"><button type="button" data-plans-prev disabled aria-label="Предыдущий абонемент">Назад</button><span class="memberships__counter" data-plans-counter aria-live="polite">01 / <%= String(plans.filter(p=>p.kind===(initial==='gym'?'GYM':'GROUP')).length).padStart(2,'0') %></span><button type="button" data-plans-next disabled aria-label="Следующий абонемент">Далее</button></div></div>
+<% for(const [category,kind,label] of [['gym','GYM','Тренажёрный зал'],['groups','GROUP','Групповые занятия']]){ const items=plans.filter(p=>p.kind===kind); %>
+<div class="memberships__plan-view" data-plans-panel="<%= category %>">
+<h3 class="memberships__category"><%= label %></h3>
+<% if(!items.length){ %><p class="memberships__note">Тарифы этого направления готовятся к публикации.</p><% } %>
+<div class="memberships__track" data-plans-track="<%= category %>" tabindex="0" role="region" aria-label="<%= label %>: абонементы">
+<% for(const [i,p] of items.entries()){ const terms=planTerms(p); const price=money(p.priceCents)+' ₽'; %>
+<article class="membership-card" aria-label="<%= p.name %>"><div class="membership-card__top"><span class="membership-card__index"><%= String(i+1).padStart(2,'0') %> / IDEAL</span><span class="membership-card__dash" aria-hidden="true"></span></div>
+<h4 class="membership-card__name"><%= p.name %></h4><p class="membership-card__times"><%= p.fromTime %>–<%= p.toTime %></p><div class="membership-card__price"><strong><%= price %></strong></div><p class="membership-card__description"><%= terms %></p>
+<button class="membership-card__buy" type="button" data-buy-plan="<%= p.name %>" data-buy-price="<%= price %>" data-buy-details="<%= terms %>" aria-haspopup="dialog">Условия оформления</button></article>
+<% } %></div></div><% } %><p class="memberships__note">Цена за человека. Оформление и оплата — в клубе. Онлайн-покупка недоступна.</p><% } %>
+</div></div></section>

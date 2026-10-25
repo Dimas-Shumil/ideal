@@ -50,6 +50,7 @@ run("--test", [
   "--test-concurrency=1",
   "tests/auth.test.js",
   "tests/policy.test.js",
+  "tests/seo.test.js",
   "tests/crm-dates.test.js",
   "tests/schedule-dates.test.js",
   "tests/crm.test.js",

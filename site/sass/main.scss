@@ -1903,8 +1903,9 @@ html.hero-intro .header {
   transform: scale(0.98);
 }
 .memberships__tabs button.is-active {
-  background: #f3f3f1;
-  color: #1b1e20;
+  background: #444a4d;
+  color: #fff;
+  box-shadow: inset 0 0 0 1px #fff;
 }
 .memberships__arrows {
   display: flex;
@@ -2982,6 +2983,8 @@ html.hero-intro .header {
 @media (prefers-reduced-motion: reduce) {
   .directions__explore,
   .memberships__browse,
+  .memberships__tabs button,
+  .memberships__arrows button,
   .direction-card > img,
   .membership-card,
   .membership-card__buy,
@@ -3208,3 +3211,13 @@ html.hero-intro .header {
 .header__nav-link, .menu-panel nav a { text-decoration: none; }
 .header__nav-link[aria-current="page"]::after { transform: scaleX(1); }
 .nutrition a.nutrition__buy { display:inline-flex;align-items:center;justify-content:center;text-decoration:none; }
+
+// CRM-backed public tariffs: long names/conditions and no-JS category headings.
+.memberships__category { color: #fff; font: 600 18px/1.4 'Segoe UI', Arial, sans-serif; margin: 12px 0; }
+.membership-card__name, .membership-card__description { overflow-wrap: anywhere; }
+
+.memberships--crm .membership-card__price strong {
+  font-size: clamp(25px, 2.2vw, 36px);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
