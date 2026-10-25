@@ -77,6 +77,8 @@ model TrainerProfile {
   id String @id @default(uuid()) @db.Uuid
   userId String @unique @db.Uuid
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  publicName String @default("") @db.VarChar(100)
+  publicVersion Int @default(1)
   assignments TrainerAssignment[]
   lessons Lesson[]
 }
@@ -185,6 +187,9 @@ model CrmOperation {
 model Lesson {
   id String @id @default(uuid()) @db.Uuid
   seriesId String? @db.Uuid
+  publicVisible Boolean @default(false)
+  publicPreviousStartsAt DateTime? @db.Timestamptz(3)
+  publicPreviousEndsAt DateTime? @db.Timestamptz(3)
   kind String @db.VarChar(10)
   title String @db.VarChar(100)
   startsAt DateTime @db.Timestamptz(3)
@@ -206,6 +211,7 @@ model Lesson {
   events ScheduleEvent[]
   @@index([trainerId, startsAt])
   @@index([status, startsAt])
+  @@index([publicVisible, startsAt])
   @@index([seriesId])
 }
 

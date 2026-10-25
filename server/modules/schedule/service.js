@@ -5,6 +5,8 @@ import { audit } from "../audit/service.js";
 import { addDays, dateString, dbDate, endDate, today } from "../crm/dates.js";
 import { trainerClientWhere } from "../../policies/trainer.js";
 import {
+  publicationBody,
+  publicTrainerBody,
   attendanceBody,
   bookBody,
   cancelBody,
@@ -447,6 +449,49 @@ export function scheduleService(prisma) {
         orderBy: [{ displayName: "asc" }, { id: "asc" }],
       });
     },
+    async publicationOptions(id) {
+      const lesson = await prisma.lesson.findUnique({ where: { id: uuid.parse(id) }, include: { trainer: { include: { user: { select: { displayName: true } } } } } });
+      if (!lesson) throw fail(404, "Занятие не найдено.");
+      const choices = await prisma.lesson.findMany({
+        where: { kind: "GROUP", OR: [{ id: lesson.id }, ...(lesson.seriesId ? [{ seriesId: lesson.seriesId, startsAt: { gt: new Date() } }] : [])] },
+        select: { id: true, title: true, startsAt: true, endsAt: true, status: true, version: true, publicVisible: true },
+        orderBy: [{ startsAt: "asc" }, { id: "asc" }], take: 200,
+      });
+      return { lesson, choices };
+    },
+    async publish(ctx, id, input) {
+      const data = publicationBody.parse(input);
+      const selected = data.lessons.map(value => { const [id, v] = value.split(":"); return { id: uuid.parse(id), version: version.parse(v) }; });
+      check(new Set(selected.map(v => v.id)).size === selected.length, "Повторяющиеся занятия.");
+      return mutate(ctx, "LESSON_PUBLICATION_CHANGED", id, input, ["OWNER"], async (tx, actor) => {
+        const anchor = await tx.lesson.findUnique({ where: { id: uuid.parse(id) } });
+        check(anchor?.kind === "GROUP", "Публикация доступна только групповым занятиям.");
+        for (const item of selected) {
+          const lesson = await tx.lesson.findUnique({ where: { id: item.id } });
+          check(lesson?.kind === "GROUP" && lesson.version === item.version, "Занятие изменилось. Обновите страницу.");
+          check(lesson.id === anchor.id || (anchor.seriesId && lesson.seriesId === anchor.seriesId && lesson.startsAt > new Date()), "Выберите занятие этой серии в будущем.");
+          if (data.visible) {
+            check(lesson.endsAt > new Date() && lesson.status === "SCHEDULED", "Опубликовать можно только действующее, ещё не завершённое занятие.");
+            check(await tx.trainerProfile.findFirst({ where: { id: lesson.trainerId, user: { active: true, role: "TRAINER" } } }), "Тренер недоступен.");
+          }
+          await tx.lesson.update({ where: { id: lesson.id }, data: { publicVisible: data.visible, version: { increment: 1 },
+            ...(!data.visible ? { publicPreviousStartsAt: null, publicPreviousEndsAt: null } : {}) } });
+          await scheduleHistory(tx, ctx, "LESSON_PUBLICATION_CHANGED", lesson.id, "", { publicVisible: data.visible });
+        }
+        return { id, count: selected.length };
+      });
+    },
+    async publicTrainer(ctx, id, input) {
+      const data = publicTrainerBody.parse(input);
+      return mutate(ctx, "TRAINER_PUBLIC_NAME_CHANGED", id, input, ["OWNER"], async (tx) => {
+        const lesson = await tx.lesson.findUnique({ where: { id: uuid.parse(id) } });
+        check(lesson, "Занятие не найдено.");
+        const profile = await tx.trainerProfile.updateMany({ where: { id: lesson.trainerId, publicVersion: data.publicVersion }, data: { publicName: data.publicName, publicVersion: { increment: 1 } } });
+        check(profile.count === 1, "Публичное имя изменилось. Обновите страницу.");
+        await scheduleHistory(tx, ctx, "TRAINER_PUBLIC_NAME_CHANGED", id, "", { trainerId: lesson.trainerId });
+        return { id };
+      });
+    },
     async create(ctx, input) {
       const data = lessonCreate.parse(input);
       check(data.date >= today(), "Новое занятие нельзя создать в прошлом.");
@@ -504,7 +549,7 @@ export function scheduleService(prisma) {
           if (lesson.kind === "GROUP")
             check(await findMembership(tx, booking.clientId, "GROUP", startsAt, endsAt), `Абонемент клиента «${booking.client.name}» не допускает перенесённое занятие.`);
         }
-        await tx.lesson.update({ where: { id }, data: { startsAt, endsAt, room: data.room, version: { increment: 1 } } });
+        await tx.lesson.update({ where: { id }, data: { startsAt, endsAt, room: data.room, version: { increment: 1 }, ...(lesson.publicVisible && (startsAt.getTime() !== lesson.startsAt.getTime() || endsAt.getTime() !== lesson.endsAt.getTime()) ? { publicPreviousStartsAt: lesson.startsAt, publicPreviousEndsAt: lesson.endsAt } : {}) } });
         await enqueueSchedulePush(tx, ctx, "LESSON_MOVED", id, participants.length > 0);
         await scheduleHistory(tx, ctx, "LESSON_MOVED", id, data.reason, { before: { startsAt: lesson.startsAt, endsAt: lesson.endsAt, room: lesson.room }, after: { startsAt, endsAt, room: data.room } });
         return { id };

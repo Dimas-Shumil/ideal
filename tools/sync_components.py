@@ -22,4 +22,7 @@ if shop_views.is_dir():
     footer = '\n'.join((root / ('components/' + name + '.html')).read_text(encoding='utf-8').strip()
                        for name in ('footer', 'menu', 'preview'))
     (shop_views / 'footer.ejs').write_text(footer + '\n<script src="/site/scripts/main.js" defer></script></body></html>\n', encoding='utf-8')
+public_views = root / 'server/views/public'
+(public_views / 'header.ejs').write_text((root / 'components/header.html').read_text(encoding='utf-8').strip() + '\n', encoding='utf-8')
+(public_views / 'footer.ejs').write_text('\n'.join((root / ('components/' + name + '.html')).read_text(encoding='utf-8').strip() for name in ('footer', 'menu', 'preview')) + '\n<script src="/site/scripts/main.js" defer></script></body></html>\n', encoding='utf-8')
 print('Shared components synchronized.')

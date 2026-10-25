@@ -64,4 +64,12 @@ export const operation = z.object({
   version: version.optional(),
 });
 
+export const publicationBody = z.object({
+  visible: z.enum(["true", "false"]).transform(v => v === "true"),
+  lessons: z.union([z.string(), z.array(z.string())]).transform(v => Array.isArray(v) ? v : [v])
+    .pipe(z.array(z.string().regex(/^[a-f0-9-]{36}:[1-9]\d{0,9}$/i)).min(1).max(200)),
+  confirm: z.literal("PUBLIC"),
+}).strict();
+export const publicTrainerBody = z.object({ publicName: z.string().trim().max(100), publicVersion: version }).strict();
+
 export const deleteBody = z.object({ reason, confirm: z.literal("DELETE") }).strict();

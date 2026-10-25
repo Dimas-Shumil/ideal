@@ -72,6 +72,10 @@ export function scheduleRoutes({ config, prisma }) {
     if (req.path.startsWith("/api/")) return res.json(data);
     return render(req, res, "list", { ...data, trainers: await service.trainers() });
   });
+  router.get("/crm/schedule/:id/publication", requireAuth, requireRole("OWNER"), async (req, res) =>
+    render(req, res, "publication", await service.publicationOptions(req.params.id)));
+  post(["/crm/schedule/:id/publication", "/api/crm/schedule/:id/publication"], ["OWNER"], (req, ctx, input) => service.publish(ctx, req.params.id, input), req => `/crm/schedule/${uuid.parse(req.params.id)}/publication`);
+  post(["/crm/schedule/:id/public-trainer", "/api/crm/schedule/:id/public-trainer"], ["OWNER"], (req, ctx, input) => service.publicTrainer(ctx, req.params.id, input), req => `/crm/schedule/${uuid.parse(req.params.id)}/publication`);
   router.get("/crm/schedule/new", requireAuth, requireRole("OWNER", "ADMIN"), async (req, res) =>
     render(req, res, "new", { trainers: await service.trainers() }),
   );

@@ -335,3 +335,95 @@ test("panel navigation: identical order and one active item across OWNER CRM and
     assert.ok(nav.includes(`href="${path}" aria-current="page"`),path);
   }
 });
+
+// Public schedule integration: executed by npm test only on the guarded PostgreSQL test DB.
+async function setPublic(session, lesson, visible = 'true', key = randomUUID()) {
+  return post(session, `/crm/schedule/${lesson.id}/publication`, { visible, lessons: `${lesson.id}:${lesson.version}`, confirm: 'PUBLIC' }, 200, key);
+}
+test('public schedule: publication page and both mutation APIs independently enforce OWNER, Origin and CSRF', async () => {
+  const lesson = await directLesson({date:addDays(today(),30)});
+  const ownerSession=await login('schedowner'), adminSession=await login('schedadmin'), trainer=await login('schedta');
+  await request(app).get(`/crm/schedule/${lesson.id}/publication`).expect(303);
+  await ownerSession.agent.get(`/crm/schedule/${lesson.id}/publication`).expect(200);
+  for(const s of [adminSession,trainer]) {
+    await s.agent.get(`/crm/schedule/${lesson.id}/publication`).expect(403);
+    for(const suffix of ['publication','public-trainer']) await post(s,`/crm/schedule/${lesson.id}/${suffix}`,{},403);
+  }
+  for(const suffix of ['publication','public-trainer']) {
+    await request(app).post(`/api/crm/schedule/${lesson.id}/${suffix}`).send({}).expect(401);
+    await ownerSession.agent.post(`/api/crm/schedule/${lesson.id}/${suffix}`).send({_csrf:ownerSession.token,key:randomUUID()}).expect(403);
+    await ownerSession.agent.post(`/api/crm/schedule/${lesson.id}/${suffix}`).set('Origin',origin).send({key:randomUUID()}).expect(403);
+  }
+});
+test('public schedule: existing/new groups stay hidden; personal publication prohibited by service and database',async()=>{
+  const s=await login('schedowner');
+  const group=await directLesson({date:addDays(today(),31)});
+  const personal=await directLesson({date:addDays(today(),31),kind:'PERSONAL'});
+  assert.equal(group.publicVisible,false); assert.equal(personal.publicVisible,false);
+  await post(s,`/crm/schedule/${personal.id}/publication`,{visible:'true',lessons:personal.id+':1',confirm:'PUBLIC'},409);
+  await assert.rejects(db.prisma.lesson.update({where:{id:personal.id},data:{publicVisible:true}}));
+});
+test('public schedule: only selected future series instances publish, stale versions and unrelated lessons reject atomically',async()=>{
+  const s=await login('schedowner'); const seriesId=randomUUID();
+  const a=await directLesson({date:addDays(today(),32)}), b=await directLesson({date:addDays(today(),33)}), other=await directLesson({date:addDays(today(),34)});
+  await db.prisma.lesson.updateMany({where:{id:{in:[a.id,b.id]}},data:{seriesId}});
+  await post(s,`/crm/schedule/${a.id}/publication`,{visible:'true',lessons:[a.id+':1',other.id+':1'],confirm:'PUBLIC'},409);
+  assert.equal((await db.prisma.lesson.findUnique({where:{id:a.id}})).publicVisible,false);
+  await setPublic(s,a);
+  assert.equal((await db.prisma.lesson.findUnique({where:{id:b.id}})).publicVisible,false);
+  await post(s,`/crm/schedule/${a.id}/publication`,{visible:'false',lessons:a.id+':1',confirm:'PUBLIC'},409);
+  const b2=await db.prisma.lesson.findUnique({where:{id:b.id}}); await setPublic(s,b2);
+});
+test('public schedule: replay does not republish or duplicate events, audit failure rolls back visibility',async()=>{
+  const s=await login('schedowner'), lesson=await directLesson({date:addDays(today(),35)}), key=randomUUID();
+  await setPublic(s,lesson,'true',key); await setPublic(s,lesson,'true',key);
+  assert.equal(await db.prisma.scheduleEvent.count({where:{lessonId:lesson.id,action:'LESSON_PUBLICATION_CHANGED'}}),1);
+  await db.pool.query(`CREATE FUNCTION public_schedule_reject() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'test audit unavailable'; END $$`);
+  await db.pool.query('CREATE TRIGGER public_schedule_reject BEFORE INSERT ON "AuditEvent" FOR EACH ROW EXECUTE FUNCTION public_schedule_reject()');
+  try { await post(s,`/crm/schedule/${lesson.id}/publication`,{visible:'false',lessons:lesson.id+':2',confirm:'PUBLIC'},500); }
+  finally { await db.pool.query('DROP TRIGGER public_schedule_reject ON "AuditEvent"'); await db.pool.query('DROP FUNCTION public_schedule_reject()'); }
+  assert.equal((await db.prisma.lesson.findUnique({where:{id:lesson.id}})).publicVisible,true);
+});
+test('public schedule: approved trainer name changes separately with version guards and no-JS forms',async()=>{
+  const s=await login('schedowner'), lesson=await directLesson({date:addDays(today(),36)});
+  const trainer=await db.prisma.trainerProfile.findUnique({where:{id:lesson.trainerId}});
+  await s.agent.post(`/crm/schedule/${lesson.id}/public-trainer`).set('Origin',origin).type('form').send({_csrf:s.token,key:randomUUID(),publicVersion:trainer.publicVersion,publicName:'Публичный тренер'}).expect(303);
+  const p=await db.prisma.trainerProfile.findUnique({where:{id:trainer.id}}); assert.equal(p.publicName,'Публичный тренер');
+  assert.equal((await db.prisma.user.findUnique({where:{id:ta.id}})).displayName,'schedta');
+  await post(s,`/crm/schedule/${lesson.id}/public-trainer`,{publicVersion:trainer.publicVersion,publicName:'Старое'},409);
+  await s.agent.post(`/crm/schedule/${lesson.id}/publication`).set('Origin',origin).type('form').send({_csrf:s.token,key:randomUUID(),visible:'true',lessons:lesson.id+':1',confirm:'PUBLIC'}).expect(303);
+});
+test('public schedule: real SQL/HTTP excludes private groups, personal data, inactive and changed-role trainers',async()=>{
+  const s=await login('schedowner');
+  const group=await directLesson({date:today(),title:'Публичная группа UTC7'});
+  const hidden=await directLesson({date:today(),title:'PRIVATE_HIDDEN_GROUP'});
+  await directLesson({date:today(),kind:'PERSONAL',title:'PRIVATE_PERSONAL_CLIENT'});
+  // Seed visibility directly because today's lesson may already have finished.
+  await db.prisma.lesson.update({where:{id:group.id},data:{publicVisible:true}});
+  const clientId=await makeClient(s,'PRIVATE_CLIENT'); await directBooking(group.id,clientId);
+  const response=await request(app).get('/schedule.html').expect(200);
+  assert.match(response.text,/Публичная группа UTC7/);
+  for(const secret of ['PRIVATE_HIDDEN_GROUP','PRIVATE_PERSONAL_CLIENT','PRIVATE_CLIENT','schedta','7999','PRIVATE',group.id,hidden.id]) assert.equal(response.text.includes(secret),false);
+  assert.equal(response.headers['set-cookie'],undefined); assert.equal(response.headers['cache-control'],'no-store');
+  for(const change of [{active:false},{role:'ADMIN'}]) {
+    await db.prisma.user.update({where:{id:ta.id},data:change});
+    try { assert.doesNotMatch((await request(app).get('/schedule.html').expect(200)).text,/Публичная группа UTC7/); }
+    finally { await db.prisma.user.update({where:{id:ta.id},data:{active:true,role:'TRAINER'}}); }
+  }
+});
+test('public schedule: published move exposes only prior time, cancellation remains visible and unpublish clears public history',async()=>{
+  const s=await login('schedowner');
+  const lesson=await directLesson({date:addDays(today(),150),start:'18:00',end:'19:00'}); await setPublic(s,lesson);
+  await post(s,`/crm/schedule/${lesson.id}/move`,{version:2,date:addDays(today(),151),startTime:'18:00',endTime:'19:00',room:'',reason:'PRIVATE_MOVE_REASON'});
+  let current=await db.prisma.lesson.findUnique({where:{id:lesson.id}});
+  assert.equal(current.publicPreviousStartsAt.toISOString(),lesson.startsAt.toISOString());
+  await post(s,`/crm/schedule/${lesson.id}/cancel`,{version:3,reason:'PRIVATE_CANCEL_REASON'});
+  current=await db.prisma.lesson.findUnique({where:{id:lesson.id}}); assert.equal(current.publicVisible,true);
+  await setPublic(s,current,'false'); current=await db.prisma.lesson.findUnique({where:{id:lesson.id}});
+  assert.equal(current.publicPreviousStartsAt,null); assert.equal(current.publicPreviousEndsAt,null);
+});
+test('public schedule: revoked OWNER cannot change publication or public trainer name',async()=>{
+  const s=await login('schedowner'), lesson=await directLesson({date:addDays(today(),37)});
+  await db.prisma.user.update({where:{id:owner.id},data:{authVersion:{increment:1}}});
+  for(const suffix of ['publication','public-trainer']) await post(s,`/crm/schedule/${lesson.id}/${suffix}`,{},401);
+});

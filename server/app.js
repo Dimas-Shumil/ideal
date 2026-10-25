@@ -1,3 +1,4 @@
+import { publicScheduleRoutes } from "./modules/public/schedule.js";
 import { applySeo, robotsText, sitemapXml } from "./modules/public/seo.js";
 import { shopRoutes } from "./modules/shop/routes.js";
 import { pushRoutes } from "./modules/push/routes.js";
@@ -122,11 +123,15 @@ export async function createApp({
       `/${name}.html`,
       async (req, res) => res.type("html").send(applySeo(res, config, `/${name}.html`, await readFile(path.join(root, `${name}.html`), "utf8"), req.query)),
     );
+  app.use(publicScheduleRoutes({ config, prisma: db.prisma }));
   // Private/auth responses always no-store, even errors and unknown API routes.
   app.use((req, res, next) => {
     res.set("Cache-Control", "no-store");
     next();
   });
+  app.use(["/crm/schedule/:id/publication", "/api/crm/schedule/:id/publication"],
+    express.urlencoded({ extended: false, limit: "32kb", parameterLimit: 210 }),
+    express.json({ limit: "32kb", strict: true }));
   // Product descriptions need bounded room for UTF-8 URL-encoded form fields.
   app.use(["/shop-panel/products", "/api/shop-panel/products"],
     express.urlencoded({ extended: false, limit: "128kb", parameterLimit: 12 }),

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title><%= seo.title %></title><meta name="description" content="<%= seo.description %>"><meta name="robots" content="<%= seo.robots %>">
+<% if (seo.canonical) { %><link rel="canonical" href="<%= seo.canonical %>"><% } %>
+<link rel="stylesheet" href="/site/css/main.css"><link rel="stylesheet" href="/site/css/public-schedule.css">
+<link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/site/img/pwa/apple-touch-180.png">
+<link rel="stylesheet" href="/site/css/pwa-install.css"><script src="/site/scripts/pwa.js" defer></script><script src="/site/scripts/pwa-install.js" defer></script>
+</head><body class="public-schedule-page">
+<a class="public-schedule__skip" href="#content">К расписанию</a>
+<%- include('header') %>
+<% const dateLabel = value => new Intl.DateTimeFormat('ru-RU', { timeZone: 'Asia/Krasnoyarsk', day: 'numeric', month: 'long' }).format(new Date(value + 'T12:00:00+07:00'));
+const dayLabel = value => new Intl.DateTimeFormat('ru-RU', { timeZone: 'Asia/Krasnoyarsk', weekday: 'long' }).format(new Date(value + 'T12:00:00+07:00')); %>
+<main class="public-schedule" id="content" tabindex="-1"><div class="public-schedule__shell">
+<nav class="public-schedule__breadcrumb" aria-label="Хлебные крошки"><a href="/">Главная</a><span aria-hidden="true">/</span><span aria-current="page">Расписание</span></nav>
+<section class="public-schedule__intro" aria-labelledby="schedule-title">
+<p class="public-schedule__eyebrow">ИДЕАЛ / ГРУППОВЫЕ ЗАНЯТИЯ</p><h1 id="schedule-title">Расписание<span>тренировок.</span></h1>
+<div class="public-schedule__description"><p>Найди время<br>для движения.</p><p>Время клуба — Абакан, UTC+7.<br>Здесь можно посмотреть расписание. Онлайн-записи нет. Изменения видны после обновления страницы.</p></div>
+</section>
+<nav class="public-schedule__weeks" aria-label="Выбор недели">
+<% for (let i = 0; i < 4; i++) { %><a href="<%= i === 0 ? '/schedule.html' : '/schedule.html?week=' + i %>" <%- week === i ? 'aria-current="page"' : '' %>><%= i === 0 ? 'Эта неделя' : i === 1 ? 'Следующая неделя' : 'Через ' + i + ' недели' %></a><% } %>
+</nav>
+<div class="public-schedule__heading"><h2><%= dateLabel(from) %> — <%= dateLabel(to) %></h2><span>UTC+7</span></div>
+<% if (unavailable) { %>
+<div class="public-schedule__notice" role="alert"><h2>Расписание временно недоступно</h2><p>Попробуйте обновить страницу позже.</p><a class="public-schedule__retry" href="<%= week ? '/schedule.html?week=' + week : '/schedule.html' %>">Обновить расписание</a></div>
+<% } else { %>
+<% if (!items.length) { %><p class="public-schedule__notice">На эту неделю расписание пока не опубликовано.</p><% } %>
+<div class="public-schedule__days">
+<% for (const day of days) { %>
+<section class="public-schedule__day" aria-label="<%= dayLabel(day.date) + ', ' + dateLabel(day.date) %>">
+<div class="public-schedule__date"><h3><%= dayLabel(day.date) %></h3><p><time datetime="<%= day.date %>"><%= dateLabel(day.date) %></time></p><% if (day.date === today) { %><span class="public-schedule__today">Сегодня</span><% } %></div>
+<div class="public-schedule__lessons">
+<% if (!day.items.length) { %><p class="public-schedule__empty">Нет опубликованных занятий</p><% } %>
+<% for (const lesson of day.items) { %><article class="public-schedule__lesson<%= lesson.cancelled ? ' public-schedule__lesson--cancelled' : '' %>">
+<p class="public-schedule__time"><time datetime="<%= lesson.date + 'T' + lesson.startTime + ':00+07:00' %>"><%= lesson.startTime %></time><span>—</span><time datetime="<%= lesson.date + 'T' + lesson.endTime + ':00+07:00' %>"><%= lesson.endTime %></time></p>
+<div class="public-schedule__details"><h4><%= lesson.title %></h4><% if (lesson.trainerName) { %><p>Тренер: <%= lesson.trainerName %></p><% } %>
+<% if (lesson.previous) { %><p class="public-schedule__moved">Перенесено. Ранее: <%= dateLabel(lesson.previous.date) %>, <%= lesson.previous.startTime %>–<%= lesson.previous.endTime %></p><% } %></div>
+<% if (lesson.cancelled) { %><span class="public-schedule__status">Отменено</span><% } %>
+</article><% } %>
+</div></section><% } %>
+</div><% } %>
+</div></main>
+<%- include('footer') %>

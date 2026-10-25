@@ -53,6 +53,7 @@ run("--test", [
   "tests/seo.test.js",
   "tests/crm-dates.test.js",
   "tests/schedule-dates.test.js",
+  "tests/public-schedule.test.js",
   "tests/crm.test.js",
   "tests/schedule.test.js",
   "tests/push.test.js",
