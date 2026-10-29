@@ -26,3 +26,10 @@
 - [TRAINERS_NOTES.txt](TRAINERS_NOTES.txt).
 - [TRAINER_PANEL_NOTES.txt](TRAINER_PANEL_NOTES.txt).
 - [SHOP_STAGE14.md](SHOP_STAGE14.md) — серверный магазин, этап 14.
+
+- [STAGE16_INTEGRATION.md](STAGE16_INTEGRATION.md) — интеграция прайса и SEO, этап 16.
+
+- [TARIFF_PRODUCT_MANAGEMENT.md](TARIFF_PRODUCT_MANAGEMENT.md) — удаление тарифов/товаров и фото при создании.
+
+- [Публичный контент и управление OWNER — этап 19](PUBLIC_CONTENT_STAGE19.md):
+  реализация, фактические проверки, ограничения PostgreSQL и локальная приёмка.

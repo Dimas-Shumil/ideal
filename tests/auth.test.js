@@ -83,7 +83,7 @@ test("schema: auth, CRM and schedule entities; bootstrap cannot repeat", async (
   );
   assert.deepEqual(
     rows.rows.map((x) => x.tablename).sort(),
-    ["AuditEvent", "AuthSession", "User", "_prisma_migrations", "Client", "TrainerProfile", "TrainerAssignment", "MembershipPlan", "MembershipPurchase", "Membership", "MembershipFreeze", "MembershipRefund", "CrmEvent", "CrmOperation", "Lesson", "LessonBooking", "ScheduleEvent", "Visit", "PushSubscription", "PushDelivery", "ShopProduct", "ShopVariant", "ShopImage", "ShopOrder", "ShopOrderEvent"].sort(),
+    ["ContentEntry", "ContentPhoto", "AuditEvent", "AuthSession", "User", "_prisma_migrations", "Client", "TrainerProfile", "TrainerPhoto", "TrainerAssignment", "MembershipPlan", "MembershipPurchase", "Membership", "MembershipFreeze", "MembershipRefund", "CrmEvent", "CrmOperation", "Lesson", "LessonBooking", "ScheduleEvent", "Visit", "PushSubscription", "PushDelivery", "ShopProduct", "ShopVariant", "ShopImage", "ShopOrder", "ShopOrderEvent"].sort(),
   );
   await assert.rejects(() =>
     users.create(
@@ -100,10 +100,8 @@ test("schema: auth, CRM and schedule entities; bootstrap cannot repeat", async (
 test("public pages, static boundaries, CSP hash, errors and no root static", async () => {
   for (const p of [
     "/",
-    "/index.html",
     "/about.html",
     "/trainers.html",
-    "/trainer.html",
     "/shop.html",
     "/product.html",
     "/cart.html",
@@ -113,6 +111,9 @@ test("public pages, static boundaries, CSP hash, errors and no root static", asy
     if (!["/shop.html", "/product.html", "/cart.html"].includes(p)) assert.ok(!r.headers["set-cookie"]);
     else { assert.ok(r.headers["set-cookie"]); assert.equal(r.headers["cache-control"],"no-store"); }
   }
+  await request(app).get("/trainer.html").expect(301).expect("Location", "/trainers.html");
+  const alias = await request(app).get("/index.html?source=check").expect(301);
+  assert.equal(alias.headers.location, "/?source=check");
   const home = await request(app).get("/");
   assert.match(home.headers["content-security-policy"], /sha256-/);
   assert.ok(!home.headers["content-security-policy"].includes("unsafe-inline"));
@@ -148,7 +149,14 @@ test("no-JS form, CSRF/Origin prelogin, strict input, uniform credentials failur
   const page = await agent.get("/login").expect(200);
   const token = page.text.match(/name="_csrf" value="([a-f0-9]+)"/)[1];
   assert.match(page.text, /method="post"/);
-  assert.ok(!page.text.includes("<script"));
+  // No-JS means the HTML form works without script execution, not that the
+  // page cannot load a progressive enhancement such as PWA registration.
+  assert.match(page.text, /<form[^>]*action="\/login"[^>]*method="post"/);
+  assert.deepEqual(
+    page.text.match(/<script\b[^>]*>[\s\S]*?<\/script>/gi) || [],
+    ['<script src="/site/scripts/pwa.js" defer></script>'],
+  );
+  assert.doesNotMatch(page.text, /\son[a-z]+\s*=/i);
   const body = { login: "owner", password: secret, _csrf: token };
   await agent.post("/login").type("form").send(body).expect(403);
   await agent

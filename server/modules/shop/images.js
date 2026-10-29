@@ -1,7 +1,8 @@
 import Busboy from "busboy";
 import sharp from "sharp";
 import { fail } from "./service.js";
-export function parseImage(req, res, next) {
+function imageParser({ product = false } = {}) {
+return function parseUpload(req, res, next) {
   let parser;
   try {
     parser = Busboy({
@@ -9,9 +10,9 @@ export function parseImage(req, res, next) {
       limits: {
         fileSize: 5 * 1024 * 1024,
         files: 1,
-        fields: 3,
-        fieldSize: 128,
-        parts: 5,
+        fields: product ? 8 : 3,
+        fieldSize: product ? 16384 : 128,
+        parts: product ? 10 : 5,
         headerPairs: 32,
       },
     });
@@ -35,7 +36,7 @@ export function parseImage(req, res, next) {
       next(err);
     } else {
       req.body = fields;
-      req.shopImage = Buffer.concat(chunks);
+      req.shopImage = hasFile ? Buffer.concat(chunks) : null;
       next();
     }
   };
@@ -51,7 +52,7 @@ export function parseImage(req, res, next) {
   req.on("data", count);
   parser.on("field", (name, value, info) => {
     if (
-      !["_csrf", "key", "version"].includes(name) ||
+      !(product ? ["_csrf", "key", "version", "name", "category", "description", "characteristics", "active"] : ["_csrf", "key", "version"]).includes(name) ||
       Object.hasOwn(fields, name) ||
       info.valueTruncated ||
       info.nameTruncated
@@ -60,6 +61,11 @@ export function parseImage(req, res, next) {
     fields[name] = value;
   });
   parser.on("file", (name, file, info) => {
+    if (product && name === "image" && !info.filename) {
+      file.on("data", chunk => { if (chunk.length) invalid = true; });
+      file.on("error", () => { invalid = true; });
+      file.resume(); return;
+    }
     if (
       name !== "image" ||
       hasFile ||
@@ -85,13 +91,16 @@ export function parseImage(req, res, next) {
   parser.on("error", () => finish(fail(400, "Некорректная форма фотографии.")));
   parser.on("close", () =>
     finish(
-      invalid || !hasFile || !size
+      invalid || (hasFile && !size) || (!product && !hasFile)
         ? fail(400, "Нужен один JPEG, PNG или WebP до 5 МБ.")
         : null,
     ),
   );
   req.pipe(parser);
+};
 }
+export const parseImage = imageParser();
+export const parseProductImage = imageParser({ product: true });
 export async function normalizeImage(input) {
   try {
     const png = input

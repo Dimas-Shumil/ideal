@@ -1,0 +1,19 @@
+<section class="trainer-cta" id="personal-training" aria-labelledby="trainer-cta-title">
+          <div class="trainer-cta__shell">
+            <div class="trainer-cta__eyebrow"><span>04 / ПЕРСОНАЛЬНЫЙ ПОДХОД</span><span>ИДЕАЛ / АБАКАН</span></div>
+            <div class="trainer-cta__composition">
+              <h2 class="trainer-cta__title" id="trainer-cta-title"><span>ВЫБЕРИ</span><span>СВОЕГО</span><span>ТРЕНЕРА.</span></h2>
+              <figure class="trainer-cta__portrait">
+                
+                <img class="trainer-cta__image" src="<%= trainer ? trainer.photoUrl : '/site/img/trainer-placeholder.svg' %>" alt="<%= trainer ? trainer.name : 'Нейтральный силуэт тренера' %>" width="800" height="1000" loading="lazy" decoding="async" />
+                <figcaption class="trainer-cta__caption"><% if(trainer){ %><a href="<%= trainer.url %>"><%= trainer.name %></a><% }else{ %><span>ТВОЯ ЦЕЛЬ.</span><span>ОБЩАЯ РАБОТА.</span><% } %></figcaption>
+              </figure>
+              <div class="trainer-cta__copy">
+                <p class="trainer-cta__lead">Твой результат.<br />С профессиональной поддержкой.</p>
+                <p class="trainer-cta__text">Персональный подход, правильная техника и программа под твои цели. Тренер рядом — от первого движения до нового результата.</p>
+                <a class="trainer-cta__link" href="/trainers.html">Смотреть тренеров</a>
+              </div>
+            </div>
+            <p class="trainer-cta__signature"><span>ТЕХНИКА / ПРОГРАММА / ПРОГРЕСС</span><span>В ТВОЁМ РИТМЕ.</span></p>
+          </div>
+        </section>

@@ -127,6 +127,10 @@ export function userService(prisma) {
           await tx.pushSubscription.deleteMany({ where: { userId: id } });
         }
         if (user.role === "TRAINER" && (data.active === false || (data.role && data.role !== "TRAINER"))) {
+          await tx.trainerProfile.updateMany({
+            where: { userId: id },
+            data: { publicVisible: false, publicVersion: { increment: 1 } },
+          });
           await tx.trainerAssignment.updateMany({
             where: { trainer: { userId: id }, active: true },
             data: { active: false, revokedAt: new Date() },

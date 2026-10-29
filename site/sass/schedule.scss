@@ -130,3 +130,14 @@
 .schedule__delete-booking summary:hover { text-decoration: underline; }
 .schedule .schedule__confirm { display: flex; align-items: flex-start; gap: 12px; }
 .schedule .schedule__confirm input { width: 20px; min-width: 20px; height: 20px; margin-top: 3px; }
+
+.schedule__card-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.schedule .schedule__card-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 11px 20px; border-radius: 10px; background: #294e3e; color: #fff; text-decoration: none; transition: background-color 750ms ease, transform 750ms ease; }
+.schedule .schedule__card-button:hover { background: #1d3b2e; }
+.schedule .schedule__card-button--delete { background: #803c2c; }
+.schedule .schedule__card-button--delete:hover { background: #632c20; }
+.schedule .schedule__card-button:active { transform: scale(.98); }
+.schedule .schedule__card-button:focus-visible { outline: 3px solid #a36b18; outline-offset: 4px; }
+.schedule #delete-lesson, .schedule #cancel-lesson { scroll-margin-top: 24px; }
+@media (max-width: 560px) { .schedule__card-actions { align-items: stretch; flex-direction: column; } .schedule .schedule__card-button { width: 100%; box-sizing: border-box; } }
+@media (prefers-reduced-motion: reduce) { .schedule .schedule__card-button { transition: none; } }

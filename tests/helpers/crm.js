@@ -1,5 +1,7 @@
 // Only imported by suites whose test-only database guard runs before hooks.
 export async function clearCrm(p) {
+  await p.contentPhoto.deleteMany();
+  await p.contentEntry.updateMany({data:{data:{},visible:false,publicOrder:0,version:1}});
   await p.shopOrderEvent.deleteMany();
   await p.shopOrder.deleteMany();
   await p.shopImage.deleteMany();

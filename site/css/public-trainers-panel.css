@@ -1,0 +1,68 @@
+.public-trainers-panel__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.public-trainers-panel__card, .public-trainers-panel__section {
+  padding: 24px;
+  border: 1px solid #bfc8bd;
+  border-radius: 12px;
+  margin: 24px 0;
+  min-width: 0;
+}
+.public-trainers-panel__form, .public-trainers-panel__section form {
+  display: grid;
+  gap: 20px;
+  max-width: 900px;
+}
+.public-trainers-panel__form button, .public-trainers-panel__section button {
+  justify-self: start;
+}
+.public-trainers-panel textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid #a7b1a6;
+  border-radius: 8px;
+  font: inherit;
+  color: #20251f;
+  background: #fff;
+}
+.public-trainers-panel__confirm {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+}
+.public-trainers-panel__confirm input {
+  width: 24px;
+  min-height: 24px;
+  flex-shrink: 0;
+}
+.public-trainers-panel__photo {
+  display: block;
+  max-width: 100%;
+  width: 320px;
+  height: 400px;
+  object-fit: contain;
+  margin-bottom: 24px;
+  background: #e8ebe6;
+}
+.public-trainers-panel__section form + form {
+  margin-top: 32px;
+}
+@media (max-width: 800px) {
+  .public-trainers-panel__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .public-trainers-panel__card, .public-trainers-panel__section {
+    padding: 18px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-trainers-panel button,
+  .public-trainers-panel a.panel__button {
+    transition: none;
+  }
+}

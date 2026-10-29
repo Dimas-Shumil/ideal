@@ -160,7 +160,9 @@
   const next = document.querySelector('[data-plans-next]');
   const counter = document.querySelector('[data-plans-counter]');
   const extras = [...document.querySelectorAll('[data-plans-extra]')];
-  let current = 'gym';
+  let current = tabs.find(tab => tab.classList.contains('is-active'))?.dataset.planTab || 'gym';
+  // With no JS both categories remain visible and readable.
+  views.forEach(panel => { panel.hidden = panel.dataset.plansPanel !== current; });
 
   const currentTrack = () => document.querySelector(`[data-plans-track="${current}"]`);
   const cardsOf = (track) => [...track.querySelectorAll('.membership-card')];
@@ -180,7 +182,7 @@
     const cards = cardsOf(track);
     const count = cards.length;
     const index = getCurrentIndex(track);
-    if (counter) counter.textContent = `${String(index + 1).padStart(2,'0')} / ${String(count).padStart(2,'0')}`;
+    if (counter) counter.textContent = `${String(count ? index + 1 : 0).padStart(2,'0')} / ${String(count).padStart(2,'0')}`;
     if (prev) prev.disabled = track.scrollLeft <= 4;
     if (next) next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 4;
   }

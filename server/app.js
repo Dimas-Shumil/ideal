@@ -1,3 +1,9 @@
+import { contentManagementRoutes } from './modules/content/routes.js';
+import { contentPublicRoutes, publicContacts } from './modules/content/public.js';
+import { publicTrainerRoutes } from './modules/public/trainers.js';
+import { trainerManagementRoutes } from './modules/trainers/routes.js';
+import { publicScheduleRoutes } from "./modules/public/schedule.js";
+import { applySeo, robotsText, sitemapXml } from "./modules/public/seo.js";
 import { shopRoutes } from "./modules/shop/routes.js";
 import { pushRoutes } from "./modules/push/routes.js";
 import express from "express";
@@ -35,6 +41,7 @@ export async function createApp({
   app.use((req, res, next) => {
     req.id = randomUUID();
     res.set("X-Request-ID", req.id);
+    res.set("X-Robots-Tag", "noindex,nofollow");
     next();
   });
   const index = await readFile(path.join(root, "index.html"), "utf8");
@@ -94,27 +101,40 @@ export async function createApp({
     );
   app.get("/push-sw.js", (req, res) => {
     res.set("Cache-Control", "no-cache");
-    res.sendFile(path.join(root, "server/modules/push/sw.js"));
+    res.sendFile(path.join(root, "server/modules/push/sw.js"), { lastModified: false, etag: false });
   });
-  const pages = [
-    "about",
-    "trainers",
-    "trainer",
-  ];
-  for (const name of pages)
-    app.get(
-      name === "index" ? ["/", "/index.html"] : `/${name}.html`,
-      (req, res) => res.sendFile(path.join(root, `${name}.html`)),
-    );
+  app.get('/manifest.webmanifest', (req, res) => {
+    res.set('Cache-Control', 'no-cache');
+    res.type('application/manifest+json').sendFile(path.join(root, 'server/modules/pwa/manifest.json'));
+  });
+  app.get('/offline.html', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+    res.sendFile(path.join(root, 'server/modules/pwa/offline.html'));
+  });
+  app.get('/robots.txt', (req, res) => res.type('text/plain').send(robotsText(config)));
+  app.get('/sitemap.xml', async (req, res) => res.type('application/xml').send(await sitemapXml(config, db.prisma)));
+  app.get('/index.html', (req, res) => {
+    const query = req.originalUrl.indexOf('?');
+    res.redirect(301, '/' + (query < 0 ? '' : req.originalUrl.slice(query)));
+  });
+  app.use(publicContacts(db.prisma));
+  app.use(contentPublicRoutes({config,prisma:db.prisma}));
+  app.use(publicTrainerRoutes({ config, prisma: db.prisma }));
+  app.use(publicScheduleRoutes({ config, prisma: db.prisma }));
   // Private/auth responses always no-store, even errors and unknown API routes.
   app.use((req, res, next) => {
     res.set("Cache-Control", "no-store");
     next();
   });
+  app.use(["/crm/schedule/:id/publication", "/api/crm/schedule/:id/publication"],
+    express.urlencoded({ extended: false, limit: "32kb", parameterLimit: 210 }),
+    express.json({ limit: "32kb", strict: true }));
   // Product descriptions need bounded room for UTF-8 URL-encoded form fields.
   app.use(["/shop-panel/products", "/api/shop-panel/products"],
     express.urlencoded({ extended: false, limit: "128kb", parameterLimit: 12 }),
     express.json({ limit: "48kb", strict: true }));
+  app.use("/admin/content", express.urlencoded({ extended: false, limit: "256kb", parameterLimit: 24 }));
+  app.use("/admin/public-trainers", express.urlencoded({ extended: false, limit: "256kb", parameterLimit: 20 }));
   app.use(
     express.urlencoded({ extended: false, limit: "8kb", parameterLimit: 24 }),
   );
@@ -142,9 +162,12 @@ export async function createApp({
   const users = userService(db.prisma);
   app.use(await authRoutes({ config, prisma: db.prisma, store, users }));
   app.use(shopRoutes({config,prisma:db.prisma,indexHtml:index}));
+  app.get('/application', requireAuth, requireRole('OWNER', 'ADMIN', 'TRAINER'), (req, res) => res.render('pwa/panel', {user: req.user}));
   app.use(pushRoutes({ config, prisma: db.prisma }));
   app.use(crmRoutes({config,prisma:db.prisma}));
   app.use(scheduleRoutes({ config, prisma: db.prisma }));
+  app.use(contentManagementRoutes({config,prisma:db.prisma}));
+  app.use(trainerManagementRoutes({ config, prisma: db.prisma }));
   app.use(ownerRoutes({ config, prisma: db.prisma, users }));
   app.use(trainerRoutes());
   for (const [route, role, label] of [

@@ -4,13 +4,13 @@
     ['/admin','Обзор',true], ['/crm/clients','Клиенты'], ['/crm/plans','Тарифы'],
     ['/crm/schedule','Расписание'], ['/crm/visits','Посещения'],
     ['/shop-panel/orders','Заказы магазина'], ['/shop-panel/products','Товары'],
-    ['/admin/employees','Сотрудники'], ['/admin/account','Мой аккаунт'],
+    ['/admin/public-trainers','Публичные тренеры'], ['/admin/content','Контент сайта'], ['/admin/employees','Сотрудники'], ['/admin/account','Мой аккаунт'],
   ] : user.role === 'TRAINER' ? [
     ['/trainer','Обзор',true], ['/trainer/clients','Назначенные клиенты'],
     ['/trainer/lessons','Мои занятия'], ['/trainer/account','Мой аккаунт'],
   ] : [ ['/crm/clients','Клиенты'], ['/crm/plans','Тарифы'],
     ['/crm/schedule','Расписание'], ['/crm/visits','Посещения'], ['/shop-panel/orders','Заказы магазина'] ];
-  navItems.push(['/notifications','Уведомления'], ['/','Открыть сайт клуба',true]);
+  navItems.push(['/application','Приложение'], ['/notifications','Уведомления'], ['/','Открыть сайт клуба',true]);
 %>
 <nav class="panel__nav" aria-label="Рабочие разделы">
   <% for (const [url,label,exact] of navItems) {

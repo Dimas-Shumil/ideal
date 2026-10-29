@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Вход сотрудников — ИДЕАЛ</title><link rel="stylesheet" href="/site/css/auth.css"></head>
-<body class="auth"><main class="auth__card"><a class="auth__brand" href="/index.html">ИДЕАЛ.</a><h1 class="auth__title">Вход сотрудников</h1><p>Введите личный логин и пароль.</p>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Вход сотрудников — ИДЕАЛ</title><link rel="stylesheet" href="/site/css/auth.css"><%- include('../partials/pwa-head') %></head>
+<body class="auth"><main class="auth__card"><a class="auth__brand" href="/">ИДЕАЛ.</a><h1 class="auth__title">Вход сотрудников</h1><p>Введите личный логин и пароль.</p>
 <% if (error) { %><p class="auth__error" role="alert"><%= error %></p><% } %>
 <form class="auth__form" action="/login" method="post"><input type="hidden" name="_csrf" value="<%= csrf %>">
 <label for="login">Логин</label><input id="login" name="login" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="64" required>
 <label for="password">Пароль</label><input id="password" name="password" type="password" autocomplete="current-password" maxlength="128" required>
 <button class="auth__button" type="submit">Войти</button></form>
-<p class="auth__hint">Для восстановления доступа обратитесь к владельцу клуба. Владелец обращается в ShumDev.</p><a href="/index.html">На главную</a></main></body></html>
+<p class="auth__hint">Для восстановления доступа обратитесь к владельцу клуба. Владелец обращается в ShumDev.</p><a href="/">На главную</a></main></body></html>

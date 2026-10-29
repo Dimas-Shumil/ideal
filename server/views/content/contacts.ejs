@@ -1,0 +1,10 @@
+<div class="ideal-footer__contacts">
+ <h2>Контакты</h2>
+ <% const c=typeof siteContacts==='object'?siteContacts:{}; if(c.address){ %><address><%= c.address %></address><% } %>
+ <% if(c.phone){ %><a href="tel:<%= c.phone %>"><%= c.phone %></a><% } %>
+ <% if(c.hours){ %><p class="ideal-footer__hours"><%= c.hours %></p><% } %>
+ <% if(c.map){ %><a href="<%= c.map %>" target="_blank" rel="noopener noreferrer">Посмотреть на карте</a><% } %>
+ <% if(c.vk){ %><a href="<%= c.vk %>" target="_blank" rel="noopener noreferrer">ВКонтакте</a><% } %>
+ <% if(c.telegram){ %><a href="<%= c.telegram %>" target="_blank" rel="noopener noreferrer">Telegram</a><% } %>
+ <% if(!c.address&&!c.phone&&!c.map&&!c.hours&&!c.vk&&!c.telegram){ %><p>Контакты пока не опубликованы.</p><% } %>
+</div>

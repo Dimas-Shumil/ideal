@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ru">
   <head>
+    <meta name="robots" content="noindex,follow">
     <meta charset="utf-8" />
     <meta
       name="viewport"
@@ -47,48 +48,41 @@
       })();
     </script>
     <link rel="stylesheet" href="site/css/main.css" />
-  </head>
+  <link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/site/img/pwa/apple-touch-180.png">
+<link rel="stylesheet" href="/site/css/pwa-install.css">
+<script src="/site/scripts/pwa.js" defer></script>
+<script src="/site/scripts/pwa-install.js" defer></script>
+</head>
   <body>
     <!-- component:header:start -->
 <header class="header" id="top">
-      <a class="header__logo" href="/index.html#top" aria-label="ИДЕАЛ — на главную"
+      <a class="header__logo" href="/#top" aria-label="ИДЕАЛ — на главную"
         >ИДЕАЛ.</a
       >
       <nav class="header__navigation" aria-label="Главное меню">
         <a class="header__nav-link" href="/about.html">
           О клубе
         </a>
-        <a class="header__nav-link" href="/index.html#next">
+        <a class="header__nav-link" href="/#next">
           Направления
         </a>
         <a class="header__nav-link" href="/trainers.html">
           Тренеры
         </a>
-        <a class="header__nav-link" href="/index.html#memberships">
+        <a class="header__nav-link" href="/#memberships">
           Абонементы
         </a>
         <a class="header__nav-link" href="/shop.html">
           Магазин
         </a>
-        <button
-          class="header__nav-link"
-          type="button"
-          data-preview="Расписание"
-        >
-          Расписание
-        </button>
-        <a class="header__nav-link" href="/index.html#contacts">
+        <a class="header__nav-link" href="/schedule.html">Расписание</a>
+        <a class="header__nav-link" href="/#contacts">
           Контакты
         </a>
       </nav>
       <div class="header__actions">
-        <button
-          class="header__appointment"
-          type="button"
-          data-preview="Записаться"
-        >
-          <span>Записаться</span>
-        </button>
+        <a class="header__appointment" href="/#contacts"><span>Связаться</span></a>
         <button
           class="header__menu-toggle"
           id="menu-toggle"
@@ -151,26 +145,12 @@
 
         <div class="hero__cta-block">
           <p class="hero__mobile-subtitle">Больше<br />чем тренировки</p>
-          <button type="button" class="hero__cta" data-preview="Абонементы">
+          <a class="hero__cta" href="#memberships">
             <span>Выбрать абонемент</span>
-          </button>
+          </a>
         </div>
 
-        <button
-          class="hero__video"
-          type="button"
-          data-preview="Видео о клубе"
-          aria-label="Посмотреть видео о клубе"
-        >
-          <span class="hero__play" aria-hidden="true"
-            ><svg viewBox="0 0 20 20"><path d="m7 4 8 6-8 6z" /></svg></span>
-          <span class="hero__video-label"
-            >Посмотреть<br />видео о клубе<span
-              class="hero__video-rule"
-              aria-hidden="true"
-            ></span
-          ></span>
-        </button>
+
 
         <p class="hero__address">
           Бограда, 135 <span aria-hidden="true"></span>
@@ -190,131 +170,7 @@
 
       <!-- IDEAL / MONO — два новых блока. Существующий hero выше без изменений. -->
       <div class="ideal-flow" data-ideal-flow>
-        <section
-          class="directions"
-          id="next"
-          aria-labelledby="directions-title"
-        >
-          <div class="directions__shell">
-            <div class="directions__intro">
-              <p class="directions__eyebrow">
-                <span>01</span><i aria-hidden="true"></i>Направления
-              </p>
-              <h2 class="directions__heading" id="directions-title">
-                ВЫБЕРИ<br /><strong>СВОЙ ПУТЬ</strong>
-              </h2>
-              <p class="directions__lead">
-                Разные форматы тренировок, одна цель — лучшая версия тебя.
-              </p>
-              <a class="directions__explore" href="#directions-cards"
-                ><span>Узнать больше<br />о направлениях</span></a
-              >
-              <p class="directions__count">
-                <strong>01</strong><span></span>02&nbsp;&nbsp;03
-              </p>
-            </div>
-            <div class="directions__cards" id="directions-cards">
-              <article class="direction-card">
-                <img
-                  src="site/img/direction-gym.webp"
-                  alt="Гантели и оборудование тренажёрного зала"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div class="direction-card__scrim" aria-hidden="true"></div>
-                <span class="direction-card__number"
-                  >01 <span aria-hidden="true"></span
-                ></span>
-                <div class="direction-card__content">
-                  <h3>ТРЕНАЖЁРНЫЙ<br />ЗАЛ</h3>
-                  <p>Силовые и кардиотренировки в твоём ритме.</p>
-                  <button
-                    type="button"
-                    data-preview="Тренажёрный зал"
-                    aria-label="Подробнее: тренажёрный зал"
-                  >
-                    <span>Подробнее</span>
-                  </button>
-                </div>
-              </article>
-              <article class="direction-card">
-                <img
-                  src="site/img/direction-group.webp"
-                  alt="Спортсменка во время групповой тренировки"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div class="direction-card__scrim" aria-hidden="true"></div>
-                <span class="direction-card__number"
-                  >02 <span aria-hidden="true"></span
-                ></span>
-                <div class="direction-card__content">
-                  <h3>ГРУППОВЫЕ<br />ЗАНЯТИЯ</h3>
-                  <p>HOT-IRON, Pilates, Stretching и Fitness MIX.</p>
-                  <a class="direction-card__details" href="#group-programs"
-                    >Расписание программ</a
-                  >
-                </div>
-              </article>
-              <article class="direction-card">
-                <img
-                  src="site/img/direction-personal.webp"
-                  alt="Тренер помогает спортсмену во время силового упражнения"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div class="direction-card__scrim" aria-hidden="true"></div>
-                <span class="direction-card__number"
-                  >03 <span aria-hidden="true"></span
-                ></span>
-                <div class="direction-card__content">
-                  <h3>ПЕРСОНАЛЬНЫЕ<br />ТРЕНИРОВКИ</h3>
-                  <p>Индивидуальный подход и внимание к технике.</p>
-                  <button
-                    type="button"
-                    data-preview="Персональные тренировки"
-                    aria-label="Подробнее: персональные тренировки"
-                  >
-                    <span>Подробнее</span>
-                  </button>
-                </div>
-              </article>
-            </div>
-            <div
-              class="directions__programs"
-              id="group-programs"
-              aria-labelledby="group-programs-heading"
-            >
-              <div class="directions__programs-head">
-                <span class="directions__programs-label"
-                  >ГРУППОВЫЕ ПРОГРАММЫ / РАСПИСАНИЕ</span
-                >
-                <h3 id="group-programs-heading">Движение по расписанию</h3>
-                <p>
-                  Проводятся HOT-IRON, Pilates, Pilates + Stretching и Fitness
-                  MIX.
-                </p>
-              </div>
-              <div class="directions__programs-days">
-                <div class="directions__programs-day">
-                  <strong>ПН · СР · ПТ</strong>
-                  <p><span>12:00</span> HOT-IRON</p>
-                </div>
-                <div class="directions__programs-day">
-                  <strong>ВТ · ЧТ</strong>
-                  <p><span>18:15</span> PILATES</p>
-                  <p><span>19:15</span> PILATES + Stretching</p>
-                  <p><span>18:30</span> Fitness MIX</p>
-                  <p><span>19:30</span> HOT-IRON</p>
-                </div>
-              </div>
-              <p class="directions__programs-foot">
-                Время указано по информации клуба. Актуальность и распределение
-                занятий по дням уточняйте перед записью.
-              </p>
-            </div>
-          </div>
-        </section>
+        <section class="directions" id="next" aria-labelledby="directions-title"><div class="directions__shell"><div class="directions__intro"><h2 class="directions__heading" id="directions-title">НАПРАВЛЕНИЯ</h2><p class="directions__lead">Актуальные направления доступны при запуске через Node / Express.</p></div></div></section>
 
         <section
           class="memberships"
@@ -345,507 +201,7 @@
                 >Посмотреть<br />все абонементы</a
               >
             </div>
-            <div class="memberships__content" id="plans">
-              <div class="memberships__toolbar">
-                <div
-                  class="memberships__tabs"
-                  role="group"
-                  aria-label="Вид абонемента"
-                >
-                  <button
-                    type="button"
-                    data-plan-tab="gym"
-                    class="is-active"
-                    aria-pressed="true"
-                  >
-                    Тренажёрный зал
-                  </button>
-                  <button
-                    type="button"
-                    data-plan-tab="groups"
-                    aria-pressed="false"
-                  >
-                    Групповые занятия
-                  </button>
-                </div>
-                <div
-                  class="memberships__arrows"
-                  aria-label="Прокрутить карточки"
-                >
-                  <button
-                    type="button"
-                    data-plans-prev
-                    aria-label="Предыдущий абонемент"
-                  >
-                    Назад
-                  </button>
-                  <span
-                    class="memberships__counter"
-                    data-plans-counter
-                    aria-live="polite"
-                    >01 / 10</span
-                  >
-                  <button
-                    type="button"
-                    data-plans-next
-                    aria-label="Следующий абонемент"
-                  >
-                    Далее
-                  </button>
-                </div>
-              </div>
-              <div
-                class="memberships__plan-view"
-                data-plans-panel="gym"
-                id="plans-gym"
-              >
-                <div class="memberships__track" data-plans-track="gym">
-                  <article
-                    class="membership-card"
-                    aria-label="Абонемент Безлимит · Дневной, 2 600 ₽"
-                  >
-                    <div class="membership-card__top">
-                      <span class="membership-card__index">01 / IDEAL</span
-                      ><span
-                        class="membership-card__dash"
-                        aria-hidden="true"
-                      ></span>
-                    </div>
-                    <h3 class="membership-card__name">Безлимит · Дневной</h3>
-                    <p class="membership-card__times">08:00–16:00 · 1 месяц</p>
-                    <div class="membership-card__price">
-                      <strong>2 600 ₽</strong>
-                    </div>
-                    <p class="membership-card__description">
-                      Неограниченные посещения в дневное время.
-                    </p>
-                    <button
-                      class="membership-card__buy"
-                      type="button"
-                      data-buy-plan="Безлимит · Дневной"
-                      data-buy-price="2 600 ₽"
-                      data-buy-details="Неограниченные посещения в дневное время."
-                    >
-                      Купить
-                    </button>
-                  </article>
-                  <article
-                    class="membership-card membership-card--featured"
-                    aria-label="Абонемент Безлимит · Единый, 2 999 ₽"
-                  >
-                    <div class="membership-card__top">
-                      <span class="membership-card__index">02 / IDEAL</span
-                      ><span class="membership-card__tag">Безлимит</span>
-                    </div>
-                    <h3 class="membership-card__name">Безлимит · Единый</h3>
-                    <p class="membership-card__times">08:00–22:00 · 1 месяц</p>
-                    <div class="membership-card__price">
-                      <strong>2 999 ₽</strong>
-                    </div>
-                    <p class="membership-card__description">
-                      Неограниченные посещения в течение дня.
-                    </p>
-                    <button
-                      class="membership-card__buy"
-                      type="button"
-                      data-buy-plan="Безлимит · Единый"
-                      data-buy-price="2 999 ₽"
-                      data-buy-details="Неограниченные посещения в течение дня."
-                    >
-                      Купить
-                    </button>
-                  </article>
-                  <article
-                    class="membership-card"
-                    aria-label="Абонемент Дуэт, 2 800 ₽"
-                  >
-                    <div class="membership-card__top">
-                      <span class="membership-card__index">03 / IDEAL</span
-                      ><span
-                        class="membership-card__dash"
-                        aria-hidden="true"
-                      ></span>
-                    </div>
-                    <h3 class="membership-card__name">Дуэт</h3>
-                    <p class="membership-card__times">
-                      08:00–22:00 · за человека
-                    </p>
-                    <div class="membership-card__price">
-                      <strong>2 800 ₽</strong>
-                    </div>
-                    <p class="membership-card__description">
-                      Для двух человек. Оба абонемента оплачиваются вместе;
-                      общая стоимость 5 600 ₽.
-                    </p>
-                    <button
-                      class="membership-card__buy"
-                      type="button"
-                      data-buy-plan="Дуэт"
-                      data-buy-price="2 800 ₽"
-                      data-buy-details="Для двух человек. Оба абонемента оплачиваются вместе; общая стоимость 5 600 ₽."
-                    >
-                      Купить
-                    </button>
-                  </article>
-                  <article
-                    class="membership-card"
-                    aria-label="Абонемент Вт · Чт · Сб · Вс, 2 500 ₽"
-                  >
-                    <div class="membership-card__top">
-                      <span class="membership-card__index">04 / IDEAL</span
-                      ><span
-                        class="membership-card__dash"
-                        aria-hidden="true"
-                      ></span>
-                    </div>
-                    <h3 class="membership-card__name">Вт · Чт · Сб · Вс</h3>
-                    <p class="membership-card__times">
-                      08:00–22:00 · выбранные дни
-                    </p>
-                    <div class="membership-card__price">
-                      <strong>2 500 ₽</strong>
-                    </div>
-                    <p class="membership-card__description">
-                      Посещение по вторникам, четвергам, субботам и
-                      воскресеньям.
-                    </p>
-                    <button
-                      class="membership-card__buy"
-                      type="button"
-                      data-buy-plan="Вт · Чт · Сб · Вс"
-                      data-buy-price="2 500 ₽"
-                      data-buy-details="Посещение по вторникам, четвергам, субботам и воскресеньям."
-                    >
-                      Купить
-                    </button>
-                  </article>
-                  <article
-                    class="membership-card"
-                    aria-label="Абонемент Студенческий, 2 300 ₽"
-                  >
-                    <div class="membership-card__top">
-                      <span class="membership-card__index">05 / IDEAL</span
-                      ><span
-                        class="membership-card__dash"
-                        aria-hidden="true"
-                      ></span>
-                    </div>
-                    <h3 class="membership-card__name">Студенческий</h3>
-                    <p class="membership-card__times">
-                      Дневной тариф · 08:00–16:00
-                    </p>
-                    <div class="membership-card__price">
-                      <strong>2 300 ₽</strong>
-                    </div>
-                    <p class="membership-card__description">
-                      Специальный тариф для студентов.
-                    </p>
-                    <button
-                      class="membership-card__buy"
-                      type="button"
-                      data-buy-plan="Студенческий"
-                      data-buy-price="2 300 ₽"
-                      data-buy-details="Специальный тариф для студентов."
-                    >
-                      Купить
-                    </button>
-                  </article>
-                  <article
-                    class="membership-card"
-                    aria-label="Абонемент Социальный, 2 300 ₽"
-                  >
-                    <div class="membership-card__top">
-                      <span class="membership-card__index">06 / IDEAL</span
-                      ><span
-                        class="membership-card__dash"
-                        aria-hidden="true"
-                      ></span>
-                    </div>
-                    <h3 class="membership-card__name">Социальный</h3>
-                    <p class="membership-card__times">
-                      Дневной тариф · 08:00–16:00
-                    </p>
-                    <div class="membership-card__price">
-                      <strong>2 300 ₽</strong>
-                    </div>
-                    <p class="membership-card__description">
-                      Социальный тариф; условия предоставления уточняются.
-                    </p>
-                    <button
-                      class="membership-card__buy"
-                      type="button"
-                      data-buy-plan="Социальный"
-                      data-buy-price="2 300 ₽"
-                      data-buy-details="Социальный тариф; условия предоставления уточняются."
-                    >
-                      Купить
-                    </button>
-                  </article>
-                  <article
-                    class="membership-card"
-                    aria-label="Абонемент Утро, 2 300 ₽"
-                  >
-                    <div class="membership-card__top">
-                      <span class="membership-card__index">07 / IDEAL</span
-                      ><span
-                        class="membership-card__dash"
-                        aria-hidden="true"
-                      ></span>
-                    </div>
-                    <h3 class="membership-card__name">Утро</h3>
-                    <p class="membership-card__times">08:00–10:00</p>
-                    <div class="membership-card__price">
-                      <strong>2 300 ₽</strong>
-                    </div>
-                    <p class="membership-card__description">
-                      Занятия в утренние часы.
-                    </p>
-                    <button
-                      class="membership-card__buy"
-                      type="button"
-                      data-buy-plan="Утро"
-                      data-buy-price="2 300 ₽"
-                      data-buy-details="Занятия в утренние часы."
-                    >
-                      Купить
-                    </button>
-                  </article>
-                  <article
-                    class="membership-card"
-                    aria-label="Абонемент Разовое · День, 300 ₽"
-                  >
-                    <div class="membership-card__top">
-                      <span class="membership-card__index">08 / IDEAL</span
-                      ><span
-                        class="membership-card__dash"
-                        aria-hidden="true"
-                      ></span>
-                    </div>
-                    <h3 class="membership-card__name">Разовое · День</h3>
-                    <p class="membership-card__times">
-                      08:00–16:00 · 1 посещение
-                    </p>
-                    <div class="membership-card__price">
-                      <strong>300 ₽</strong>
-                    </div>
-                    <p class="membership-card__description">
-                      Разовое посещение тренажёрного зала.
-                    </p>
-                    <button
-                      class="membership-card__buy"
-                      type="button"
-                      data-buy-plan="Разовое · День"
-                      data-buy-price="300 ₽"
-                      data-buy-details="Разовое посещение тренажёрного зала."
-                    >
-                      Купить
-                    </button>
-                  </article>
-                  <article
-                    class="membership-card"
-                    aria-label="Абонемент Разовое · Вечер, 400 ₽"
-                  >
-                    <div class="membership-card__top">
-                      <span class="membership-card__index">09 / IDEAL</span
-                      ><span
-                        class="membership-card__dash"
-                        aria-hidden="true"
-                      ></span>
-                    </div>
-                    <h3 class="membership-card__name">Разовое · Вечер</h3>
-                    <p class="membership-card__times">С 16:00 · 1 посещение</p>
-                    <div class="membership-card__price">
-                      <strong>400 ₽</strong>
-                    </div>
-                    <p class="membership-card__description">
-                      Разовое посещение в вечернее время.
-                    </p>
-                    <button
-                      class="membership-card__buy"
-                      type="button"
-                      data-buy-plan="Разовое · Вечер"
-                      data-buy-price="400 ₽"
-                      data-buy-details="Разовое посещение в вечернее время."
-                    >
-                      Купить
-                    </button>
-                  </article>
-                  <article
-                    class="membership-card"
-                    aria-label="Абонемент Выгодный · День, 7 000 ₽"
-                  >
-                    <div class="membership-card__top">
-                      <span class="membership-card__index">10 / IDEAL</span
-                      ><span
-                        class="membership-card__dash"
-                        aria-hidden="true"
-                      ></span>
-                    </div>
-                    <h3 class="membership-card__name">Выгодный · День</h3>
-                    <p class="membership-card__times">
-                      Дневное посещение 08:00–16:00
-                    </p>
-                    <div class="membership-card__price">
-                      <strong>7 000 ₽</strong>
-                    </div>
-                    <p class="membership-card__description">
-                      Срок действия тарифа уточняется в клубе.
-                    </p>
-                    <button
-                      class="membership-card__buy"
-                      type="button"
-                      data-buy-plan="Выгодный · День"
-                      data-buy-price="7 000 ₽"
-                      data-buy-details="Срок действия тарифа уточняется в клубе."
-                    >
-                      Купить
-                    </button>
-                  </article>
-                  <article
-                    class="membership-card"
-                    aria-label="Абонемент Выгодный · Единый, 8 000 ₽"
-                  >
-                    <div class="membership-card__top">
-                      <span class="membership-card__index">11 / IDEAL</span
-                      ><span
-                        class="membership-card__dash"
-                        aria-hidden="true"
-                      ></span>
-                    </div>
-                    <h3 class="membership-card__name">Выгодный · Единый</h3>
-                    <p class="membership-card__times">08:00–22:00</p>
-                    <div class="membership-card__price">
-                      <strong>8 000 ₽</strong>
-                    </div>
-                    <p class="membership-card__description">
-                      Срок действия тарифа уточняется в клубе.
-                    </p>
-                    <button
-                      class="membership-card__buy"
-                      type="button"
-                      data-buy-plan="Выгодный · Единый"
-                      data-buy-price="8 000 ₽"
-                      data-buy-details="Срок действия тарифа уточняется в клубе."
-                    >
-                      Купить
-                    </button>
-                  </article>
-                </div>
-              </div>
-              <div
-                class="memberships__plan-view"
-                data-plans-panel="groups"
-                id="plans-groups"
-                hidden
-              >
-                <div class="memberships__track" data-plans-track="groups">
-                  <article
-                    class="membership-card"
-                    aria-label="Абонемент 8 занятий, 3 200 ₽"
-                  >
-                    <div class="membership-card__top">
-                      <span class="membership-card__index">01 / IDEAL</span
-                      ><span
-                        class="membership-card__dash"
-                        aria-hidden="true"
-                      ></span>
-                    </div>
-                    <h3 class="membership-card__name">8 занятий</h3>
-                    <p class="membership-card__times">8 посещений · 1 месяц</p>
-                    <div class="membership-card__price">
-                      <strong>3 200 ₽</strong>
-                    </div>
-                    <p class="membership-card__description">
-                      В подарок — посещение тренажёрного зала.
-                    </p>
-                    <button
-                      class="membership-card__buy"
-                      type="button"
-                      data-buy-plan="8 занятий"
-                      data-buy-price="3 200 ₽"
-                      data-buy-details="В подарок — посещение тренажёрного зала."
-                    >
-                      Купить
-                    </button>
-                  </article>
-                  <article
-                    class="membership-card"
-                    aria-label="Абонемент 12 занятий, 3 600 ₽"
-                  >
-                    <div class="membership-card__top">
-                      <span class="membership-card__index">02 / IDEAL</span
-                      ><span
-                        class="membership-card__dash"
-                        aria-hidden="true"
-                      ></span>
-                    </div>
-                    <h3 class="membership-card__name">12 занятий</h3>
-                    <p class="membership-card__times">12 посещений · 1 месяц</p>
-                    <div class="membership-card__price">
-                      <strong>3 600 ₽</strong>
-                    </div>
-                    <p class="membership-card__description">
-                      В подарок — посещение тренажёрного зала.
-                    </p>
-                    <button
-                      class="membership-card__buy"
-                      type="button"
-                      data-buy-plan="12 занятий"
-                      data-buy-price="3 600 ₽"
-                      data-buy-details="В подарок — посещение тренажёрного зала."
-                    >
-                      Купить
-                    </button>
-                  </article>
-                  <article
-                    class="membership-card"
-                    aria-label="Абонемент Разовое занятие, 500 ₽"
-                  >
-                    <div class="membership-card__top">
-                      <span class="membership-card__index">03 / IDEAL</span
-                      ><span
-                        class="membership-card__dash"
-                        aria-hidden="true"
-                      ></span>
-                    </div>
-                    <h3 class="membership-card__name">Разовое занятие</h3>
-                    <p class="membership-card__times">1 групповое занятие</p>
-                    <div class="membership-card__price">
-                      <strong>500 ₽</strong>
-                    </div>
-                    <p class="membership-card__description">
-                      Ознакомительное посещение групповой программы.
-                    </p>
-                    <button
-                      class="membership-card__buy"
-                      type="button"
-                      data-buy-plan="Разовое занятие"
-                      data-buy-price="500 ₽"
-                      data-buy-details="Ознакомительное посещение групповой программы."
-                    >
-                      Купить
-                    </button>
-                  </article>
-                </div>
-              </div>
-              <div class="memberships__extras" data-plans-extra="gym">
-                <span>Дополнительно</span
-                ><span>Замена клубной карты — 50 ₽</span>
-              </div>
-              <div class="memberships__extras" data-plans-extra="groups" hidden>
-                <span>Групповые занятия</span
-                ><span
-                  >Абонемент можно оформить на 2 недели — условия
-                  уточняются</span
-                ><span>Посещение тренажёрного зала в подарок</span>
-              </div>
-              <p class="memberships__note">
-                Цены и расписание — по предоставленному прайсу клуба. Перед
-                оплатой уточняйте доступность, сроки действия и специальные
-                условия.
-              </p>
-            </div>
-          </div>
+            <div class="memberships__content" id="plans"><p class="memberships__note">Актуальные абонементы загружаются из CRM при запуске через Express. В статическом просмотре тарифы не отображаются.</p></div></div>
         </section>
 
         <!-- Спортивное питание. Концепты упаковок и категории заменяются реальными товарами. -->
@@ -934,18 +290,19 @@
   <div class="ideal-footer__container">
     <div class="ideal-footer__top">
       <div class="ideal-footer__about">
-        <a class="ideal-footer__logo" href="/index.html#top" aria-label="Идеал — наверх">ИДЕАЛ.</a>
+        <a class="ideal-footer__logo" href="/#top" aria-label="Идеал — наверх">ИДЕАЛ.</a>
         <p>Спортивный клуб в Абакане.<br>Тренируйся в своём ритме.</p>
       </div>
 
       <nav class="ideal-footer__nav" aria-label="Навигация по сайту">
         <h2>Навигация</h2>
-        <a href="/index.html#top">Главная</a>
+        <a href="/#top">Главная</a>
         <a href="/about.html">О клубе</a>
         <a href="/trainers.html">Тренеры</a>
-        <a href="/index.html#next">Направления</a>
-        <a href="/index.html#memberships">Абонементы</a>
+        <a href="/#next">Направления</a>
+        <a href="/#memberships">Абонементы</a>
         <a href="/shop.html">Спортивное питание</a>
+        <a href="/login">Кабинет сотрудника</a>
       </nav>
 
       <div class="ideal-footer__contacts">
@@ -972,34 +329,26 @@
           <a href="/about.html">
             <span>О клубе</span>
           </a>
-          <a href="/index.html#next">
+          <a href="/#next">
             <span>Направления</span>
           </a>
           <a href="/trainers.html">
             <span>Тренеры</span>
           </a>
-          <a href="/index.html#memberships">
+          <a href="/#memberships">
             <span>Абонементы</span>
           </a>
           <a href="/shop.html">
             <span>Магазин</span>
           </a>
-          <button type="button" data-preview="Расписание">
-            <span>Расписание</span>
-          </button>
-          <a href="/index.html#contacts">
+          <a href="/schedule.html"><span>Расписание</span></a>
+          <a href="/#contacts">
             <span>Контакты</span>
           </a>
         </nav>
         <div class="menu-panel__bottom">
           <p class="menu-panel__footnote">ИДЕАЛ · АБАКАН<br />БОГРАДА, 135</p>
-          <button
-            class="menu-panel__appointment"
-            type="button"
-            data-preview="Записаться"
-          >
-            <span>Записаться</span>
-          </button>
+          <a class="menu-panel__appointment" href="/#contacts"><span>Связаться</span></a>
         </div>
       </div>
     </div>
@@ -1018,10 +367,10 @@
       >
         ×
       </button>
-      <span class="preview-dialog__eyebrow">IDEAL / PREVIEW</span>
-      <h2 id="preview-dialog-title">Раздел в разработке</h2>
+      <span class="preview-dialog__eyebrow">ИДЕАЛ / ИНФОРМАЦИЯ</span>
+      <h2 id="preview-dialog-title">Информация</h2>
       <p id="preview-dialog-description">
-        Пока мы собираем первый экран. Этот раздел подключим на следующем этапе.
+        Актуальную информацию можно уточнить в клубе.
       </p>
       <button class="preview-dialog__ok" type="button" id="preview-dialog-ok">
         Понятно
@@ -1045,12 +394,11 @@
       </button>
       <span class="purchase-dialog__eyebrow">IDEAL / АБОНЕМЕНТ</span>
       <h2 id="purchase-title">Ваш выбор</h2>
-      <p class="purchase-dialog__plan" data-purchase-name>Единый</p>
-      <p class="purchase-dialog__price" data-purchase-price>2 999 ₽</p>
+      <p class="purchase-dialog__plan" data-purchase-name>Выбранный абонемент</p>
+      <p class="purchase-dialog__price" data-purchase-price>Цена указана в карточке</p>
       <p class="purchase-dialog__terms" data-purchase-terms></p>
       <p class="purchase-dialog__note">
-        Оформление и приём оплаты подключим на следующем этапе. Сейчас покупка
-        не совершается и деньги не списываются.
+        Оформление и оплата — в клубе. Онлайн-покупка недоступна: заявки не отправляются, деньги не списываются.
       </p>
       <button type="button" class="purchase-dialog__button" data-purchase-close>
         Понятно

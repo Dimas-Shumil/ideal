@@ -463,3 +463,84 @@
     transition: none;
   }
 }
+/* Published club media; empty sections are omitted by SSR. */
+.about-media {
+  margin: 0;
+  min-width: 0;
+}
+
+.about-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.about-media figcaption {
+  padding: 14px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.about-hero__media {
+  margin: 50px 0 0;
+}
+
+.about-hero__media img {
+  aspect-ratio: 16/8;
+}
+
+.about-space__media {
+  margin-top: 50px;
+}
+
+.about-space__media img {
+  aspect-ratio: 16/7;
+}
+
+.about-gallery__media img {
+  aspect-ratio: 4/3;
+}
+
+.about-gallery__media:first-child {
+  grid-row: span 2;
+}
+
+.about-gallery__media:first-child img {
+  height: calc(100% - 55px);
+  min-height: 300px;
+}
+
+.about__text, .about-hero__bottom p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.about a:focus-visible {
+  outline: 3px solid #708188;
+  outline-offset: 6px;
+}
+
+@media (max-width: 680px) {
+  .about-hero__media img, .about-space__media img {
+    aspect-ratio: 4/5;
+  }
+  .about-gallery__media:first-child {
+    grid-row: auto;
+  }
+  .about-gallery__media:first-child img {
+    height: auto;
+    min-height: 0;
+  }
+}
+.about-page .header__appointment {
+  background: #25282a;
+  border-color: #25282a;
+  color: #fff;
+}
+
+.about-page .header__appointment:hover {
+  background: #454b4e;
+  color: #fff;
+}

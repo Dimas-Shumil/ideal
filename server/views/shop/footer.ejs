@@ -2,25 +2,22 @@
   <div class="ideal-footer__container">
     <div class="ideal-footer__top">
       <div class="ideal-footer__about">
-        <a class="ideal-footer__logo" href="/index.html#top" aria-label="Идеал — наверх">ИДЕАЛ.</a>
+        <a class="ideal-footer__logo" href="/#top" aria-label="Идеал — наверх">ИДЕАЛ.</a>
         <p>Спортивный клуб в Абакане.<br>Тренируйся в своём ритме.</p>
       </div>
 
       <nav class="ideal-footer__nav" aria-label="Навигация по сайту">
         <h2>Навигация</h2>
-        <a href="/index.html#top">Главная</a>
+        <a href="/#top">Главная</a>
         <a href="/about.html">О клубе</a>
         <a href="/trainers.html">Тренеры</a>
-        <a href="/index.html#next">Направления</a>
-        <a href="/index.html#memberships">Абонементы</a>
+        <a href="/#next">Направления</a>
+        <a href="/#memberships">Абонементы</a>
         <a href="/shop.html">Спортивное питание</a>
+        <a href="/login">Кабинет сотрудника</a>
       </nav>
 
-      <div class="ideal-footer__contacts">
-        <h2>Контакты</h2>
-        <address>Абакан, ул. Бограда, 135</address>
-        <a href="https://2gis.ru/abakan/firm/9711414977502434" target="_blank" rel="noopener noreferrer">Посмотреть на карте</a>
-      </div>
+      <%- include('../content/contacts') %>
     </div>
 
     <div class="ideal-footer__bottom">
@@ -36,34 +33,26 @@
           <a href="/about.html">
             <span>О клубе</span>
           </a>
-          <a href="/index.html#next">
+          <a href="/#next">
             <span>Направления</span>
           </a>
           <a href="/trainers.html">
             <span>Тренеры</span>
           </a>
-          <a href="/index.html#memberships">
+          <a href="/#memberships">
             <span>Абонементы</span>
           </a>
           <a href="/shop.html">
             <span>Магазин</span>
           </a>
-          <button type="button" data-preview="Расписание">
-            <span>Расписание</span>
-          </button>
-          <a href="/index.html#contacts">
+          <a href="/schedule.html"><span>Расписание</span></a>
+          <a href="/#contacts">
             <span>Контакты</span>
           </a>
         </nav>
         <div class="menu-panel__bottom">
-          <p class="menu-panel__footnote">ИДЕАЛ · АБАКАН<br />БОГРАДА, 135</p>
-          <button
-            class="menu-panel__appointment"
-            type="button"
-            data-preview="Записаться"
-          >
-            <span>Записаться</span>
-          </button>
+          <p class="menu-panel__footnote">ИДЕАЛ · АБАКАН<% if(typeof siteContacts === "object" && siteContacts.address){ %><br><%= siteContacts.address %><% } %></p>
+          <a class="menu-panel__appointment" href="/#contacts"><span>Связаться</span></a>
         </div>
       </div>
     </div>
@@ -80,10 +69,10 @@
       >
         ×
       </button>
-      <span class="preview-dialog__eyebrow">IDEAL / PREVIEW</span>
-      <h2 id="preview-dialog-title">Раздел в разработке</h2>
+      <span class="preview-dialog__eyebrow">ИДЕАЛ / ИНФОРМАЦИЯ</span>
+      <h2 id="preview-dialog-title">Информация</h2>
       <p id="preview-dialog-description">
-        Пока мы собираем первый экран. Этот раздел подключим на следующем этапе.
+        Актуальную информацию можно уточнить в клубе.
       </p>
       <button class="preview-dialog__ok" type="button" id="preview-dialog-ok">
         Понятно

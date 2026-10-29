@@ -49,20 +49,8 @@ menuToggle.addEventListener('click', () => {
 function openPreview(name, opener) {
   restoreFocusTo = opener;
   setMenuState(false);
-  const isShopDemo = name === 'Демо-товар';
-  const isProfile = name.startsWith('Профиль тренера');
-  const isBooking = name === 'Записаться';
-  const isMembership = name === 'Абонементы';
-  previewTitle.textContent = isShopDemo ? 'Демонстрационный товар' : isProfile ? 'Профиль готовится' : isBooking ? 'Запись в клуб' : isMembership ? 'Абонементы' : name;
-  previewText.textContent = isShopDemo
-    ? 'Это пример оформления каталога, а не товар клуба. Ассортимент, фасовки и цены ещё не утверждены. Демо-корзина проверяет только интерфейс; оформление заказа, оплата и отправка заявок недоступны.'
-    : isProfile
-    ? 'Это демонстрационная карточка. Имя, фотографию и специализацию добавим после получения материалов клуба. Персональная страница пока недоступна.'
-    : isBooking
-    ? 'Интерфейс записи подготовим вместе со страницей тренировок. Запись пока недоступна: заявки ещё не отправляются.'
-    : isMembership
-      ? 'Здесь откроются тарифы клуба и выбор абонемента. На этом этапе доступен только первый экран сайта.'
-      : `Раздел «${name}» добавим на следующем этапе. Сейчас доступны готовые разделы главной страницы.`;
+  previewTitle.textContent = name === 'Записаться' ? 'Контакты клуба' : name;
+  previewText.textContent = 'Условия посещения можно уточнить в клубе. Контакты указаны внизу страницы.';
   clearTimeout(modalCloseTimer);
   previewDialog.showModal();
   requestAnimationFrame(() => previewDialog.classList.add('is-visible'));

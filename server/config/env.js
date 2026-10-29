@@ -10,6 +10,8 @@ const shape = z.object({
     .default("development"),
   PORT: z.coerce.number().int().min(1024).max(65535).default(3000),
   APP_ORIGIN: z.string().url(),
+  SEO_ORIGIN: z.string().default(""),
+  SEO_INDEXABLE: z.enum(["true", "false"]).default("false").transform(v => v === "true"),
   DATABASE_URL: z.string().url(),
   SESSION_SECRET: z.string().min(64).max(256),
   TRUST_PROXY: z.enum(["none", "loopback"]).default("none"),
@@ -36,6 +38,17 @@ export function readConfig(input = process.env) {
       if (pair.getPublicKey().toString("base64url") !== c.PUSH_PUBLIC_KEY) throw new Error();
     } catch { throw new Error("Проверьте переменные: PUSH_PUBLIC_KEY, PUSH_PRIVATE_KEY"); }
   }
+  if (c.SEO_ORIGIN) {
+    let seo;
+    try { seo = new URL(c.SEO_ORIGIN); } catch { throw new Error("Проверьте переменные: SEO_ORIGIN"); }
+    if (seo.protocol !== "https:" || seo.origin !== c.SEO_ORIGIN || seo.username || seo.password ||
+        seo.hostname === "localhost" || seo.hostname.endsWith(".localhost") ||
+        seo.hostname === "[::1]" || /^[0-9.]+$/.test(seo.hostname) || !seo.hostname.includes("."))
+      throw new Error("SEO_ORIGIN: укажите HTTPS origin публичного домена без пути и завершающего /");
+    if (c.NODE_ENV === "production" && c.SEO_ORIGIN !== c.APP_ORIGIN)
+      throw new Error("SEO_ORIGIN должен совпадать с production APP_ORIGIN");
+  }
+  if (c.SEO_INDEXABLE && !c.SEO_ORIGIN) throw new Error("Для SEO_INDEXABLE требуется SEO_ORIGIN");
   const origin = new URL(c.APP_ORIGIN),
     db = new URL(c.DATABASE_URL);
   if (

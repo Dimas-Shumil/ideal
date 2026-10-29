@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="/site/css/owner.css">
   <link rel="stylesheet" href="/site/css/schedule.css">
   <script src="/site/scripts/owner.js" defer></script>
-</head>
+<%- include('../partials/pwa-head') %></head>
 <body class="panel schedule">
 <a class="panel__skip" href="#content">К содержимому</a>
 <%
@@ -52,11 +52,40 @@
         <div class="panel__heading"><div><p class="panel__eyebrow"><%= start.date %> · <%= start.time %>–<%= end.time %></p><h2><%= item.title %></h2></div><span class="panel__badge"><%= statusName[item.status] %></span></div>
         <p><%= kindName[item.kind] %> · <%= item.trainer.user.displayName %><%= item.room ? ' · ' + item.room : '' %></p>
         <p>Участников: <%= item._count.bookings %> / <%= item.capacity %></p>
-        <a href="<%= base %>/<%= item.id %>">Открыть занятие</a>
+        <div class="schedule__card-actions">
+          <a href="<%= base %>/<%= item.id %>">Открыть занятие</a>
+          <% if (isOwner && item.status === 'CANCELLED') { %>
+            <a class="schedule__card-button schedule__card-button--delete" href="/crm/schedule/<%= item.id %>#delete-lesson">Удалить</a>
+          <% } else if (!isTrainer && item.status === 'SCHEDULED') { %>
+            <a class="schedule__card-button" href="/crm/schedule/<%= item.id %>#cancel-lesson">Отменить</a>
+          <% } %>
+        </div>
       </article>
     <% } %>
   </div>
   <% if (!items.length) { %><section class="panel__card"><h2>Занятий нет</h2><p>В выбранном диапазоне расписание пусто.</p></section><% } %>
+
+<% } else if (page === 'publication') { %>
+  <a href="/crm/schedule/<%= lesson.id %>">К занятию</a><h1>Публикация расписания</h1>
+  <p><a href="/schedule.html">Открыть публичное расписание</a></p>
+  <section class="panel__card"><h2>Публичное имя тренера</h2>
+    <p>Сотрудник: <%= lesson.trainer.user.displayName %>. Имя ниже используется во всех его опубликованных занятиях. Пустое поле скрывает строку тренера.</p>
+    <form class="panel__form" method="post" action="/crm/schedule/<%= lesson.id %>/public-trainer">
+      <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>">
+      <input type="hidden" name="publicVersion" value="<%= lesson.trainer.publicVersion %>">
+      <label>Согласованное публичное имя<input name="publicName" maxlength="100" value="<%= lesson.trainer.publicName %>"></label><button>Сохранить публичное имя</button>
+    </form>
+  </section>
+  <% if (lesson.kind === 'GROUP') { %>
+  <form class="panel__card panel__form" method="post" action="/crm/schedule/<%= lesson.id %>/publication">
+    <h2>Выберите занятия</h2><p>Публикация раскрывает название, дату, время и заданное публичное имя тренера. Проверьте названия перед публикацией. Остальные занятия серии не меняются.</p>
+    <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>">
+    <% for (const item of choices) { const start = club(item.startsAt); %>
+      <label class="schedule__confirm"><input type="checkbox" name="lessons" value="<%= item.id %>:<%= item.version %>"><span><%= start.date %> <%= start.time %> · <%= item.title %> · <%= statusName[item.status] %> · <%= item.publicVisible ? 'Опубликовано' : 'Скрыто' %></span></label>
+    <% } %>
+    <label>Действие<select name="visible"><option value="true">Показывать на сайте</option><option value="false">Скрыть с сайта</option></select></label>
+    <label class="schedule__confirm"><input type="checkbox" name="confirm" value="PUBLIC" required>Подтверждаю выбор занятий и пригодность названий для публичного сайта</label><button>Применить к выбранным занятиям</button>
+  </form><% } else { %><p>Персональные занятия не публикуются.</p><% } %>
 
 <% } else if (page === 'new') { %>
   <a href="/crm/schedule">Все занятия</a><h1>Создать занятие</h1>
@@ -82,6 +111,7 @@
 <% } else if (page === 'detail') { const current = lesson; const start = club(current.startsAt), end = club(current.endsAt); const started = new Date(current.startsAt) <= new Date(); %>
   <a href="<%= base %>">Все занятия</a>
   <div class="panel__heading"><div><p class="panel__eyebrow"><%= start.date %> · <%= start.time %>–<%= end.time %></p><h1><%= current.title %></h1></div><span class="panel__badge"><%= statusName[current.status] %></span></div>
+  <% if (isOwner && current.kind === "GROUP") { %><p><a href="/crm/schedule/<%= current.id %>/publication">Публикация на сайте и публичное имя тренера</a> · <%= current.publicVisible ? "Опубликовано" : "Скрыто" %></p><% } %>
   <section class="panel__card">
     <h2>Параметры</h2>
     <dl class="schedule__details">
@@ -101,7 +131,7 @@
     </section>
   <% } %>
   <% if (!isTrainer && current.status === 'SCHEDULED') { %>
-    <section class="panel__card">
+    <section class="panel__card" id="cancel-lesson" tabindex="-1">
       <h2>Отменить занятие</h2><p>Действующие записи будут отменены. Уже отмеченные посещения будут компенсированы атомарно.</p>
       <form class="panel__form" method="post" action="/crm/schedule/<%= current.id %>/cancel">
         <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><input type="hidden" name="version" value="<%= current.version %>">
@@ -111,7 +141,7 @@
   <% } %>
 
   <% if (isOwner && current.status === 'CANCELLED') { %>
-    <section class="panel__card schedule__delete">
+    <section class="panel__card schedule__delete" id="delete-lesson" tabindex="-1">
       <h2>Удалить занятие навсегда</h2>
       <% if (canDeleteLesson) { %>
       <p>Занятие и отменённые записи исчезнут из расписания. Отменить удаление нельзя. Журнал действий сохраняется. Другие занятия серии останутся.</p>

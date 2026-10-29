@@ -6,49 +6,42 @@
   <meta name="description" content="Магазин спортивного питания ИДЕАЛ, Абакан. Демонстрационный каталог: ассортимент и цены ожидают подтверждения клуба." />
   <title>Демо-корзина — ИДЕАЛ</title>
   <link rel="stylesheet" href="site/css/main.css" /><link rel="stylesheet" href="site/css/cart.css" />
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/site/img/pwa/apple-touch-180.png">
+<link rel="stylesheet" href="/site/css/pwa-install.css">
+<script src="/site/scripts/pwa.js" defer></script>
+<script src="/site/scripts/pwa-install.js" defer></script>
 </head>
 <body class="cart-page">
 <a class="cart-page__skip" href="#cart">К содержимому</a>
 <!-- component:header:start -->
 <header class="header" id="top">
-      <a class="header__logo" href="/index.html#top" aria-label="ИДЕАЛ — на главную"
+      <a class="header__logo" href="/#top" aria-label="ИДЕАЛ — на главную"
         >ИДЕАЛ.</a
       >
       <nav class="header__navigation" aria-label="Главное меню">
         <a class="header__nav-link" href="/about.html">
           О клубе
         </a>
-        <a class="header__nav-link" href="/index.html#next">
+        <a class="header__nav-link" href="/#next">
           Направления
         </a>
         <a class="header__nav-link" href="/trainers.html">
           Тренеры
         </a>
-        <a class="header__nav-link" href="/index.html#memberships">
+        <a class="header__nav-link" href="/#memberships">
           Абонементы
         </a>
         <a class="header__nav-link" href="/shop.html">
           Магазин
         </a>
-        <button
-          class="header__nav-link"
-          type="button"
-          data-preview="Расписание"
-        >
-          Расписание
-        </button>
-        <a class="header__nav-link" href="/index.html#contacts">
+        <a class="header__nav-link" href="/schedule.html">Расписание</a>
+        <a class="header__nav-link" href="/#contacts">
           Контакты
         </a>
       </nav>
       <div class="header__actions">
-        <button
-          class="header__appointment"
-          type="button"
-          data-preview="Записаться"
-        >
-          <span>Записаться</span>
-        </button>
+        <a class="header__appointment" href="/#contacts"><span>Связаться</span></a>
         <button
           class="header__menu-toggle"
           id="menu-toggle"
@@ -62,24 +55,25 @@
       </div>
     </header>
     <!-- component:header:end -->
-<main class="cart" id="cart" tabindex="-1"><div class="cart__shell"><nav aria-label="Хлебные крошки"><a href="/index.html">Главная</a> / <a href="/shop.html">Магазин</a> / <span aria-current="page">Демо-корзина</span></nav><h1>Демо-корзина</h1><p>ДЕМОНСТРАЦИОННЫЙ РЕЖИМ / IDEAL</p><p>Это проверка интерфейса. Примеры не являются ассортиментом клуба. Покупки, оплата и заявки не оформляются.</p><div data-cart-view hidden><h2 tabindex="-1" data-cart-heading>Ваши демо-примеры</h2><ul class="cart__list" data-cart-list></ul><p data-cart-empty>Корзина пуста. <a href="/shop.html">Выбрать пример в магазине</a></p><button type="button" data-cart-clear hidden>Очистить демо-корзину</button></div><noscript><p>Для чтения локальной корзины нужен JavaScript. Её состояние сейчас не определено.</p></noscript><section class="cart__summary"><h2>Оформление недоступно</h2><p>Денежные итоги не рассчитываются до подтверждения цен. Фасовки и наличие клубом не указаны.</p><button type="button" data-preview="Демо-товар" data-cart-explain disabled>Почему нельзя оформить</button></section><p>Количество ограничено 99 на позицию — это технический предел демонстрации, а не складской остаток.</p><p data-cart-feedback role="status" aria-live="polite" aria-atomic="true"></p><p data-cart-storage role="status"></p><div class="cart__links"><a href="/shop.html">Вернуться в каталог</a><a href="/cart.html">Демо-корзина</a></div></div></main>
+<main class="cart" id="cart" tabindex="-1"><div class="cart__shell"><nav aria-label="Хлебные крошки"><a href="/">Главная</a> / <a href="/shop.html">Магазин</a> / <span aria-current="page">Демо-корзина</span></nav><h1>Демо-корзина</h1><p>ДЕМОНСТРАЦИОННЫЙ РЕЖИМ / IDEAL</p><p>Это проверка интерфейса. Примеры не являются ассортиментом клуба. Покупки, оплата и заявки не оформляются.</p><div data-cart-view hidden><h2 tabindex="-1" data-cart-heading>Ваши демо-примеры</h2><ul class="cart__list" data-cart-list></ul><p data-cart-empty>Корзина пуста. <a href="/shop.html">Выбрать пример в магазине</a></p><button type="button" data-cart-clear hidden>Очистить демо-корзину</button></div><noscript><p>Для чтения локальной корзины нужен JavaScript. Её состояние сейчас не определено.</p></noscript><section class="cart__summary"><h2>Оформление недоступно</h2><p>Денежные итоги не рассчитываются до подтверждения цен. Фасовки и наличие клубом не указаны.</p><button type="button" data-preview="Демо-товар" data-cart-explain disabled>Почему нельзя оформить</button></section><p>Количество ограничено 99 на позицию — это технический предел демонстрации, а не складской остаток.</p><p data-cart-feedback role="status" aria-live="polite" aria-atomic="true"></p><p data-cart-storage role="status"></p><div class="cart__links"><a href="/shop.html">Вернуться в каталог</a><a href="/cart.html">Демо-корзина</a></div></div></main>
 <!-- component:footer:start -->
 <footer class="ideal-footer" id="contacts">
   <div class="ideal-footer__container">
     <div class="ideal-footer__top">
       <div class="ideal-footer__about">
-        <a class="ideal-footer__logo" href="/index.html#top" aria-label="Идеал — наверх">ИДЕАЛ.</a>
+        <a class="ideal-footer__logo" href="/#top" aria-label="Идеал — наверх">ИДЕАЛ.</a>
         <p>Спортивный клуб в Абакане.<br>Тренируйся в своём ритме.</p>
       </div>
 
       <nav class="ideal-footer__nav" aria-label="Навигация по сайту">
         <h2>Навигация</h2>
-        <a href="/index.html#top">Главная</a>
+        <a href="/#top">Главная</a>
         <a href="/about.html">О клубе</a>
         <a href="/trainers.html">Тренеры</a>
-        <a href="/index.html#next">Направления</a>
-        <a href="/index.html#memberships">Абонементы</a>
+        <a href="/#next">Направления</a>
+        <a href="/#memberships">Абонементы</a>
         <a href="/shop.html">Спортивное питание</a>
+        <a href="/login">Кабинет сотрудника</a>
       </nav>
 
       <div class="ideal-footer__contacts">
@@ -104,34 +98,26 @@
           <a href="/about.html">
             <span>О клубе</span>
           </a>
-          <a href="/index.html#next">
+          <a href="/#next">
             <span>Направления</span>
           </a>
           <a href="/trainers.html">
             <span>Тренеры</span>
           </a>
-          <a href="/index.html#memberships">
+          <a href="/#memberships">
             <span>Абонементы</span>
           </a>
           <a href="/shop.html">
             <span>Магазин</span>
           </a>
-          <button type="button" data-preview="Расписание">
-            <span>Расписание</span>
-          </button>
-          <a href="/index.html#contacts">
+          <a href="/schedule.html"><span>Расписание</span></a>
+          <a href="/#contacts">
             <span>Контакты</span>
           </a>
         </nav>
         <div class="menu-panel__bottom">
           <p class="menu-panel__footnote">ИДЕАЛ · АБАКАН<br />БОГРАДА, 135</p>
-          <button
-            class="menu-panel__appointment"
-            type="button"
-            data-preview="Записаться"
-          >
-            <span>Записаться</span>
-          </button>
+          <a class="menu-panel__appointment" href="/#contacts"><span>Связаться</span></a>
         </div>
       </div>
     </div>
@@ -150,10 +136,10 @@
       >
         ×
       </button>
-      <span class="preview-dialog__eyebrow">IDEAL / PREVIEW</span>
-      <h2 id="preview-dialog-title">Раздел в разработке</h2>
+      <span class="preview-dialog__eyebrow">ИДЕАЛ / ИНФОРМАЦИЯ</span>
+      <h2 id="preview-dialog-title">Информация</h2>
       <p id="preview-dialog-description">
-        Пока мы собираем первый экран. Этот раздел подключим на следующем этапе.
+        Актуальную информацию можно уточнить в клубе.
       </p>
       <button class="preview-dialog__ok" type="button" id="preview-dialog-ok">
         Понятно

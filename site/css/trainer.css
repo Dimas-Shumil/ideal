@@ -359,3 +359,31 @@
     transition: none;
   }
 }
+.trainer__hero {
+  padding-top: 40px;
+}
+
+.trainer__facts dd, .trainer__description, .trainer__specialty {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.trainer-page a:focus-visible {
+  outline: 3px solid #82662c;
+  outline-offset: 5px;
+}
+
+.trainer__notice h1 {
+  font-size: clamp(30px, 5vw, 64px);
+}
+
+.trainer-page .header__appointment {
+  background: #25282a;
+  border-color: #25282a;
+  color: #fff;
+}
+
+.trainer-page .header__appointment:hover {
+  background: #464b4e;
+  color: #fff;
+}

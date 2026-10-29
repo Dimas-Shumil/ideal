@@ -14,6 +14,7 @@ export const productBody = z
     active: bool,
   })
   .strict();
+export const productDeleteBody = z.object({ confirm: z.literal("delete") }).strict();
 // Decimal string -> integer kopecks, no floating point rounding.
 export const price = z
   .string()
