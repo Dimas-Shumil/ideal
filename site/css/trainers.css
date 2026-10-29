@@ -366,5 +366,7 @@
     transform: none;
   }
 }
-
-.trainer-card__profile { text-decoration: none; }
+/* Catalog links now open the shared demonstration template. */
+.trainer-card__profile {
+  text-decoration: none;
+}
