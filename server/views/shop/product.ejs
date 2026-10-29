@@ -1,2 +1,44 @@
 <%- include('head',{title:product?product.name:'Товар',pageClass:'product'}) %><main class="product" id="content" tabindex="-1"><div class="product__shell"><nav aria-label="Хлебные крошки"><a href="/shop.html">Магазин</a> / <span aria-current="page"><%= product?product.name:'Товар' %></span></nav>
-<% if(!product){ %><h1>Выберите товар в каталоге</h1><% }else{ %><h1><%= product.name %></h1><div class="product__layout"><div class="product__gallery" aria-label="Фотографии товара"><% if(!product.images.length){ %><img src="/site/img/shop-placeholder.svg" alt="Фото пока не добавлено" width="600" height="760"><% } for(const image of product.images){ %><a href="/shop/images/<%= image.id %>.webp" target="_blank" rel="noopener"><img src="/shop/images/<%= image.id %>.webp" alt="<%= product.name %>, фото <%= product.images.indexOf(image)+1 %>" width="600" height="760" loading="lazy"></a><% } %></div><div><p><%= product.category %></p><h2>Описание</h2><p class="product__text"><%= product.description||'Описание пока не добавлено.' %></p><h2>Характеристики</h2><p class="product__text"><%= product.characteristics||'Характеристики пока не добавлены.' %></p><h2>Варианты товара</h2><% if(!product.variants.length){ %><p>Варианты пока не добавлены.</p><% } for(const variant of product.variants){ %><article class="product__variant"><h3><%= variant.name %></h3><p><%= money(variant.priceCents) %> ₽ · <%= variant.available?'В наличии':'Нет в наличии' %></p><% if(variant.available){ %><form method="post" action="/shop/cart/add"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="variantId" value="<%= variant.id %>"><label>Количество<input type="number" name="quantity" min="1" max="99" step="1" value="1" required></label><button>Добавить в корзину</button></form><% } %></article><% } %></div></div><p>Самовывоз из клуба. Наличие подтверждает сотрудник после отправки заказа. До 99 единиц на вариант — технический предел формы, а не остаток склада.</p><% } %><div class="product__links"><a href="/shop.html">В каталог</a><a href="/cart.html">Корзина</a></div></div></main><%- include('footer') %>
+<% if(!product){ %><h1>Выберите товар в каталоге</h1><% }else{ %>
+<h1><%= product.name %></h1>
+<div class="product__layout">
+  <div class="product__gallery" aria-label="Фотографии товара">
+    <% if(!product.images.length){ %><img src="/site/img/shop-placeholder.svg" alt="Фото пока не добавлено" width="600" height="760"><% } %>
+    <% for(const image of product.images){ %><a href="/shop/images/<%= image.id %>.webp" target="_blank" rel="noopener"><img src="/shop/images/<%= image.id %>.webp" alt="<%= product.name %>, фото <%= product.images.indexOf(image)+1 %>" width="600" height="760" loading="lazy"></a><% } %>
+  </div>
+  <div class="product__details">
+    <p><%= product.category %></p>
+    <section class="product__selection" aria-labelledby="product-variants-title">
+      <h2 id="product-variants-title">Выберите вариант</h2>
+      <% if(!product.variants.length){ %>
+        <p class="product__availability" role="status">У товара пока нет опубликованных вариантов. Добавить его в корзину нельзя — уточните наличие в клубе.</p>
+      <% } else if(!product.variants.some(v=>v.available)){ %>
+        <p class="product__availability" role="status">Сейчас нет доступных вариантов. Добавление в корзину временно недоступно.</p>
+      <% } else { %>
+        <p class="product__cart-help">Чтобы добавить товар, выберите вариант и нажмите «Добавить в корзину». Ссылка «Посмотреть корзину» внизу страницы только открывает уже добавленные товары.</p>
+      <% } %>
+      <% for(const variant of product.variants){ %>
+        <article class="product__variant">
+          <h3><%= variant.name %></h3>
+          <p><%= money(variant.priceCents) %> ₽ · <%= variant.available?'В наличии':'Нет в наличии' %></p>
+          <% if(variant.available){ %>
+            <form method="post" action="/shop/cart/add">
+              <input type="hidden" name="_csrf" value="<%= csrf %>">
+              <input type="hidden" name="variantId" value="<%= variant.id %>">
+              <label>Количество<input type="number" name="quantity" min="1" max="99" step="1" value="1" required></label>
+              <button type="submit" class="product__add">Добавить в корзину</button>
+            </form>
+          <% } %>
+        </article>
+      <% } %>
+    </section>
+    <h2>Описание</h2><p class="product__text"><%= product.description||'Описание пока не добавлено.' %></p>
+    <h2>Характеристики</h2><p class="product__text"><%= product.characteristics||'Характеристики пока не добавлены.' %></p>
+  </div>
+</div>
+<p>Самовывоз из клуба. Наличие подтверждает сотрудник после отправки заказа. До 99 единиц на вариант — технический предел формы, а не остаток склада.</p>
+<% } %>
+<div class="product__links">
+  <a href="/shop.html">В каталог</a>
+  <a class="product__view-cart" href="/cart.html" aria-label="Посмотреть корзину, товаров: <%= cartCount %>">Посмотреть корзину (<%= cartCount %>)</a>
+</div></div></main><%- include('footer') %>

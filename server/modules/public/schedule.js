@@ -49,11 +49,13 @@ export function publicScheduleRoutes({ config, prisma }) {
     res.set('Cache-Control', 'no-store');
     const range = publicScheduleRange(req.query);
     const seo = seoFor(config, '/schedule.html', req.query);
-    seo.robots = 'noindex,follow'; // Indexing remains a separate approval after real content.
-    res.set('X-Robots-Tag', seo.robots);
+
     let data, unavailable = false;
     try { data = await publicSchedule(prisma, req.query); }
     catch { unavailable = true; data = { ...range, items: [] }; res.status(503); }
+    const contentSeo = seoFor(config, '/schedule.html', req.query, null, {published: !unavailable && data.items.some(item=>!item.cancelled)});
+    seo.robots=contentSeo.robots;
+    res.set('X-Robots-Tag',seo.robots);
     const days = Array.from({ length: 7 }, (_, i) => {
       const date = addDays(data.from, i);
       return { date, items: data.items.filter(item => item.date === date) };

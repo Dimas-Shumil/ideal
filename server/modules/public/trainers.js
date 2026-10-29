@@ -80,14 +80,10 @@ export function publicTrainerRoutes({ config, prisma }) {
     res.set("X-Robots-Tag", "noindex,follow");
     next();
   });
-  const seo = (path, name) => ({
-    ...seoFor(config, path),
-    title: name
-      ? name + " — тренер ИДЕАЛ / Абакан"
-      : "Тренеры — ИДЕАЛ / Абакан",
-    description:
-      "Тренеры спортивного клуба ИДЕАЛ в Абакане. Информация предоставлена клубом.",
-    robots: "noindex,follow",
+  const seo = (path, name, published = false) => ({
+    ...seoFor(config, path, {}, null, { published }),
+    title: name ? name + ' — тренер ИДЕАЛ / Абакан' : 'Тренеры — ИДЕАЛ / Абакан',
+    description: name ? `${name} — тренер спортивного клуба ИДЕАЛ в Абакане.` : 'Опубликованные профили тренеров клуба ИДЕАЛ в Абакане.'
   });
   router.get("/trainers.html", async (req, res) => {
     z.object({}).strict().parse(req.query);
@@ -99,8 +95,10 @@ export function publicTrainerRoutes({ config, prisma }) {
       unavailable = true;
       res.status(503);
     }
+    const meta=seo('/trainers.html',null,!unavailable && items.length>0);
+    res.set('X-Robots-Tag',meta.robots);
     res.render("public/trainers", {
-      seo: seo("/trainers.html"),
+      seo: meta,
       items,
       unavailable,
     });
@@ -136,8 +134,10 @@ export function publicTrainerRoutes({ config, prisma }) {
       res.status(503);
     }
     if (!unavailable && !profile) res.status(404);
+    const meta=seo(req.path,profile?.name,Boolean(profile?.hasPhoto && (profile?.summary?.trim() || profile?.biography?.trim())) && !unavailable);
+    res.set('X-Robots-Tag',meta.robots);
     res.render("public/trainer", {
-      seo: seo(req.path, profile?.name),
+      seo: meta,
       profile,
       unavailable,
     });

@@ -133,7 +133,7 @@ export async function createApp({
   app.use(["/shop-panel/products", "/api/shop-panel/products"],
     express.urlencoded({ extended: false, limit: "128kb", parameterLimit: 12 }),
     express.json({ limit: "48kb", strict: true }));
-  app.use("/admin/content", express.urlencoded({ extended: false, limit: "256kb", parameterLimit: 24 }));
+  app.use("/admin/content", express.urlencoded({extended:false,limit:"48kb",parameterLimit:48}));
   app.use("/admin/public-trainers", express.urlencoded({ extended: false, limit: "256kb", parameterLimit: 20 }));
   app.use(
     express.urlencoded({ extended: false, limit: "8kb", parameterLimit: 24 }),
@@ -159,6 +159,8 @@ export async function createApp({
   );
   app.use(loadUser(db.prisma));
   app.use((req, res, next) => { res.locals.currentPath = req.path; next(); });
+  // CMS mutations remain OWNER-only and use CSRF, Origin and version checks.
+  app.use(contentManagementRoutes({config,prisma:db.prisma}));
   const users = userService(db.prisma);
   app.use(await authRoutes({ config, prisma: db.prisma, store, users }));
   app.use(shopRoutes({config,prisma:db.prisma,indexHtml:index}));
@@ -166,7 +168,6 @@ export async function createApp({
   app.use(pushRoutes({ config, prisma: db.prisma }));
   app.use(crmRoutes({config,prisma:db.prisma}));
   app.use(scheduleRoutes({ config, prisma: db.prisma }));
-  app.use(contentManagementRoutes({config,prisma:db.prisma}));
   app.use(trainerManagementRoutes({ config, prisma: db.prisma }));
   app.use(ownerRoutes({ config, prisma: db.prisma, users }));
   app.use(trainerRoutes());

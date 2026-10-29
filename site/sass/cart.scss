@@ -26,3 +26,19 @@
 .cart__checkout input,.cart__checkout select,.cart__checkout textarea { box-sizing:border-box;width:100%;padding:14px;margin:0;border:1px solid #8b9092;background:#fff;color:#25282a;font:inherit; }
 .cart__checkout button { justify-self:start; }
 .cart :is(select,textarea):focus-visible { outline:2px solid #61696d;outline-offset:5px; }
+
+/* IDEAL cart and return-to-catalog buttons share the rounded shop style. */
+.cart button, .cart__links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  border-radius: 999px;
+  text-align: center;
+  font-weight: 600;
+}
+.cart__item img { border-radius: 14px; }
+@media (max-width: 680px) {
+  .cart__links a { width: 100%; }
+}
+

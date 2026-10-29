@@ -1,3 +1,5 @@
+<% // Isolated public-route renders may not have the global siteContacts middleware.
+   const footerContacts = typeof siteContacts === 'object' && siteContacts !== null ? siteContacts : {}; %>
 <footer class="ideal-footer" id="contacts">
   <div class="ideal-footer__container">
     <div class="ideal-footer__top">
@@ -17,7 +19,7 @@
         <a href="/login">Кабинет сотрудника</a>
       </nav>
 
-      <%- include('../content/contacts') %>
+      <%- include('../content/contacts', { siteContacts: footerContacts }) %>
     </div>
 
     <div class="ideal-footer__bottom">
@@ -26,6 +28,7 @@
     </div>
   </div>
 </footer>
+<%- include('../public/floating-cta', { siteContacts: footerContacts }) %>
 <div class="menu-panel" id="mobile-menu" hidden aria-hidden="true">
       <div class="menu-panel__inner">
         <p class="menu-panel__heading">Навигация / IDEAL</p>
@@ -51,7 +54,7 @@
           </a>
         </nav>
         <div class="menu-panel__bottom">
-          <p class="menu-panel__footnote">ИДЕАЛ · АБАКАН<% if(typeof siteContacts === "object" && siteContacts.address){ %><br><%= siteContacts.address %><% } %></p>
+          <p class="menu-panel__footnote">ИДЕАЛ · АБАКАН<% if(footerContacts.address){ %><br><%= footerContacts.address %><% } %></p>
           <a class="menu-panel__appointment" href="/#contacts"><span>Связаться</span></a>
         </div>
       </div>

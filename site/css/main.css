@@ -2012,7 +2012,7 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   isolation: isolate;
 }
 .nutrition__shell {
-  max-width: 1560px;
+  max-width: 1720px;
   margin: 0 auto;
   min-width: 0;
 }
@@ -2859,7 +2859,7 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   background: transparent;
 }
 .trainer-cta__shell {
-  max-width: 1560px;
+  max-width: 1720px;
   margin: 0 auto;
   min-width: 0;
 }
@@ -2974,8 +2974,7 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   border-top: 1px solid #5d6062;
   color: #b9bcbe;
 }
-.trainer-cta.is-reveal-enabled .trainer-cta__title,
-.trainer-cta.is-reveal-enabled .trainer-cta__copy {
+.trainer-cta.is-reveal-enabled .trainer-cta__title, .trainer-cta.is-reveal-enabled .trainer-cta__copy {
   opacity: 0;
   transform: translateY(28px);
   transition: opacity 1500ms cubic-bezier(0.22, 1, 0.36, 1), transform 1500ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -2985,9 +2984,7 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   transform: translateY(20px) scale(0.96);
   transition: opacity 1800ms cubic-bezier(0.22, 1, 0.36, 1), transform 1800ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.trainer-cta.is-reveal-enabled.is-visible .trainer-cta__title,
-.trainer-cta.is-reveal-enabled.is-visible .trainer-cta__copy,
-.trainer-cta.is-reveal-enabled.is-visible .trainer-cta__portrait {
+.trainer-cta.is-reveal-enabled.is-visible .trainer-cta__title, .trainer-cta.is-reveal-enabled.is-visible .trainer-cta__copy, .trainer-cta.is-reveal-enabled.is-visible .trainer-cta__portrait {
   opacity: 1;
   transform: none;
 }
@@ -3071,9 +3068,7 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .trainer-cta.is-reveal-enabled .trainer-cta__title,
-  .trainer-cta.is-reveal-enabled .trainer-cta__copy,
-  .trainer-cta.is-reveal-enabled .trainer-cta__portrait {
+  .trainer-cta.is-reveal-enabled .trainer-cta__title, .trainer-cta.is-reveal-enabled .trainer-cta__copy, .trainer-cta.is-reveal-enabled .trainer-cta__portrait {
     opacity: 1;
     transform: none;
     transition: none;
@@ -3209,9 +3204,7 @@ html.hero-intro.hero-intro-playing .hero__scroll {
     font-size: 11px;
     margin-bottom: 10px;
   }
-  .ideal-footer__nav a,
-  .ideal-footer__nav address, .ideal-footer__contacts a,
-  .ideal-footer__contacts address {
+  .ideal-footer__nav a, .ideal-footer__nav address, .ideal-footer__contacts a, .ideal-footer__contacts address {
     font-size: 12px;
     overflow-wrap: anywhere;
   }
@@ -3221,8 +3214,7 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   }
 }
 
-.header__nav-link,
-.menu-panel nav a {
+.header__nav-link, .menu-panel nav a {
   text-decoration: none;
 }
 
@@ -3243,8 +3235,7 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   margin: 12px 0;
 }
 
-.membership-card__name,
-.membership-card__description {
+.membership-card__name, .membership-card__description {
   overflow-wrap: anywhere;
 }
 
@@ -3255,16 +3246,14 @@ html.hero-intro.hero-intro-playing .hero__scroll {
 }
 
 /* Stage 19: content supplied by OWNER, with existing composition retained. */
-.header__appointment,
-.menu-panel__appointment {
+.header__appointment, .menu-panel__appointment {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
 }
 
-.header__appointment:focus-visible,
-.menu-panel__appointment:focus-visible {
+.header__appointment:focus-visible, .menu-panel__appointment:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 5px;
 }
@@ -3274,8 +3263,7 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   padding: 30px 0;
 }
 
-.direction-card__content h3,
-.direction-card__content p {
+.direction-card__content h3, .direction-card__content p {
   overflow-wrap: anywhere;
 }
 
@@ -3307,13 +3295,11 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   background: #454b4e;
 }
 
-.directions__schedule:active,
-.trainer-cta__caption a:active {
+.directions__schedule:active, .trainer-cta__caption a:active {
   transform: scale(0.98);
 }
 
-.directions__schedule:focus-visible,
-.trainer-cta__caption a:focus-visible {
+.directions__schedule:focus-visible, .trainer-cta__caption a:focus-visible {
   outline: 2px solid #b6c2c7;
   outline-offset: 5px;
 }
@@ -3336,18 +3322,12 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   overflow-wrap: anywhere;
 }
 
-.hero__address,
-.hero__hours,
-.ideal-footer__contacts,
-.menu-panel__footnote {
+.hero__address, .hero__hours, .ideal-footer__contacts, .menu-panel__footnote {
   overflow-wrap: anywhere;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .directions__schedule,
-  .trainer-cta__caption a,
-  .header__appointment,
-  .menu-panel__appointment {
+  .directions__schedule, .trainer-cta__caption a, .header__appointment, .menu-panel__appointment {
     transition: none;
   }
 }
@@ -3355,17 +3335,13 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   text-decoration: none;
 }
 
-.menu-panel__appointment,
-.header.is-scrolled .header__appointment,
-body.menu-open .header__appointment {
+.menu-panel__appointment, .header.is-scrolled .header__appointment, body.menu-open .header__appointment {
   background: #25282a;
   color: #fff;
   border-color: #4f575c;
 }
 
-.menu-panel__appointment:hover,
-.header.is-scrolled .header__appointment:hover,
-body.menu-open .header__appointment:hover {
+.menu-panel__appointment:hover, .header.is-scrolled .header__appointment:hover, body.menu-open .header__appointment:hover {
   background: #454b4e;
   color: #fff;
 }
@@ -3373,3 +3349,41 @@ body.menu-open .header__appointment:hover {
 .directions__programs-head {
   grid-column: 1/-1;
 }
+/* Floating actions — compiled from main.scss */
+.floating-cta{position:fixed;z-index:90;right:max(24px, env(safe-area-inset-right));bottom:max(26px, env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:9px;width:52px;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(20px);transition:opacity .32s ease,transform .4s cubic-bezier(.22,1,.36,1),visibility .32s}
+.floating-cta.is-visible{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}
+.floating-cta__link{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;padding:0;border:1px solid rgba(24,28,30,.22);border-radius:50%;text-decoration:none;box-shadow:0 9px 30px rgba(0,0,0,.13);transition:transform .18s ease,background .2s ease,box-shadow .2s ease}
+.floating-cta__link svg{flex-shrink:0;width:22px;height:22px}.floating-cta__link:hover{transform:translateY(-2px);box-shadow:0 13px 30px rgba(0,0,0,.18)}
+.floating-cta__link:active{transform:scale(.98)}.floating-cta__link:focus-visible{outline:2px solid #333;outline-offset:4px}
+.floating-cta__link--call{background:#f7f7f5;color:#191c1e}.floating-cta__link--call:hover{background:#fff}
+.floating-cta__link--book{background:#202427;color:#fff;border-color:#202427}.floating-cta__link--book:hover{background:#393f43}
+@media(max-width:600px){.floating-cta{right:max(14px, env(safe-area-inset-right));bottom:max(18px, env(safe-area-inset-bottom));width:48px;gap:8px}.floating-cta__link{width:48px;height:48px}}
+@media(prefers-reduced-motion:reduce){.floating-cta,.floating-cta__link{transition:none}}
+
+.ideal-footer__booking-note{max-width:340px;font-size:12px;line-height:1.55;opacity:.8}
+
+@media (max-width: 1180px) {
+  .header__appointment { display: none; }
+}
+.floating-cta__link--disabled {
+  opacity: .58;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.floating-cta__link--disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Mobile membership text controls + disabled nutrition controls. */
+@media (max-width: 700px) {
+  .memberships__arrows button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 66px;
+    min-height: 38px;
+    padding: 8px 11px;
+  }
+}
+.nutrition__nav:disabled { opacity: .35; cursor: not-allowed; }

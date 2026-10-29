@@ -48,7 +48,7 @@ export function contentService(prisma) {
    return mutate(ctx,key,'CONTENT_SAVE',{data,publicOrder},async(tx,p)=>{
     if(key==='home'&&data.trainerId&&!await tx.trainerProfile.findFirst({where:{...publicTrainerWhere,id:data.trainerId,photo:{isNot:null}},select:{id:true}}))throw fail(409,'Выберите опубликованный профиль активного тренера с именем и фотографией.');
     if(p.visible&&['gym','group','personal'].includes(key)&&(!data.title||!data.summary||!data.body))throw fail(409,'Сначала скройте направление либо заполните название и описания.');
-    await tx.contentEntry.update({where:{id:p.id},data:{data,publicOrder}});
+    await tx.contentEntry.update({where:{id:p.id},data:{data,publicOrder,...(key==='contacts'?{visible:true}:{})}});
    });
   },
   async publish(ctx,key,input){const data=publication.parse(input);return mutate(ctx,key,'CONTENT_PUBLISH',data,async(tx,p)=>{

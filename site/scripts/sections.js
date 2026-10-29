@@ -166,6 +166,9 @@
 
   const currentTrack = () => document.querySelector(`[data-plans-track="${current}"]`);
   const cardsOf = (track) => [...track.querySelectorAll('.membership-card')];
+  // Remember the requested slide while smooth scrolling is still in progress.
+  // Otherwise two quick clicks can both target the same card.
+  const intendedIndex = new WeakMap();
   const getCurrentIndex = (track) => {
     const cards = cardsOf(track);
     const left = track.scrollLeft;
@@ -199,8 +202,9 @@
     if (!track) return;
     const cards = cardsOf(track);
     if (!cards.length) return;
-    const from = getCurrentIndex(track);
+    const from = intendedIndex.get(track) ?? getCurrentIndex(track);
     const to = clamp(from + direction, 0, cards.length - 1);
+    intendedIndex.set(track, to);
     track.scrollTo({left: cards[to].offsetLeft - cards[0].offsetLeft,
       behavior: reducedMotion.matches ? 'instant' : 'smooth'});
   }
@@ -255,7 +259,17 @@
         event.preventDefault(); step(event.key === 'ArrowRight' ? 1 : -1);
       }
     });
-    track.addEventListener('scroll', () => { if (track === currentTrack()) requestAnimationFrame(updateNav); }, {passive:true});
+    // Sync intended position after manual scrolling, including touch swipes.
+    // Scroll events during smooth button navigation must not overwrite it.
+    let settledTimer;
+    track.addEventListener('scroll', () => {
+      if (track === currentTrack()) requestAnimationFrame(updateNav);
+      clearTimeout(settledTimer);
+      settledTimer = setTimeout(() => {
+        intendedIndex.set(track, getCurrentIndex(track));
+        if (track === currentTrack()) updateNav();
+      }, 180);
+    }, {passive:true});
     // На touch-устройствах нативный горизонтальный свайп с snap; вертикальная
     // прокрутка страницы остаётся свободной, не перехватываем touchstart.
   });
@@ -311,7 +325,7 @@
     views.forEach(panel => { panel.hidden = panel.dataset.plansPanel !== category; });
     extras.forEach(item => { item.hidden = item.dataset.plansExtra !== category; });
     const track = currentTrack();
-    if (track) track.scrollLeft = 0;
+    if (track) { track.scrollLeft = 0; intendedIndex.set(track, 0); }
     requestAnimationFrame(updateNav);
   }));
   window.addEventListener('resize', () => requestAnimationFrame(updateNav));

@@ -1,8 +1,7 @@
 <!doctype html>
 <html lang="ru"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title><%= seo.title %></title><meta name="description" content="<%= seo.description %>"><meta name="robots" content="<%= seo.robots %>">
-<% if (seo.canonical) { %><link rel="canonical" href="<%= seo.canonical %>"><% } %>
+<%- include('../public/seo-meta') %>
 <link rel="stylesheet" href="/site/css/main.css"><link rel="stylesheet" href="/site/css/public-schedule.css">
 <link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/site/img/pwa/apple-touch-180.png">
 <link rel="stylesheet" href="/site/css/pwa-install.css"><script src="/site/scripts/pwa.js" defer></script><script src="/site/scripts/pwa-install.js" defer></script>

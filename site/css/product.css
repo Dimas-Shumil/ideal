@@ -197,3 +197,31 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+
+/* IDEAL public product page: consistent rounded shop controls. */
+.product button, .product__links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  border-radius: 999px;
+  text-align: center;
+  font-weight: 600;
+}
+.product figure, .product__gallery img { border-radius: 20px; }
+.product figure { overflow: hidden; }
+@media (max-width: 680px) {
+  .product__links a { width: 100%; }
+}
+
+
+
+/* Real store: distinguish add-to-cart action from the link that only views the cart. */
+.product__selection { margin: 24px 0 36px; }
+.product__cart-help { padding: 12px 0; color: #53595c; font-size: 14px; }
+.product__availability { padding: 16px 20px; background: #ebedec; border-radius: 16px; color: #42484b; }
+.product__variant form { margin: 14px 0 4px; }
+.product__variant h3 { margin: 0 0 6px; }
+.product__add { min-height: 54px; background: #25282a; color: #fff; border-radius: 999px; }
+.product__links .product__view-cart { background: transparent; border: 1px solid #a9afb1; color: #25282a; }
+.product__links .product__view-cart:hover { background: #e8eaea; color: #25282a; }

@@ -138,8 +138,23 @@ test("shop public: catalog/card/home server data, hidden products and unknown qu
     .expect(200);
   assert.match(card.text, /action="\/shop\/cart\/add"/);
   const home = await request(app).get("/").expect(200);
-  assert.match(home.text, new RegExp('data-product-id="' + product.id + '"'));
-  assert.doesNotMatch(home.text, /demo-products\.js|demo-cart\.js/);
+  // Editorial Coverflow is always the same five illustrated categories,
+  // regardless of the real products published in the shop.
+  for (const [id, image] of [
+    ['demo-01', 'protein'], ['demo-02', 'creatine'],
+    ['demo-03', 'bcaa'], ['demo-04', 'preworkout'], ['demo-05', 'amino'],
+  ]) {
+    assert.match(home.text, new RegExp('data-demo-id="' + id + '"'));
+    assert.ok(home.text.includes('site/img/nutrition/' + image + '.svg'));
+  }
+  assert.match(home.text, /demo-products\.js/);
+  assert.doesNotMatch(home.text, /demo-cart\.js|data-product-id=/);
+  assert.doesNotMatch(home.text, /Тестовый товар/);
+  // Check the real gallery CTA as a complete link, not fragile attribute adjacency.
+  // Extra aria-label/other attributes must not break this assertion.
+  const nutritionBuyLink = home.text.match(/<a\b[^>]*\bdata-nutrition-buy\b[^>]*>/i)?.[0];
+  assert.ok(nutritionBuyLink, 'Главная должна содержать кнопку каталога в галерее спортпита');
+  assert.match(nutritionBuyLink, /\bhref=["']\/shop\.html["']/, 'Кнопка галереи должна вести в реальный магазин');
   await p.shopProduct.update({
     where: { id: product.id },
     data: { active: false },
@@ -149,6 +164,9 @@ test("shop public: catalog/card/home server data, hidden products and unknown qu
     .expect(404);
   const list = await request(app).get("/api/shop/products").expect(200);
   assert.equal(list.body.total, 0);
+  const homeWithEmptyShop = await request(app).get("/").expect(200);
+  assert.match(homeWithEmptyShop.text, /data-demo-id="demo-05"/);
+  assert.doesNotMatch(homeWithEmptyShop.text, /Тестовый товар/);
   await request(app).get("/product.html?id=demo-01").expect(400);
   await request(app).get("/shop.html?price=1").expect(400);
 });
@@ -257,6 +275,30 @@ test("shop product/variant: money, version conflicts, strict DTO and duplicate n
     active: "true",
     version: 1,
   });
+});
+test("shop buyer UI: product -> actual add form -> cart -> order in OWNER panel", async () => {
+  const g = await guest();
+  const productPage = await g.agent.get("/product.html?id=" + product.id).expect(200);
+  assert.match(productPage.text, /action="\/shop\/cart\/add"/);
+  assert.match(productPage.text, /Добавить в корзину/);
+  assert.match(productPage.text, /Посмотреть корзину \(0\)/);
+  // A plain navigation link must not add anything. The POST form does.
+  assert.match((await g.agent.get("/cart.html").expect(200)).text, /Корзина пуста/);
+  await g.agent.post("/shop/cart/add")
+    .set("Origin", origin).type("form")
+    .send({ _csrf: token(productPage.text), variantId: hidden(productPage.text, "variantId"), quantity: "1" })
+    .expect(303).expect("Location", "/cart.html");
+  const cart = await g.agent.get("/cart.html").expect(200);
+  assert.match(cart.text, /Тестовый товар/);
+  assert.match(cart.text, /Отправить заказ/);
+  assert.doesNotMatch(cart.text, /Корзина пуста/);
+  const data = await checkout(g);
+  const reply = await send(g, data);
+  const id = reply.headers.location.split("/").at(-1);
+  assert.ok(await p.shopOrder.findUnique({ where: { id } }));
+  const panel = await os.agent.get("/shop-panel/orders").expect(200);
+  assert.match(panel.text, /Покупатель/);
+  assert.match((await g.agent.get("/cart.html").expect(200)).text, /Корзина пуста/);
 });
 test("shop cart: server price, quantity bounds, remove and unavailable positions", async () => {
   const g = await guest();

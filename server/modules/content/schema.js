@@ -1,7 +1,7 @@
 import { z } from 'zod';
 export const definitions = {
  home: { label: 'Главная — тренер', fields: {trainerId: ['Профиль тренера', 36]} },
- contacts: {label:'Контакты', fields: {address:['Адрес',300], phone:['Телефон в международном формате, например +7…',20], hours:['Часы работы',500], map:['Ссылка на карту 2ГИС / Яндекс / Google',1000], vk:['Ссылка VK',500], telegram:['Ссылка Telegram',500]}},
+ contacts: {label:'Контакты', fields: {address:['Адрес',300], hours:['Часы работы',500], phone:['Телефон',40], map:['Ссылка на карту 2ГИС / Яндекс / Google',1000], vk:['Ссылка VK',500], telegram:['Ссылка Telegram',500]}},
  about: {label:'О клубе', fields:{title:['Заголовок первого экрана',150], summary:['Вступление',1000], storyTitle:['Заголовок рассказа о клубе',150], body:['Рассказ о клубе',6000], spaceTitle:['Заголовок пространства',150], spaceText:['Описание зала и пространства',3000], feature1:['Возможность 1 — название',100], feature1Text:['Возможность 1 — описание',1000], feature2:['Возможность 2 — название',100], feature2Text:['Возможность 2 — описание',1000], feature3:['Возможность 3 — название',100], feature3Text:['Возможность 3 — описание',1000]}},
  gym: {label:'Тренажёрный зал'}, group: {label:'Групповые занятия'}, personal: {label:'Персональные тренировки'},
 };
@@ -23,7 +23,7 @@ export function entryBody(key) {
  let fields=Object.fromEntries(Object.entries(definitions[key].fields).map(([name,[,max]])=>[name,z.string().trim().max(max)]));
  if(key==='home') fields.trainerId=z.union([z.literal(''),z.string().uuid()]);
  if(key==='contacts') {
-  fields.phone=z.string().trim().regex(/^(?:\+[1-9][0-9]{6,14})?$/);
+  fields.phone=fields.phone.refine(v=>!v || (/^[+\d()\s\-–—]+$/.test(v) && v.replace(/\D/g,'').length>=10 && v.replace(/\D/g,'').length<=15), 'Укажите корректный номер телефона.');
   for(const name of ['map','vk','telegram']) fields[name]=fields[name].refine(v=>safeLink(v,name),'Нужна допустимая HTTPS-ссылка.');
  }
  return z.object(fields).strict();

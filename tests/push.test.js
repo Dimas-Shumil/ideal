@@ -8,6 +8,7 @@ import { createDatabase } from '../server/db/client.js';
 import { clearCrm } from './helpers/crm.js';
 import { pushWorker } from '../server/modules/push/worker.js';
 import { enqueueSchedulePush } from '../server/modules/push/events.js';
+import { enqueueTrainerReminders } from '../server/modules/push/reminders.js';
 import { addDays, today } from '../server/modules/crm/dates.js';
 import { clubDateTime } from '../server/modules/schedule/dates.js';
 import webpush from 'web-push';
@@ -152,4 +153,48 @@ test('push: provider permanent rejection and expired events never retry indefini
 test('push: expired lease recovers and exhausted crashed claim becomes FAILED',async()=>{
  await seed();await event(await lesson());await p.pushDelivery.updateMany({data:{status:'SENDING',attempts:1,availableAt:new Date(0)}});let calls=0;await deliver(async()=>{calls++;});assert.equal(calls,1);
  await p.pushDelivery.updateMany({data:{status:'SENDING',attempts:5,availableAt:new Date(0)}});await deliver(async()=>{calls++;});assert.equal(calls,1);assert.equal((await p.pushDelivery.findFirst()).status,'FAILED');
+});
+
+// Time-based reminders are queued by the background worker, not by an HTTP request.
+// They share its existing delivery table and idempotent uniqueness constraint.
+async function bookedReminderLesson(hoursBefore) {
+ const profile=await p.trainerProfile.upsert({where:{userId:trainer.id},create:{userId:trainer.id},update:{}});
+ const start=new Date(Date.now()+hoursBefore*3600000-60000);
+ const l=await p.lesson.create({data:{kind:'PERSONAL',title:'PRIVATE APPOINTMENT',startsAt:start,endsAt:new Date(start.getTime()+3600000),trainerId:profile.id,capacity:1,createdById:owner.id}});
+ const client=await p.client.create({data:{name:'PRIVATE PERSON',phone:'79992223344',birthDate:new Date('1994-01-01')}});
+ const booking=await p.lessonBooking.create({data:{lessonId:l.id,clientId:client.id,status:'BOOKED',bookedById:owner.id}});
+ return {l,booking};
+}
+test('push reminders: automatically send once per trainer device at 24h and 3h',async()=>{
+ await seed();await seed(other);
+ await bookedReminderLesson(24);await bookedReminderLesson(3);
+ assert.equal(await enqueueTrainerReminders(p),2);
+ assert.equal(await enqueueTrainerReminders(p),0);
+ let sent=0;
+ await deliver(async()=>{sent++;});
+ assert.equal(sent,2);
+ assert.equal(await p.pushDelivery.count({where:{status:'SENT'}}),2);
+ assert.equal(await p.pushDelivery.count({where:{userId:other.id}}),0);
+ assert.equal(await enqueueTrainerReminders(p),0);
+ await deliver(async()=>{sent++;});
+ assert.equal(sent,2);
+ const messages=JSON.stringify((await p.pushDelivery.findMany()).map(row=>row.payload));
+ for(const secret of ['PRIVATE APPOINTMENT','PRIVATE PERSON','79992223344'])assert.ok(!messages.includes(secret));
+});
+test('push reminders: cancellation and move after queueing prevent stale sends',async()=>{
+ await seed();const cancelled=await bookedReminderLesson(24),moved=await bookedReminderLesson(3);
+ assert.equal(await enqueueTrainerReminders(p),2);
+ await p.lesson.update({where:{id:cancelled.l.id},data:{status:'CANCELLED'}});
+ await p.lesson.update({where:{id:moved.l.id},data:{startsAt:new Date(moved.l.startsAt.getTime()+3600000),endsAt:new Date(moved.l.endsAt.getTime()+3600000)}});
+ let sent=0;await deliver(async()=>{sent++;});
+ assert.equal(sent,0);
+ assert.equal(await p.pushDelivery.count({where:{status:'SKIPPED'}}),2);
+});
+test('push reminders: unbooked, cancelled-booking and group lessons never remind',async()=>{
+ await seed();const {l,booking}=await bookedReminderLesson(3);
+ await p.lessonBooking.update({where:{id:booking.id},data:{status:'CANCELLED'}});
+ assert.equal(await enqueueTrainerReminders(p),0);
+ await p.lessonBooking.update({where:{id:booking.id},data:{status:'BOOKED'}});
+ await p.lesson.update({where:{id:l.id},data:{kind:'GROUP'}});
+ assert.equal(await enqueueTrainerReminders(p),0);
 });

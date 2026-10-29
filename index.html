@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ru">
   <head>
-    <meta name="robots" content="noindex,follow">
+    <meta name="robots" content="noindex,follow" />
     <meta charset="utf-8" />
     <meta
       name="viewport"
@@ -48,41 +48,31 @@
       })();
     </script>
     <link rel="stylesheet" href="site/css/main.css" />
-  <link rel="manifest" href="/manifest.webmanifest">
-<link rel="apple-touch-icon" href="/site/img/pwa/apple-touch-180.png">
-<link rel="stylesheet" href="/site/css/pwa-install.css">
-<script src="/site/scripts/pwa.js" defer></script>
-<script src="/site/scripts/pwa-install.js" defer></script>
-</head>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/site/img/pwa/apple-touch-180.png" />
+    <link rel="stylesheet" href="/site/css/pwa-install.css" />
+    <script src="/site/scripts/pwa.js" defer></script>
+    <script src="/site/scripts/pwa-install.js" defer></script>
+  </head>
   <body>
     <!-- component:header:start -->
-<header class="header" id="top">
+    <header class="header" id="top">
       <a class="header__logo" href="/#top" aria-label="ИДЕАЛ — на главную"
         >ИДЕАЛ.</a
       >
       <nav class="header__navigation" aria-label="Главное меню">
-        <a class="header__nav-link" href="/about.html">
-          О клубе
-        </a>
-        <a class="header__nav-link" href="/#next">
-          Направления
-        </a>
-        <a class="header__nav-link" href="/trainers.html">
-          Тренеры
-        </a>
-        <a class="header__nav-link" href="/#memberships">
-          Абонементы
-        </a>
-        <a class="header__nav-link" href="/shop.html">
-          Магазин
-        </a>
+        <a class="header__nav-link" href="/about.html"> О клубе </a>
+        <a class="header__nav-link" href="/#next"> Направления </a>
+        <a class="header__nav-link" href="/trainers.html"> Тренеры </a>
+        <a class="header__nav-link" href="/#memberships"> Абонементы </a>
+        <a class="header__nav-link" href="/shop.html"> Магазин </a>
         <a class="header__nav-link" href="/schedule.html">Расписание</a>
-        <a class="header__nav-link" href="/#contacts">
-          Контакты
-        </a>
+        <a class="header__nav-link" href="/#contacts"> Контакты </a>
       </nav>
       <div class="header__actions">
-        <a class="header__appointment" href="/#contacts"><span>Связаться</span></a>
+        <a class="header__appointment" href="/#contacts"
+          ><span>Связаться</span></a
+        >
         <button
           class="header__menu-toggle"
           id="menu-toggle"
@@ -96,7 +86,6 @@
       </div>
     </header>
     <!-- component:header:end -->
-
 
     <main>
       <section class="hero" aria-labelledby="hero-title">
@@ -150,8 +139,6 @@
           </a>
         </div>
 
-
-
         <p class="hero__address">
           Бограда, 135 <span aria-hidden="true"></span>
         </p>
@@ -163,14 +150,106 @@
           ><span class="hero__scroll-rule" aria-hidden="true"></span
         ></a>
         <p class="hero__hours">
-          <span aria-hidden="true"></span>Работаем ежедневно<br />с 07:00 до
+          <span aria-hidden="true"></span>Работаем ежедневно<br />с 08:00 до
           22:00
         </p>
       </section>
 
       <!-- IDEAL / MONO — два новых блока. Существующий hero выше без изменений. -->
       <div class="ideal-flow" data-ideal-flow>
-        <section class="directions" id="next" aria-labelledby="directions-title"><div class="directions__shell"><div class="directions__intro"><h2 class="directions__heading" id="directions-title">НАПРАВЛЕНИЯ</h2><p class="directions__lead">Актуальные направления доступны при запуске через Node / Express.</p></div></div></section>
+        <section
+          class="directions"
+          id="next"
+          aria-labelledby="directions-title"
+        >
+          <div class="directions__shell">
+            <div class="directions__intro">
+              <p class="directions__eyebrow">
+                <span>01</span><i aria-hidden="true"></i>Направления
+              </p>
+              <h2 class="directions__heading" id="directions-title">
+                ВЫБЕРИ<br /><strong>СВОЙ ПУТЬ</strong>
+              </h2>
+              <p class="directions__lead">Выбери свой формат тренировок.</p>
+              <a class="directions__explore" href="#directions-cards"
+                ><span>Узнать больше<br />о направлениях</span></a
+              >
+              <p class="directions__count"><strong>03</strong> направления</p>
+            </div>
+            <div class="directions__cards" id="directions-cards">
+              <article class="direction-card">
+                <img
+                  src="site/img/direction-gym.webp"
+                  alt="Тренажёрный зал"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="direction-card__scrim" aria-hidden="true"></div>
+                <span class="direction-card__number">01</span>
+                <div class="direction-card__content">
+                  <h3>Тренажёрный зал</h3>
+                  <p>Силовые тренировки в своём ритме.</p>
+                  <a class="direction-card__details" href="/directions/gym"
+                    >Подробнее</a
+                  >
+                </div>
+              </article>
+              <article class="direction-card">
+                <img
+                  src="site/img/direction-group.webp"
+                  alt="Групповые занятия"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="direction-card__scrim" aria-hidden="true"></div>
+                <span class="direction-card__number">02</span>
+                <div class="direction-card__content">
+                  <h3>Групповые занятия</h3>
+                  <p>Тренировки вместе с группой.</p>
+                  <a class="direction-card__details" href="/directions/group"
+                    >Подробнее</a
+                  >
+                </div>
+              </article>
+              <article class="direction-card">
+                <img
+                  src="site/img/direction-personal.webp"
+                  alt="Персональные тренировки"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="direction-card__scrim" aria-hidden="true"></div>
+                <span class="direction-card__number">03</span>
+                <div class="direction-card__content">
+                  <h3>Персональные тренировки</h3>
+                  <p>Индивидуальный подход к твоим целям.</p>
+                  <a class="direction-card__details" href="/directions/personal"
+                    >Подробнее</a
+                  >
+                </div>
+              </article>
+            </div>
+            <div
+              class="directions__programs"
+              id="group-programs"
+              aria-labelledby="group-programs-heading"
+            >
+              <div class="directions__programs-head">
+                <span class="directions__programs-label"
+                  >ГРУППОВЫЕ ПРОГРАММЫ / РАСПИСАНИЕ</span
+                >
+                <h3 id="group-programs-heading">Движение по расписанию</h3>
+                <p>
+                  Опубликованные занятия, время и изменения — в расписании
+                  клуба.
+                </p>
+                <a class="directions__schedule" href="/schedule.html"
+                  >Смотреть расписание</a
+                >
+              </div>
+            </div>
+          </div>
+        </section>
 
         <section
           class="memberships"
@@ -201,84 +280,281 @@
                 >Посмотреть<br />все абонементы</a
               >
             </div>
-            <div class="memberships__content" id="plans"><p class="memberships__note">Актуальные абонементы загружаются из CRM при запуске через Express. В статическом просмотре тарифы не отображаются.</p></div></div>
+            <div class="memberships__content" id="plans">
+              <p class="memberships__note">
+                Актуальные абонементы загружаются из CRM при запуске через
+                Express. В статическом просмотре тарифы не отображаются.
+              </p>
+            </div>
+          </div>
         </section>
 
-        <!-- Спортивное питание. Концепты упаковок и категории заменяются реальными товарами. -->
-        <section class="nutrition" id="nutrition" aria-labelledby="nutrition-title">
+        <!-- Постоянная витрина концептов упаковок. Реальный каталог — на /shop.html. -->
+        <section
+          class="nutrition"
+          id="nutrition"
+          aria-labelledby="nutrition-title"
+        >
           <div class="nutrition__shell">
-            <div class="nutrition__eyebrow"><span>03 / СПОРТИВНОЕ ПИТАНИЕ</span><span>IDEAL / MONO</span></div>
-            <div class="nutrition__intro">
-              <h2 class="nutrition__heading" id="nutrition-title">ЭНЕРГИЯ<br />ДЛЯ БОЛЬШЕГО.</h2>
-              <p class="nutrition__lead">Демонстрационная галерея. Иллюстрации — концепты упаковок; ассортимент клубом не подтверждён.</p>
+            <div class="nutrition__eyebrow">
+              <span>03 / СПОРТИВНОЕ ПИТАНИЕ</span><span>IDEAL / MONO</span>
             </div>
-            <div class="nutrition__gallery" tabindex="0" role="region" aria-roledescription="карусель" aria-label="Спортивное питание: используйте стрелки влево и вправо" aria-describedby="nutrition-gesture">
+            <div class="nutrition__intro">
+              <h2 class="nutrition__heading" id="nutrition-title">
+                ЭНЕРГИЯ<br />ДЛЯ БОЛЬШЕГО.
+              </h2>
+              <p class="nutrition__lead">
+                Авторская галерея спортивного питания. Здесь — концепты
+                упаковок; реальные товары, цены и наличие — в магазине.
+              </p>
+            </div>
+            <div
+              class="nutrition__gallery"
+              tabindex="0"
+              role="region"
+              aria-roledescription="карусель"
+              aria-label="Спортивное питание: используйте стрелки влево и вправо"
+              aria-describedby="nutrition-gesture"
+            >
               <div class="nutrition__stage">
-                <article class="nutrition-card nutrition-card--protein" data-nutrition-card data-demo-id="demo-01" role="group" aria-roledescription="слайд" aria-label="1 из 5: Протеин">
-                  <div class="nutrition-card__top"><span>IDEAL / MONO</span><span>01</span></div>
-                  <img class="nutrition-card__image" src="site/img/nutrition/protein.svg" alt="Изображение упаковки: протеин" width="600" height="760" loading="lazy" draggable="false" />
-                  <div class="nutrition-card__bottom"><span>PROTEIN</span><span>СПОРТ / ПИТАНИЕ</span></div>
+                <article
+                  class="nutrition-card nutrition-card--protein"
+                  data-nutrition-card
+                  data-demo-id="demo-01"
+                  role="group"
+                  aria-roledescription="слайд"
+                  aria-label="1 из 5: Протеин"
+                >
+                  <div class="nutrition-card__top">
+                    <span>IDEAL / MONO</span><span>01</span>
+                  </div>
+                  <img
+                    class="nutrition-card__image"
+                    src="site/img/nutrition/protein.svg"
+                    alt="Изображение упаковки: протеин"
+                    width="600"
+                    height="760"
+                    loading="lazy"
+                    draggable="false"
+                  />
+                  <div class="nutrition-card__bottom">
+                    <span>PROTEIN</span><span>СПОРТ / ПИТАНИЕ</span>
+                  </div>
                 </article>
-                <article class="nutrition-card nutrition-card--creatine" data-nutrition-card data-demo-id="demo-02" role="group" aria-roledescription="слайд" aria-label="2 из 5: Креатин">
-                  <div class="nutrition-card__top"><span>IDEAL / MONO</span><span>02</span></div>
-                  <img class="nutrition-card__image" src="site/img/nutrition/creatine.svg" alt="Изображение упаковки: креатин" width="600" height="760" loading="lazy" draggable="false" />
-                  <div class="nutrition-card__bottom"><span>CREATINE</span><span>СПОРТ / ПИТАНИЕ</span></div>
+                <article
+                  class="nutrition-card nutrition-card--creatine"
+                  data-nutrition-card
+                  data-demo-id="demo-02"
+                  role="group"
+                  aria-roledescription="слайд"
+                  aria-label="2 из 5: Креатин"
+                >
+                  <div class="nutrition-card__top">
+                    <span>IDEAL / MONO</span><span>02</span>
+                  </div>
+                  <img
+                    class="nutrition-card__image"
+                    src="site/img/nutrition/creatine.svg"
+                    alt="Изображение упаковки: креатин"
+                    width="600"
+                    height="760"
+                    loading="lazy"
+                    draggable="false"
+                  />
+                  <div class="nutrition-card__bottom">
+                    <span>CREATINE</span><span>СПОРТ / ПИТАНИЕ</span>
+                  </div>
                 </article>
-                <article class="nutrition-card nutrition-card--bcaa" data-nutrition-card data-demo-id="demo-03" role="group" aria-roledescription="слайд" aria-label="3 из 5: BCAA">
-                  <div class="nutrition-card__top"><span>IDEAL / MONO</span><span>03</span></div>
-                  <img class="nutrition-card__image" src="site/img/nutrition/bcaa.svg" alt="Изображение упаковки: bcaa" width="600" height="760" loading="lazy" draggable="false" />
-                  <div class="nutrition-card__bottom"><span>BCAA</span><span>СПОРТ / ПИТАНИЕ</span></div>
+                <article
+                  class="nutrition-card nutrition-card--bcaa"
+                  data-nutrition-card
+                  data-demo-id="demo-03"
+                  role="group"
+                  aria-roledescription="слайд"
+                  aria-label="3 из 5: BCAA"
+                >
+                  <div class="nutrition-card__top">
+                    <span>IDEAL / MONO</span><span>03</span>
+                  </div>
+                  <img
+                    class="nutrition-card__image"
+                    src="site/img/nutrition/bcaa.svg"
+                    alt="Изображение упаковки: bcaa"
+                    width="600"
+                    height="760"
+                    loading="lazy"
+                    draggable="false"
+                  />
+                  <div class="nutrition-card__bottom">
+                    <span>BCAA</span><span>СПОРТ / ПИТАНИЕ</span>
+                  </div>
                 </article>
-                <article class="nutrition-card nutrition-card--preworkout" data-nutrition-card data-demo-id="demo-04" role="group" aria-roledescription="слайд" aria-label="4 из 5: Предтренировочный комплекс">
-                  <div class="nutrition-card__top"><span>IDEAL / MONO</span><span>04</span></div>
-                  <img class="nutrition-card__image" src="site/img/nutrition/preworkout.svg" alt="Изображение упаковки: предтренировочный комплекс" width="600" height="760" loading="lazy" draggable="false" />
-                  <div class="nutrition-card__bottom"><span>PRE / WORK</span><span>СПОРТ / ПИТАНИЕ</span></div>
+                <article
+                  class="nutrition-card nutrition-card--preworkout"
+                  data-nutrition-card
+                  data-demo-id="demo-04"
+                  role="group"
+                  aria-roledescription="слайд"
+                  aria-label="4 из 5: Предтренировочный комплекс"
+                >
+                  <div class="nutrition-card__top">
+                    <span>IDEAL / MONO</span><span>04</span>
+                  </div>
+                  <img
+                    class="nutrition-card__image"
+                    src="site/img/nutrition/preworkout.svg"
+                    alt="Изображение упаковки: предтренировочный комплекс"
+                    width="600"
+                    height="760"
+                    loading="lazy"
+                    draggable="false"
+                  />
+                  <div class="nutrition-card__bottom">
+                    <span>PRE / WORK</span><span>СПОРТ / ПИТАНИЕ</span>
+                  </div>
                 </article>
-                <article class="nutrition-card nutrition-card--amino" data-nutrition-card data-demo-id="demo-05" role="group" aria-roledescription="слайд" aria-label="5 из 5: Аминокислоты">
-                  <div class="nutrition-card__top"><span>IDEAL / MONO</span><span>05</span></div>
-                  <img class="nutrition-card__image" src="site/img/nutrition/amino.svg" alt="Изображение упаковки: аминокислоты" width="600" height="760" loading="lazy" draggable="false" />
-                  <div class="nutrition-card__bottom"><span>AMINO</span><span>СПОРТ / ПИТАНИЕ</span></div>
+                <article
+                  class="nutrition-card nutrition-card--amino"
+                  data-nutrition-card
+                  data-demo-id="demo-05"
+                  role="group"
+                  aria-roledescription="слайд"
+                  aria-label="5 из 5: Аминокислоты"
+                >
+                  <div class="nutrition-card__top">
+                    <span>IDEAL / MONO</span><span>05</span>
+                  </div>
+                  <img
+                    class="nutrition-card__image"
+                    src="site/img/nutrition/amino.svg"
+                    alt="Изображение упаковки: аминокислоты"
+                    width="600"
+                    height="760"
+                    loading="lazy"
+                    draggable="false"
+                  />
+                  <div class="nutrition-card__bottom">
+                    <span>AMINO</span><span>СПОРТ / ПИТАНИЕ</span>
+                  </div>
                 </article>
               </div>
             </div>
             <div class="nutrition__navigation">
-              <p class="nutrition__gesture" id="nutrition-gesture">Перетаскивай, чтобы выбрать</p>
+              <p class="nutrition__gesture" id="nutrition-gesture">
+                Перетаскивай, чтобы выбрать
+              </p>
               <div class="nutrition__controls">
-                <button class="nutrition__nav" type="button" data-nutrition-prev disabled aria-label="Предыдущий товар">Назад</button>
-                <span class="nutrition__counter" data-nutrition-counter>01 / 05</span>
-                <button class="nutrition__nav" type="button" data-nutrition-next disabled aria-label="Следующий товар">Далее</button>
+                <button
+                  class="nutrition__nav"
+                  type="button"
+                  data-nutrition-prev
+                  disabled
+                  aria-label="Предыдущий товар"
+                >
+                  Назад
+                </button>
+                <span class="nutrition__counter" data-nutrition-counter
+                  >01 / 05</span
+                >
+                <button
+                  class="nutrition__nav"
+                  type="button"
+                  data-nutrition-next
+                  disabled
+                  aria-label="Следующий товар"
+                >
+                  Далее
+                </button>
               </div>
             </div>
             <div class="nutrition__details">
-              <div class="nutrition__identity"><p class="nutrition__category" data-nutrition-category>Предварительная категория</p><h3 class="nutrition__name" data-nutrition-name>Протеин</h3></div>
-              <p class="nutrition__description" data-nutrition-description>Описание ожидает подтверждения клуба.</p>
-              <div class="nutrition__purchase"><p class="nutrition__price" data-nutrition-price>Цена пока не указана</p><button class="nutrition__buy" type="button" data-nutrition-buy disabled>Добавить демо-пример</button></div>
+              <div class="nutrition__identity">
+                <p class="nutrition__category" data-nutrition-category>
+                  Протеин
+                </p>
+                <h3 class="nutrition__name" data-nutrition-name>Протеин</h3>
+              </div>
+              <p class="nutrition__description" data-nutrition-description>
+                Дизайн-концепт упаковки. Реальные товары этой категории и их
+                наличие смотрите в магазине.
+              </p>
+              <div class="nutrition__purchase">
+                <p class="nutrition__price" data-nutrition-price>
+                  Актуальные цены — в магазине
+                </p>
+                <a
+                  class="nutrition__buy"
+                  href="/shop.html"
+                  data-nutrition-buy
+                  aria-label="Перейти в магазин спортивного питания"
+                  >Смотреть ассортимент</a
+                >
+              </div>
             </div>
             <div class="nutrition__footer">
-              <p>Ассортимент и цены уточняются.<br />Оформление заказов пока недоступно.</p>
-              <a class="nutrition__store" href="/shop.html">Перейти в магазин</a>
+              <p>
+                Концепты упаковок — часть дизайна.<br />Актуальный ассортимент —
+                в магазине.
+              </p>
+              <a class="nutrition__store" href="/shop.html"
+                >Перейти в магазин</a
+              >
             </div>
-            <p class="nutrition__status" role="status" aria-live="polite" aria-atomic="true" data-nutrition-status data-cart-feedback></p><p data-cart-storage role="status"></p><p>Демо-примеры, не ассортимент клуба. Покупки не оформляются. <a href="/cart.html">Демо-корзина</a></p>
+            <p
+              class="nutrition__status"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+              data-nutrition-status
+            ></p>
           </div>
         </section>
 
-        <section class="trainer-cta" id="personal-training" aria-labelledby="trainer-cta-title">
+        <section
+          class="trainer-cta"
+          id="personal-training"
+          aria-labelledby="trainer-cta-title"
+        >
           <div class="trainer-cta__shell">
-            <div class="trainer-cta__eyebrow"><span>04 / ПЕРСОНАЛЬНЫЙ ПОДХОД</span><span>ИДЕАЛ / АБАКАН</span></div>
+            <div class="trainer-cta__eyebrow">
+              <span>04 / ПЕРСОНАЛЬНЫЙ ПОДХОД</span><span>ИДЕАЛ / АБАКАН</span>
+            </div>
             <div class="trainer-cta__composition">
-              <h2 class="trainer-cta__title" id="trainer-cta-title"><span>ВЫБЕРИ</span><span>СВОЕГО</span><span>ТРЕНЕРА.</span></h2>
+              <h2 class="trainer-cta__title" id="trainer-cta-title">
+                <span>ВЫБЕРИ</span><span>СВОЕГО</span><span>ТРЕНЕРА.</span>
+              </h2>
               <figure class="trainer-cta__portrait">
                 <!-- Замените только src на путь к фото тренера. Кадрирование: object-position в main.scss. -->
-                <img class="trainer-cta__image" src="site/img/trainer-placeholder.svg" alt="Место для фотографии тренера" width="800" height="1000" loading="lazy" decoding="async" />
-                <figcaption class="trainer-cta__caption"><span>ТВОЯ ЦЕЛЬ.</span><span>ОБЩАЯ РАБОТА.</span></figcaption>
+                <img
+                  class="trainer-cta__image"
+                  src="site/img/trainer-placeholder.svg"
+                  alt="Место для фотографии тренера"
+                  width="800"
+                  height="1000"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption class="trainer-cta__caption">
+                  <span>ТВОЯ ЦЕЛЬ.</span><span>ОБЩАЯ РАБОТА.</span>
+                </figcaption>
               </figure>
               <div class="trainer-cta__copy">
-                <p class="trainer-cta__lead">Твой результат.<br />С профессиональной поддержкой.</p>
-                <p class="trainer-cta__text">Персональный подход, правильная техника и программа под твои цели. Тренер рядом — от первого движения до нового результата.</p>
-                <a class="trainer-cta__link" href="/trainers.html">Смотреть тренеров</a>
+                <p class="trainer-cta__lead">
+                  Твой результат.<br />С профессиональной поддержкой.
+                </p>
+                <p class="trainer-cta__text">
+                  Персональный подход, правильная техника и программа под твои
+                  цели. Тренер рядом — от первого движения до нового результата.
+                </p>
+                <a class="trainer-cta__link" href="/trainers.html"
+                  >Смотреть тренеров</a
+                >
               </div>
             </div>
-            <p class="trainer-cta__signature"><span>ТЕХНИКА / ПРОГРАММА / ПРОГРЕСС</span><span>В ТВОЁМ РИТМЕ.</span></p>
+            <p class="trainer-cta__signature">
+              <span>ТЕХНИКА / ПРОГРАММА / ПРОГРЕСС</span
+              ><span>В ТВОЁМ РИТМЕ.</span>
+            </p>
           </div>
         </section>
       </div>
@@ -286,43 +562,59 @@
 
     <!-- IDEAL / MONO — футер. Отдельная секция, не затрагивает hero и главный скролл-эффект. -->
     <!-- component:footer:start -->
-<footer class="ideal-footer" id="contacts">
-  <div class="ideal-footer__container">
-    <div class="ideal-footer__top">
-      <div class="ideal-footer__about">
-        <a class="ideal-footer__logo" href="/#top" aria-label="Идеал — наверх">ИДЕАЛ.</a>
-        <p>Спортивный клуб в Абакане.<br>Тренируйся в своём ритме.</p>
+    <footer class="ideal-footer" id="contacts">
+      <div class="ideal-footer__container">
+        <div class="ideal-footer__top">
+          <div class="ideal-footer__about">
+            <a
+              class="ideal-footer__logo"
+              href="/#top"
+              aria-label="Идеал — наверх"
+              >ИДЕАЛ.</a
+            >
+            <p>Спортивный клуб в Абакане.<br />Тренируйся в своём ритме.</p>
+          </div>
+
+          <nav class="ideal-footer__nav" aria-label="Навигация по сайту">
+            <h2>Навигация</h2>
+            <a href="/#top">Главная</a>
+            <a href="/about.html">О клубе</a>
+            <a href="/trainers.html">Тренеры</a>
+            <a href="/#next">Направления</a>
+            <a href="/#memberships">Абонементы</a>
+            <a href="/shop.html">Спортивное питание</a>
+            <a href="/login">Кабинет сотрудника</a>
+          </nav>
+
+          <div class="ideal-footer__contacts">
+            <h2>Контакты</h2>
+            <address>Абакан, ул. Бограда, 135</address>
+            <a href="tel:+73902287386">+7 (3902) 28-73-86</a>
+            <p class="ideal-footer__hours">Ежедневно с 08:00 до 22:00</p>
+            <a
+              href="https://2gis.ru/abakan/firm/9711414977502434"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Посмотреть на карте</a
+            >
+          </div>
+        </div>
+
+        <div class="ideal-footer__bottom">
+          <span>© 2026 ИДЕАЛ</span>
+          <a
+            href="https://shumdev.ru/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Разработка ShumDev</a
+          >
+        </div>
       </div>
-
-      <nav class="ideal-footer__nav" aria-label="Навигация по сайту">
-        <h2>Навигация</h2>
-        <a href="/#top">Главная</a>
-        <a href="/about.html">О клубе</a>
-        <a href="/trainers.html">Тренеры</a>
-        <a href="/#next">Направления</a>
-        <a href="/#memberships">Абонементы</a>
-        <a href="/shop.html">Спортивное питание</a>
-        <a href="/login">Кабинет сотрудника</a>
-      </nav>
-
-      <div class="ideal-footer__contacts">
-        <h2>Контакты</h2>
-        <address>Абакан, ул. Бограда, 135</address>
-        <a href="https://2gis.ru/abakan/firm/9711414977502434" target="_blank" rel="noopener noreferrer">Посмотреть на карте</a>
-      </div>
-    </div>
-
-    <div class="ideal-footer__bottom">
-      <span>© 2026 ИДЕАЛ</span>
-      <a href="https://shumdev.ru/" target="_blank" rel="noopener noreferrer">Разработка ShumDev</a>
-    </div>
-  </div>
-</footer>
+    </footer>
     <!-- component:footer:end -->
 
-
     <!-- component:menu:start -->
-<div class="menu-panel" id="mobile-menu" hidden aria-hidden="true">
+    <div class="menu-panel" id="mobile-menu" hidden aria-hidden="true">
       <div class="menu-panel__inner">
         <p class="menu-panel__heading">Навигация / IDEAL</p>
         <nav aria-label="Разделы сайта">
@@ -348,13 +640,15 @@
         </nav>
         <div class="menu-panel__bottom">
           <p class="menu-panel__footnote">ИДЕАЛ · АБАКАН<br />БОГРАДА, 135</p>
-          <a class="menu-panel__appointment" href="/#contacts"><span>Связаться</span></a>
+          <a class="menu-panel__appointment" href="/#contacts"
+            ><span>Связаться</span></a
+          >
         </div>
       </div>
     </div>
     <!-- component:menu:end -->
     <!-- component:preview:start -->
-<dialog
+    <dialog
       class="preview-dialog"
       id="preview-dialog"
       aria-labelledby="preview-dialog-title"
@@ -378,7 +672,6 @@
     </dialog>
     <!-- component:preview:end -->
 
-
     <dialog
       class="purchase-dialog"
       id="purchase-dialog"
@@ -394,23 +687,26 @@
       </button>
       <span class="purchase-dialog__eyebrow">IDEAL / АБОНЕМЕНТ</span>
       <h2 id="purchase-title">Ваш выбор</h2>
-      <p class="purchase-dialog__plan" data-purchase-name>Выбранный абонемент</p>
-      <p class="purchase-dialog__price" data-purchase-price>Цена указана в карточке</p>
+      <p class="purchase-dialog__plan" data-purchase-name>
+        Выбранный абонемент
+      </p>
+      <p class="purchase-dialog__price" data-purchase-price>
+        Цена указана в карточке
+      </p>
       <p class="purchase-dialog__terms" data-purchase-terms></p>
       <p class="purchase-dialog__note">
-        Оформление и оплата — в клубе. Онлайн-покупка недоступна: заявки не отправляются, деньги не списываются.
+        Оформление и оплата — в клубе. Онлайн-покупка недоступна: заявки не
+        отправляются, деньги не списываются.
       </p>
       <button type="button" class="purchase-dialog__button" data-purchase-close>
         Понятно
       </button>
     </dialog>
 
-
-
     <script src="site/scripts/main.js" defer></script>
     <script src="site/scripts/hero-motion.js" defer></script>
     <script src="site/scripts/sections.js" defer></script>
-    <script src="site/scripts/demo-products.js" defer></script><script src="site/scripts/demo-cart.js" defer></script>
+    <script src="site/scripts/demo-products.js" defer></script>
     <script src="site/scripts/nutrition.js" defer></script>
   </body>
 </html>

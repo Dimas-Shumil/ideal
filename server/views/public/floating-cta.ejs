@@ -1,0 +1,9 @@
+<nav class="floating-cta" data-floating-cta aria-label="Связаться с клубом" aria-hidden="true" inert>
+  <% if(siteContacts?.phone){ %><a class="floating-cta__link floating-cta__link--call" href="tel:<%= siteContacts.phone %>" aria-label="Позвонить в клуб ИДЕАЛ: <%= siteContacts.phoneDisplay || siteContacts.phone %>">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 3.09 5.18 2 2 0 0 1 5.08 3h3a2 2 0 0 1 2 1.72l.54 3a2 2 0 0 1-.57 1.76l-1.27 1.27a16 16 0 0 0 4.47 4.47l1.27-1.27a2 2 0 0 1 1.76-.57l3 .54A2 2 0 0 1 22 16.92Z"/></svg>
+  </a><% } %>
+  <a class="floating-cta__link floating-cta__link--book" href="#contacts" aria-label="Как записаться: контакты клуба ИДЕАЛ">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="m8 16 2.5 2.5L16 13"/></svg>
+  </a>
+</nav>
+<script src="/site/scripts/floating-cta.js" defer></script>

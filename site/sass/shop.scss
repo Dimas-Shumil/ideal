@@ -171,3 +171,81 @@
 @media (prefers-reduced-motion: reduce) {
   .shop__category-select, .shop__clear { transition: none; }
 }
+
+/* IDEAL public shop: rounded merchandise cards and pill-shaped actions. */
+.shop-card > article {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e0e2df;
+  border-radius: 22px;
+  background: #fff;
+  transition: box-shadow 350ms ease;
+}
+.shop-card:hover > article, .shop-card:focus-within > article {
+  box-shadow: 0 16px 38px rgba(25, 28, 30, .08);
+}
+.shop-card__visual { border-radius: 21px 21px 0 0; }
+.shop-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 24px;
+}
+.shop-card__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  margin-top: auto;
+  border-radius: 999px;
+  text-align: center;
+  font-weight: 600;
+  cursor: pointer;
+}
+.shop-card a.shop-card__action { margin-bottom: 0; }
+.shop-card__action + .shop-card__action { margin-top: 10px; }
+.shop__catalog-head > a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 22px;
+  border: 1px solid #25282a;
+  border-radius: 999px;
+  color: #25282a;
+  background: transparent;
+  font-size: 13px;
+  text-decoration: none;
+  transition: color 350ms ease, background-color 350ms ease, transform 350ms ease;
+}
+.shop__catalog-head > a:hover { background: #25282a; color: #fff; }
+.shop__catalog-head > a:active { transform: scale(.98); }
+.shop__apply, .shop__empty-reset, .shop__closing a, .shop__filter { border-radius: 999px; }
+.shop__category-select { border-radius: 14px; }
+.shop__pagination a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 22px;
+  border: 1px solid #c8cbca;
+  border-radius: 999px;
+  background: #fff;
+  color: #25282a;
+  font-size: 13px;
+  text-decoration: none;
+  transition: border-color 350ms ease, transform 350ms ease;
+}
+.shop__pagination a:hover { border-color: #25282a; }
+.shop__pagination a:active { transform: scale(.98); }
+@media (max-width: 680px) {
+  .shop-card__body { padding: 20px; }
+  .shop__catalog-head > a { min-height: 44px; padding-inline: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shop-card > article, .shop__catalog-head > a, .shop__pagination a { transition: none; }
+}
+

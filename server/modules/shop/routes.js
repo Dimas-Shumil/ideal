@@ -76,42 +76,37 @@ export function shopRoutes({ prisma, config, indexHtml }) {
       req.session.save((e) => (e ? reject(e) : resolve())),
     );
   r.get("/", async (req, res) => {
-    const [{ items }, plans] = await Promise.all([service.catalog(), publicPlans(prisma)]);
+    // The home Coverflow is a permanent editorial showcase from index.html.
+    // It must never be replaced by the live shop catalog.
+    const plans = await publicPlans(prisma);
     const memberships = await ejs.renderFile(
       fileURLToPath(new URL("../../views/public/memberships.ejs", import.meta.url)),
       { plans, money, planTerms },
-    );
-    const nutrition = await ejs.renderFile(
-      fileURLToPath(new URL("../../views/shop/nutrition.ejs", import.meta.url)),
-      { items: items.slice(0, 5), money },
     );
     const contentHtml = await renderHomeContent(prisma, indexHtml, res.locals.siteContacts);
     res
       .type("html")
       .send(
-        applySeo(res, config, "/", contentHtml, req.query)
-          .replace(/<section\s+class="memberships"[\s\S]*?<\/section>/, () => memberships)
-          .replace(
-            /<section class="nutrition"[\s\S]*?<\/section>/,
-            () => nutrition,
-          )
-          .replace(
-            /<script src="site\/scripts\/demo-(?:products|cart)\.js" defer><\/script>/g,
-            "",
-          ),
+        applySeo(res, config, "/", contentHtml, req.query, res.locals.siteContacts)
+          .replace(/<section\s+class="memberships"[\s\S]*?<\/section>/, () => memberships),
       );
   });
+  const cartCount = (req) => (req.session?.shopCart || [])
+    .reduce((sum, item) => sum + item.quantity, 0);
   r.get(["/shop.html", "/api/shop/products"], init, async (req, res) => {
     const data = await service.catalog(req.query);
     return req.path.startsWith("/api/")
       ? res.json(data)
-      : render(req, res, "catalog", { ...data, seo: seoFor(config, req.path, req.query) });
+      : render(req, res, "catalog", {
+          ...data, cartCount: cartCount(req), seo: seoFor(config, req.path, req.query),
+        });
   });
   r.get("/product.html", init, async (req, res) => {
     const q = z.object({ id: s.uuid.optional() }).strict().parse(req.query);
     const product = q.id ? await service.product(q.id) : null;
     render(req, res, "product", {
-      product, seo: seoFor(config, req.path, req.query, product),
+      product, cartCount: cartCount(req),
+      seo: seoFor(config, req.path, req.query, product),
     });
   });
   r.get("/api/shop/products/:id", async (req, res) =>

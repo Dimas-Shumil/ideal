@@ -12,6 +12,7 @@ const shape = z.object({
   APP_ORIGIN: z.string().url(),
   SEO_ORIGIN: z.string().default(""),
   SEO_INDEXABLE: z.enum(["true", "false"]).default("false").transform(v => v === "true"),
+  SEO_CONTENT_INDEXABLE: z.enum(["true", "false"]).default("false").transform(v => v === "true"),
   DATABASE_URL: z.string().url(),
   SESSION_SECRET: z.string().min(64).max(256),
   TRUST_PROXY: z.enum(["none", "loopback"]).default("none"),
@@ -49,6 +50,7 @@ export function readConfig(input = process.env) {
       throw new Error("SEO_ORIGIN должен совпадать с production APP_ORIGIN");
   }
   if (c.SEO_INDEXABLE && !c.SEO_ORIGIN) throw new Error("Для SEO_INDEXABLE требуется SEO_ORIGIN");
+  if (c.SEO_CONTENT_INDEXABLE && !c.SEO_INDEXABLE) throw new Error("Для SEO_CONTENT_INDEXABLE требуется SEO_INDEXABLE=true");
   const origin = new URL(c.APP_ORIGIN),
     db = new URL(c.DATABASE_URL);
   if (

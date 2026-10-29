@@ -1,6 +1,6 @@
 'use strict';
 // IDEAL / MONO — continuous coverflow, no runtime dependencies.
-// Product fields and replaceable image URLs live in index.html.
+// The five editorial cards are independent from the live catalog (/shop.html).
 (() => {
   const section = document.querySelector('.nutrition');
   if (!section) return;
@@ -8,6 +8,8 @@
   const cards = [...section.querySelectorAll('[data-nutrition-card]')];
   const count = cards.length;
   if (count < 2) return;
+  const showcase = window.IdealProducts;
+  if (!Array.isArray(showcase) || showcase.length !== count) return;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const counter = section.querySelector('[data-nutrition-counter]');
   const status = section.querySelector('[data-nutrition-status]');
@@ -38,16 +40,16 @@
   }
   function syncInfo(announce = true) {
     active = modulo(Math.round(target));
-    const live=!!cards[active].dataset.productId;
-    const data=live?cards[active].dataset:window.IdealProducts[active];
+    const data = showcase[active];
     fields.forEach(([key, element]) => {
-      element.textContent = key === 'price' && !live ? 'Стоимость не указана' : data[key];
+      element.textContent = key === 'price' ? 'Актуальные цены — в магазине' : data[key];
     });
     counter.textContent = `${String(active + 1).padStart(2, '0')} / ${String(count).padStart(2, '0')}`;
     cards.forEach((card, index) => card.setAttribute('aria-hidden', String(index !== active)));
-    const buy=section.querySelector('[data-nutrition-buy]');
-    buy.setAttribute('aria-label', `${live?'Выбрать вариант':'Добавить в корзину'}: ${data.name}`);
-    if(live)buy.href=`/product.html?id=${data.productId}`;
+    // Keep showcase actions informative; no demo cart or fabricated product links.
+    section.querySelector('[data-nutrition-buy]').setAttribute(
+      'aria-label', `Посмотреть товары в магазине: ${data.name}`,
+    );
     if (announce) status.textContent = `${active + 1} из ${count}. ${data.name}.`;
   }
   function goTo(next) {
@@ -148,10 +150,4 @@
   section.querySelector('[data-nutrition-next]').disabled = false;
   resize(); syncInfo(false);
 
-  const buy = section.querySelector('[data-nutrition-buy]');
-  if(cards[0].dataset.productId)return;
-  buy.disabled = false;
-  buy.addEventListener('click', () => {
-    window.IdealCart.add(window.IdealProducts[active].id, 1);
-  });
 })();
