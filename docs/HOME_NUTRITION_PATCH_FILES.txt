@@ -1,0 +1,11 @@
+docs/HOME_NUTRITION_CATALOG_20261030.md
+docs/HOME_NUTRITION_PATCH_FILES.txt
+index.html
+server/modules/shop/routes.js
+server/views/shop/nutrition.ejs
+site/scripts/nutrition.js
+tests/content-unit.test.js
+tests/home-nutrition.test.js
+tests/public-ui-controls.test.js
+tests/shop.test.js
+tools/run-tests.mjs

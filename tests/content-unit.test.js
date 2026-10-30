@@ -34,7 +34,7 @@ test('explicit publication, hiding and editorial photo DTO are respected',()=>{
  assert.equal(aboutDto(about).title,'Настоящая история');
  assert.equal(aboutDto({...about,visible:false}),null);
 });
-test('homepage renders CMS content, but permanently retains nutrition showcase',async()=>{
+test('homepage renders CMS content and preserves the live nutrition insertion point',async()=>{
  const html=await readFile('index.html','utf8');
  const fake={contentEntry:{findMany:async()=>[{key:'gym',visible:true,version:2,publicOrder:0,data:{title:'Тестовый зал',summary:'Новый блок',body:'Подробности'},photos:[]}]}};
  const contacts={...SITE_CONTACTS,hours:'Ежедневно с 09:00 до 20:00',address:'Абакан, тест 10'};
@@ -42,6 +42,6 @@ test('homepage renders CMS content, but permanently retains nutrition showcase',
  assert.match(rendered,/Тестовый зал/);
  assert.match(rendered,/09:00 до 20:00/);
  assert.match(rendered,/Абакан, тест 10/);
- assert.match(rendered,/nutrition__|data-nutrition/);
+ assert.match(rendered,/<!-- home:nutrition -->/);
  assert.equal((rendered.match(/data-floating-cta/g)||[]).length,1);
 });

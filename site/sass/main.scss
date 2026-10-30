@@ -7,7 +7,7 @@
 $ink: #191c1e;
 $ink-muted: #43474a;
 $paper: #f7f7f5;
-$surface-glass: rgba(248, 248, 247, 0.11);
+$surface-glass: rgba(248, 248, 247, 0.08);
 $ease-ideal: cubic-bezier(0.22, 1, 0.36, 1);
 $font-editorial:
   'Bodoni MT', 'Noto Serif Display', 'Times New Roman', Georgia, serif;
@@ -101,12 +101,20 @@ body.menu-open {
   transition:
     background 0.65s ease,
     box-shadow 0.65s ease,
-    border-color 0.65s ease;
+    border-color 0.65s ease,
+    transform 0.32s $ease-ideal;
+  &.is-hidden {
+    transform: translateY(calc(-100% - 2px));
+    pointer-events: none;
+  }
   &.is-scrolled,
   body.menu-open & {
-    background: rgba(249, 249, 248, 0.9);
+    background: rgba(249, 249, 248, 0.76);
     border-bottom-color: rgba(42, 45, 46, 0.09);
     box-shadow: 0 8px 36px rgba(15, 17, 19, 0.055);
+  }
+  body.menu-open & {
+    background: rgba(249, 249, 248, 0.94);
   }
   &__logo {
     display: inline-block;
@@ -3326,4 +3334,8 @@ html.hero-intro .header {
 .nutrition__nav:disabled {
   opacity: .35;
   cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header { transition: none; }
 }

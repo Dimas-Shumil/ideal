@@ -13,10 +13,44 @@ const motionReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 let modalCloseTimer;
 let restoreFocusTo = null;
 
+let headerLastY = Math.max(0, window.scrollY);
+let headerTravel = 0;
+
+function revealHeader() {
+  header?.classList.remove('is-hidden');
+  headerLastY = Math.max(0, window.scrollY);
+  headerTravel = 0;
+}
+
 function syncHeader() {
-  header.classList.toggle('is-scrolled', window.scrollY > 14);
+  if (!header) return;
+  // Clamp overscroll so the iPhone bounce cannot reverse the header direction.
+  const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  const y = Math.max(0, Math.min(window.scrollY, maxY));
+  const delta = y - headerLastY;
+  headerLastY = y;
+  header.classList.toggle('is-scrolled', y > 14);
+  const focused = document.activeElement;
+  const keyboardFocus = focused && header.contains(focused) && focused.matches(':focus-visible');
+  if (y <= Math.max(header.offsetHeight, 96) || document.body.classList.contains('menu-open') || keyboardFocus) {
+    header.classList.remove('is-hidden');
+    headerTravel = 0;
+    return;
+  }
+  if (!delta) return;
+  // Accumulate movement in one direction; tiny touchpad movements do not flicker.
+  headerTravel = Math.sign(delta) === Math.sign(headerTravel) ? headerTravel + delta : delta;
+  if (headerTravel >= 12) {
+    header.classList.add('is-hidden');
+    headerTravel = 0;
+  } else if (headerTravel <= -8) {
+    header.classList.remove('is-hidden');
+    headerTravel = 0;
+  }
 }
 window.addEventListener('scroll', syncHeader, { passive: true });
+window.addEventListener('pageshow', () => { revealHeader(); syncHeader(); });
+header?.addEventListener('focusin', revealHeader);
 syncHeader();
 
 // Inert prevents keyboard focus reaching hidden controls; CSS handles transitions.
@@ -27,6 +61,7 @@ menuPanel.setAttribute('aria-hidden', 'true');
 function setMenuState(open, { returnFocus = false } = {}) {
   const wasOpen = menuToggle.getAttribute('aria-expanded') === 'true';
   if (open === wasOpen) return;
+  revealHeader();
   menuToggle.setAttribute('aria-expanded', String(open));
   menuToggle.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
   menuPanel.classList.toggle('is-open', open);

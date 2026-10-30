@@ -138,23 +138,12 @@ test("shop public: catalog/card/home server data, hidden products and unknown qu
     .expect(200);
   assert.match(card.text, /action="\/shop\/cart\/add"/);
   const home = await request(app).get("/").expect(200);
-  // Editorial Coverflow is always the same five illustrated categories,
-  // regardless of the real products published in the shop.
-  for (const [id, image] of [
-    ['demo-01', 'protein'], ['demo-02', 'creatine'],
-    ['demo-03', 'bcaa'], ['demo-04', 'preworkout'], ['demo-05', 'amino'],
-  ]) {
-    assert.match(home.text, new RegExp('data-demo-id="' + id + '"'));
-    assert.ok(home.text.includes('site/img/nutrition/' + image + '.svg'));
-  }
-  assert.match(home.text, /demo-products\.js/);
-  assert.doesNotMatch(home.text, /demo-cart\.js|data-product-id=/);
-  assert.doesNotMatch(home.text, /Тестовый товар/);
-  // Check the real gallery CTA as a complete link, not fragile attribute adjacency.
-  // Extra aria-label/other attributes must not break this assertion.
+  assert.match(home.text, /Тестовый товар/);
+  assert.match(home.text, new RegExp('data-product-id="' + product.id + '"'));
+  assert.doesNotMatch(home.text, /demo-products\.js|demo-cart\.js|data-demo-id/);
   const nutritionBuyLink = home.text.match(/<a\b[^>]*\bdata-nutrition-buy\b[^>]*>/i)?.[0];
-  assert.ok(nutritionBuyLink, 'Главная должна содержать кнопку каталога в галерее спортпита');
-  assert.match(nutritionBuyLink, /\bhref=["']\/shop\.html["']/, 'Кнопка галереи должна вести в реальный магазин');
+  assert.ok(nutritionBuyLink);
+  assert.ok(nutritionBuyLink.includes('/product.html?id=' + product.id));
   await p.shopProduct.update({
     where: { id: product.id },
     data: { active: false },
@@ -165,7 +154,7 @@ test("shop public: catalog/card/home server data, hidden products and unknown qu
   const list = await request(app).get("/api/shop/products").expect(200);
   assert.equal(list.body.total, 0);
   const homeWithEmptyShop = await request(app).get("/").expect(200);
-  assert.match(homeWithEmptyShop.text, /data-demo-id="demo-05"/);
+  assert.doesNotMatch(homeWithEmptyShop.text, /class="nutrition"|data-nutrition-card/);
   assert.doesNotMatch(homeWithEmptyShop.text, /Тестовый товар/);
   await request(app).get("/product.html?id=demo-01").expect(400);
   await request(app).get("/shop.html?price=1").expect(400);

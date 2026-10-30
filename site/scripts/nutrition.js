@@ -1,6 +1,6 @@
 'use strict';
 // IDEAL / MONO — continuous coverflow, no runtime dependencies.
-// The five editorial cards are independent from the live catalog (/shop.html).
+// Product data is escaped by EJS and read from the server-rendered cards.
 (() => {
   const section = document.querySelector('.nutrition');
   if (!section) return;
@@ -8,8 +8,13 @@
   const cards = [...section.querySelectorAll('[data-nutrition-card]')];
   const count = cards.length;
   if (count < 2) return;
-  const showcase = window.IdealProducts;
-  if (!Array.isArray(showcase) || showcase.length !== count) return;
+  const showcase = cards.map(card => ({
+    id: card.dataset.productId,
+    name: card.dataset.name,
+    category: card.dataset.category,
+    description: card.dataset.description,
+    price: card.dataset.price,
+  }));
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const counter = section.querySelector('[data-nutrition-counter]');
   const status = section.querySelector('[data-nutrition-status]');
@@ -42,13 +47,14 @@
     active = modulo(Math.round(target));
     const data = showcase[active];
     fields.forEach(([key, element]) => {
-      element.textContent = key === 'price' ? 'Актуальные цены — в магазине' : data[key];
+      element.textContent = data[key];
     });
     counter.textContent = `${String(active + 1).padStart(2, '0')} / ${String(count).padStart(2, '0')}`;
     cards.forEach((card, index) => card.setAttribute('aria-hidden', String(index !== active)));
-    // Keep showcase actions informative; no demo cart or fabricated product links.
-    section.querySelector('[data-nutrition-buy]').setAttribute(
-      'aria-label', `Посмотреть товары в магазине: ${data.name}`,
+    const buy = section.querySelector('[data-nutrition-buy]');
+    buy.setAttribute('href', '/product.html?id=' + encodeURIComponent(data.id));
+    buy.setAttribute(
+      'aria-label', `Выбрать вариант товара: ${data.name}`,
     );
     if (announce) status.textContent = `${active + 1} из ${count}. ${data.name}.`;
   }

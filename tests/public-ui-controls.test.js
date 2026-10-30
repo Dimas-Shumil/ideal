@@ -40,33 +40,9 @@ test('Membership carousel supports rapid next requests and mobile controls', () 
   assert.match(read('server/views/public/memberships.ejs'), /data-plans-next disabled/);
 });
 
-test('Home nutrition is an independent five-card showcase; live shop remains database-backed', () => {
+test('Home nutrition uses live server data without static demo products', () => {
   const html = read('index.html');
-  const routes = read('server/modules/shop/routes.js');
-  const nutrition = html.match(/<section class="nutrition"[\s\S]*?<\/section>/)?.[0];
-  assert.ok(nutrition, 'Static homepage nutrition section must exist');
-  assert.equal((nutrition.match(/data-nutrition-card/g) || []).length, 5);
-  for (const [id, file] of [
-    ['demo-01', 'protein'], ['demo-02', 'creatine'],
-    ['demo-03', 'bcaa'], ['demo-04', 'preworkout'], ['demo-05', 'amino'],
-  ]) {
-    assert.match(nutrition, new RegExp('data-demo-id="' + id + '"'));
-    assert.ok(nutrition.includes('site/img/nutrition/' + file + '.svg'));
-  }
-  assert.match(nutrition, /data-nutrition-prev/);
-  assert.match(nutrition, /data-nutrition-next/);
-  assert.match(nutrition, /href="\/shop\.html" data-nutrition-buy/);
-  assert.doesNotMatch(nutrition, /data-product-id|Демо-корзина|Добавить демо-пример/);
-  assert.match(html, /demo-products\.js/);
-  assert.doesNotMatch(html, /demo-cart\.js/);
-  const homeRoute = routes.split('r.get("/",')[1].split('r.get(["/shop.html"')[0];
-  assert.ok(homeRoute, 'Home route must exist');
-  assert.doesNotMatch(homeRoute, /service\.catalog|views\/shop\/nutrition|class="nutrition"/);
-  assert.match(routes, /r.get\(\["\/shop.html".*?service\.catalog\(req\.query\)/s);
-  const js = read('site/scripts/nutrition.js');
-  assert.match(js, /if \(count < 2\) return/);
-  assert.match(js, /\[data-nutrition-prev\]/);
-  assert.match(js, /\[data-nutrition-next\]/);
-  assert.match(js, /querySelector\('\[data-nutrition-next\]'\)\.disabled = false/);
-  assert.doesNotMatch(js, /IdealCart|\/product\.html\?id=/);
+  assert.equal((html.match(/<!-- home:nutrition -->/g) || []).length, 1);
+  assert.doesNotMatch(html, /demo-products\.js|data-demo-id|site\/img\/nutrition\//);
+  assert.match(html, /nutrition\.js\?v=catalog-20261030/);
 });

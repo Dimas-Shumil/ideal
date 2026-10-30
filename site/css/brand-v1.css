@@ -1,16 +1,77 @@
 /* Official circular badge: same colors on light and dark surfaces. */
-.brand__image { display: block; width: 100%; height: 100%; object-fit: contain; }
-.header__logo { display: block; width: clamp(52px, 4vw, 72px); height: clamp(52px, 4vw, 72px); flex-shrink: 0; }
-.ideal-footer__logo { display: block; width: 96px; height: 96px; }
-.auth__brand { display: block; width: 88px; height: 88px; }
-.panel__brand { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: 12px; min-width: 0; }
-.panel__brand .brand__image { width: 56px; height: 56px; }
-.panel__brand span { min-width: 0; }
-.brand__placeholder { display: block; width: 88px; height: 88px; margin-inline: auto; }
-.pwa-install__logo { float: left; width: 64px; height: 64px; object-fit: contain; margin: 0 14px 8px 0; }
+.brand__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.header__logo {
+  display: block;
+  width: clamp(52px, 4vw, 72px);
+  height: clamp(52px, 4vw, 72px);
+  flex-shrink: 0;
+}
+
+.ideal-footer__logo {
+  display: block;
+  width: 96px;
+  height: 96px;
+}
+
+.auth__brand {
+  display: block;
+  width: 88px;
+  height: 88px;
+}
+
+.panel__brand {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.panel__brand .brand__image {
+  width: 56px;
+  height: 56px;
+}
+
+.panel__brand span {
+  min-width: 0;
+}
+
+.brand__placeholder {
+  display: block;
+  width: 88px;
+  height: 88px;
+  margin-inline: auto;
+}
+
+.pwa-install__logo {
+  float: left;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin: 0 14px 8px 0;
+}
+
 @media (max-width: 600px) {
-  .header__logo { width: 52px; height: 52px; }
-  .panel__brand { grid-template-columns: 44px minmax(0, 1fr); gap: 8px; }
-  .panel__brand .brand__image { width: 44px; height: 44px; }
-  .pwa-install__logo { width: 52px; height: 52px; }
+  .header__logo {
+    width: 52px;
+    height: 52px;
+  }
+  .panel__brand {
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 8px;
+  }
+  .panel__brand .brand__image {
+    width: 44px;
+    height: 44px;
+  }
+  .pwa-install__logo {
+    width: 52px;
+    height: 52px;
+  }
 }

@@ -76,8 +76,12 @@ export function shopRoutes({ prisma, config, indexHtml }) {
       req.session.save((e) => (e ? reject(e) : resolve())),
     );
   r.get("/", async (req, res) => {
-    // The home Coverflow is a permanent editorial showcase from index.html.
-    // It must never be replaced by the live shop catalog.
+    // Same published catalog as the shop; homepage query parameters do not filter it.
+    const { items } = await service.catalog({});
+    const nutrition = items.length ? await ejs.renderFile(
+      fileURLToPath(new URL("../../views/shop/nutrition.ejs", import.meta.url)),
+      { items, money },
+    ) : "";
     const plans = await publicPlans(prisma);
     const memberships = await ejs.renderFile(
       fileURLToPath(new URL("../../views/public/memberships.ejs", import.meta.url)),
@@ -88,7 +92,8 @@ export function shopRoutes({ prisma, config, indexHtml }) {
       .type("html")
       .send(
         applySeo(res, config, "/", contentHtml, req.query, res.locals.siteContacts)
-          .replace(/<section\s+class="memberships"[\s\S]*?<\/section>/, () => memberships),
+          .replace(/<section\s+class="memberships"[\s\S]*?<\/section>/, () => memberships)
+          .replace("<!-- home:nutrition -->", () => nutrition),
       );
   });
   const cartCount = (req) => (req.session?.shopCart || [])

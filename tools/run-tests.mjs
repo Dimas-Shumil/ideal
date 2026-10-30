@@ -67,6 +67,7 @@ run("--test", [
   "tests/push-sw.test.js",
   "tests/pwa.test.js",
   "tests/pwa-install.test.js",
+  "tests/home-nutrition.test.js",
   "tests/shop-unit.test.js",
   "tests/shop.test.js",
 ]);
