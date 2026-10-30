@@ -3044,7 +3044,8 @@ html.hero-intro.hero-intro-playing .hero__scroll {
     margin: 0 0 32px;
   }
   .trainer-cta__image {
-    aspect-ratio: 6/5;
+    height: 60vh;
+    aspect-ratio: auto;
   }
   .trainer-cta__caption {
     font-size: 8px;

@@ -3071,7 +3071,7 @@ html.hero-intro .header {
     &__title { grid-column: 1; grid-row: 1; font-size: clamp(48px, 12vw, 72px); margin-bottom: 28px; }
     &__title span:nth-child(2) { margin-left: 24px; }
     &__portrait { grid-column: 1; grid-row: 2; width: 100%; margin: 0 0 32px; }
-    &__image { aspect-ratio: 6 / 5; }
+    &__image { height: 60vh; aspect-ratio: auto; }
     &__caption { font-size: 8px; letter-spacing: .05em; }
     &__copy { grid-column: 1; grid-row: 3; max-width: 100%; }
     &__lead { font-size: 23px; }
