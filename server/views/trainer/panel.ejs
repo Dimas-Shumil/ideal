@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>ИДЕАЛ — кабинет тренера</title><link rel="stylesheet" href="/site/css/owner.css"><link rel="stylesheet" href="/site/css/trainer-panel.css"><script src="/site/scripts/owner.js" defer></script><%- include('../partials/pwa-head') %></head>
 <body class="panel"><a class="panel__skip" href="#content">К содержимому</a>
-<header class="panel__header"><a class="panel__brand" href="/trainer">ИДЕАЛ<span>Кабинет тренера</span></a><span><%= user.displayName %></span><form method="post" action="/logout"><input type="hidden" name="_csrf" value="<%= csrf %>"><button>Выйти</button></form></header>
+<header class="panel__header"><a class="panel__brand" href="/trainer"><img class="brand__image" src="/site/img/brand/ideal-logo-v1.webp" alt="ИДЕАЛ" width="256" height="256" decoding="async"><span>Кабинет тренера</span></a><span><%= user.displayName %></span><form method="post" action="/logout"><input type="hidden" name="_csrf" value="<%= csrf %>"><button>Выйти</button></form></header>
 <div class="panel__layout"><%- include('../partials/panel-nav') %>
 <main id="content" class="panel__main"><% if(error) { %><div class="panel__error" role="alert" tabindex="-1"><%= error %></div><% } %>
 <% if(page === 'overview') { %>

@@ -20,7 +20,7 @@
   const entitlementName = { MEMBER: 'Абонемент', GIFT_GYM: 'Подарок зала', NONE: 'Без списания' };
 %>
 <header class="panel__header">
-  <a class="panel__brand" href="<%= isTrainer ? '/trainer' : isOwner ? '/admin' : '/crm/clients' %>">ИДЕАЛ<span><%= isTrainer ? 'Кабинет тренера' : isOwner ? 'Панель владельца' : 'Панель администратора' %></span></a>
+  <a class="panel__brand" href="<%= isTrainer ? '/trainer' : isOwner ? '/admin' : '/crm/clients' %>"><img class="brand__image" src="/site/img/brand/ideal-logo-v1.webp" alt="ИДЕАЛ" width="256" height="256" decoding="async"><span><%= isTrainer ? 'Кабинет тренера' : isOwner ? 'Панель владельца' : 'Панель администратора' %></span></a>
   <span><%= user.displayName %></span>
   <form method="post" action="/logout"><input type="hidden" name="_csrf" value="<%= csrf %>"><button>Выйти</button></form>
 </header>

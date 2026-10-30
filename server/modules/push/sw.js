@@ -63,6 +63,7 @@ self.addEventListener("push", event => {
   event.waitUntil(self.registration.showNotification(title, {
     body: typeof data.body === "string" ? data.body.slice(0, 200) : "Откройте кабинет для подробностей.",
     tag: typeof data.tag === "string" ? data.tag.slice(0, 160) : "ideal-push",
+    icon: '/site/img/pwa/icon-192-v1.png',
     data: { url: safeUrl(data.url) },
   }));
 });

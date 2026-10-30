@@ -51,7 +51,8 @@
       finally { installButton.disabled = false; }
     });
     banner.addEventListener('keydown', event => { if (event.key === 'Escape') { event.preventDefault(); later(); } });
-    content.append(title, text, hint); actions.append(installButton, dismiss); banner.append(content, actions); document.body.append(banner);
+    const logo = document.createElement('img'); logo.className = 'pwa-install__logo'; logo.src = '/site/img/brand/ideal-logo-v1.webp'; logo.alt = ''; logo.width = 64; logo.height = 64;
+    title.append(logo); content.append(title, text, hint); actions.append(installButton, dismiss); banner.append(content, actions); document.body.append(banner);
     // Non-modal: never steal keyboard focus or prevent interaction with the page.
   }
   setTimeout(() => {
