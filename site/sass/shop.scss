@@ -30,7 +30,7 @@
 .shop__reset { flex-shrink: 0; border: 0; border-bottom: 1px solid #8d9294; padding: 8px 0; background: transparent; color: #191c1e; font-size: 12px; }
 .shop__reset:hover:enabled { color: #555b5e; }
 .shop__reset:disabled { opacity: .5; cursor: default; }
-.shop__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 52px 30px; margin: 0; padding: 0; list-style: none; }
+.shop__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 36px 24px; margin: 0; padding: 0; list-style: none; }
 .shop-card { min-width: 0; }
 .shop-card__visual { position: relative; aspect-ratio: 1 / 1.05; overflow: hidden; background: #e6e6e2; }
 .shop-card:nth-child(2n) .shop-card__visual { background: #dadddc; }
@@ -41,7 +41,7 @@
 .shop-card__caption { bottom: 18px; }
 .shop-card__body { padding: 23px 0 0; }
 .shop-card__category { font-size: 10px; line-height: 1.6; color: #555b5e; margin: 0 0 12px; }
-.shop-card h3 { margin: 0; font-size: clamp(23px, 2vw, 34px); font-weight: 450; line-height: 1.15; letter-spacing: -.035em; overflow-wrap: anywhere; }
+.shop-card h3 { margin: 0; font-size: clamp(20px, 1.55vw, 28px); font-weight: 450; line-height: 1.15; letter-spacing: -.035em; overflow-wrap: anywhere; }
 .shop-card__demo { margin: 12px 0 22px; font-size: 12px; color: #555b5e; }
 .shop-card__facts { margin: 0 0 22px; font-size: 12px; }
 .shop-card__facts div { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid #c9cbca; padding: 12px 0; }
@@ -192,13 +192,14 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  padding: 24px;
+  padding: 20px;
 }
 .shop-card__action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 52px;
+  min-height: 48px;
+  padding: 14px 20px;
   margin-top: auto;
   border-radius: 999px;
   text-align: center;

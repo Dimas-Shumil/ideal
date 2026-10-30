@@ -195,8 +195,8 @@
 
 .shop__grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 52px 30px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 36px 24px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -259,7 +259,7 @@
 
 .shop-card h3 {
   margin: 0;
-  font-size: clamp(23px, 2vw, 34px);
+  font-size: clamp(20px, 1.55vw, 28px);
   font-weight: 450;
   line-height: 1.15;
   letter-spacing: -0.035em;
@@ -682,14 +682,15 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  padding: 24px;
+  padding: 20px;
 }
 
 .shop-card__action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 52px;
+  min-height: 48px;
+  padding: 14px 20px;
   margin-top: auto;
   border-radius: 999px;
   text-align: center;
