@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Вход сотрудников — ИДЕАЛ</title><link rel="stylesheet" href="/site/css/auth.css"><%- include('../partials/pwa-head') %></head>
-<body class="auth"><main class="auth__card"><a class="auth__brand" href="/"><img class="brand__image" src="/site/img/brand/ideal-logo-v2.webp" alt="ИДЕАЛ" width="256" height="256" decoding="async"></a><h1 class="auth__title">Вход сотрудников</h1><p>Введите личный логин и пароль.</p>
+<body class="auth auth--split"><div class="auth__layout"><aside class="auth__visual" aria-label="Спортивный клуб ИДЕАЛ"><img class="auth__photo" src="/site/img/app/login-gym-v2.webp" alt="" width="960" height="1280" fetchpriority="high"><a class="auth__visual-brand" href="/" aria-label="ИДЕАЛ — на главную"><img src="/site/img/brand/ideal-logo-v2.webp" alt="ИДЕАЛ" width="112" height="112"></a><div class="auth__visual-copy"><p>ИДЕАЛ / АБАКАН</p><h2>ТВОЙ РИТМ.<br>ТВОЙ РЕЗУЛЬТАТ.</h2><span>Спортивный клуб</span></div></aside><main class="auth__card"><a class="auth__brand" href="/"><img class="brand__image" src="/site/img/brand/ideal-logo-v2.webp" alt="ИДЕАЛ" width="256" height="256" decoding="async"></a><h1 class="auth__title">Вход сотрудников</h1><p>Введите личный логин и пароль.</p>
 <% if (error) { %><p class="auth__error" role="alert"><%= error %></p><% } %>
 <form class="auth__form" action="/login" method="post"><input type="hidden" name="_csrf" value="<%= csrf %>">
 <label for="login">Логин</label><input id="login" name="login" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="64" required>
 <label for="password">Пароль</label><input id="password" name="password" type="password" autocomplete="current-password" maxlength="128" required>
 <button class="auth__button" type="submit">Войти</button></form>
-<p class="auth__hint">Для восстановления доступа обратитесь к владельцу клуба. Владелец обращается в ShumDev.</p><a href="/">На главную</a></main></body></html>
+<p class="auth__hint">Для восстановления доступа обратитесь к владельцу клуба. Владелец обращается в ShumDev.</p><a href="/">На главную</a></main></div></body></html>

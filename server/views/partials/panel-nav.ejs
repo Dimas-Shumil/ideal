@@ -11,10 +11,26 @@
   ] : [ ['/crm/clients','Клиенты'], ['/crm/plans','Тарифы'],
     ['/crm/schedule','Расписание'], ['/crm/visits','Посещения'], ['/shop-panel/orders','Заказы магазина'] ];
   navItems.push(['/application','Приложение'], ['/notifications','Уведомления'], ['/','Открыть сайт клуба',true]);
+
+  const iconFor = url => url.includes('schedule') || url.includes('lessons') ? 'calendar-days' : url.includes('clients') || url.includes('employees') ? 'users-round' : url.includes('plans') ? 'tickets' : url.includes('visits') ? 'clipboard-check' : url.includes('orders') || url.includes('products') ? 'shopping-bag' : url.includes('notifications') ? 'bell' : url.includes('account') ? 'user-round' : url.includes('public-trainers') ? 'contact-round' : url.includes('content') ? 'panels-top-left' : url.includes('application') ? 'smartphone' : url === '/' ? 'external-link' : 'layout-dashboard';
+  const dockUrls = user.role === 'TRAINER' ? ['/trainer','/trainer/clients','/trainer/lessons'] : user.role === 'OWNER' ? ['/admin','/crm/clients','/crm/schedule'] : ['/crm/clients','/crm/schedule','/shop-panel/orders'];
+  const dockLabel = url => url === '/admin' || url === '/trainer' ? 'Обзор' : url.includes('clients') ? 'Клиенты' : url.includes('lessons') ? 'Занятия' : url.includes('orders') ? 'Заказы' : 'Расписание';
+  const navSelected = (url,exact) => exact ? navPath === url : navPath === url || navPath.startsWith(url + '/');
+  const overflowActive = navItems.some(([url,,exact]) => !dockUrls.includes(url) && navSelected(url,exact));
 %>
 <nav class="panel__nav" aria-label="Рабочие разделы">
   <% for (const [url,label,exact] of navItems) {
     const selected = exact ? navPath === url : navPath === url || navPath.startsWith(url + '/'); %>
-    <a href="<%= url %>" <%- selected ? 'aria-current="page"' : '' %>><%= label %></a>
+    <a href="<%= url %>" <%- selected ? 'aria-current="page"' : '' %>><img class="app-nav__icon" src="/site/img/app/icons/<%= iconFor(url) %>.svg" alt="" width="22" height="22"><span><%= label %></span></a>
   <% } %>
+</nav>
+
+<nav class="app-dock" aria-label="Быстрая навигация">
+  <% for(const url of dockUrls){ const item=navItems.find(i=>i[0]===url); %>
+  <a class="app-dock__item" href="<%= url %>" <%- navSelected(url,item[2])?'aria-current="page"':'' %>><img src="/site/img/app/icons/<%= iconFor(url) %>.svg" alt="" width="23" height="23"><span><%= dockLabel(url) %></span></a>
+  <% } %>
+  <details class="app-dock__more">
+    <summary class="app-dock__item" <%- overflowActive?'data-active="true"':'' %>><img src="/site/img/app/icons/ellipsis.svg" alt="" width="23" height="23"><span>Ещё</span></summary>
+    <div class="app-dock__sheet"><p>Рабочие разделы</p><% for(const [url,label,exact] of navItems){ if(dockUrls.includes(url))continue; %><a href="<%= url %>" <%- navSelected(url,exact)?'aria-current="page"':'' %>><img src="/site/img/app/icons/<%= iconFor(url) %>.svg" alt="" width="22" height="22"><span><%= label %></span></a><% } %></div>
+  </details>
 </nav>
