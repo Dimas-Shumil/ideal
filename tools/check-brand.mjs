@@ -9,6 +9,6 @@ await walk(root);
 for(const ref of refs)assert.ok((await readFile(path.join(root,ref))).length,ref);
 const m=JSON.parse(await readFile(path.join(root,'server/modules/pwa/manifest.json'),'utf8'));
 assert.equal(m.id,'/employee-app');assert.equal(m.start_url,'/');assert.equal(m.scope,'/');
-for(const i of [...m.icons,{src:'/site/img/pwa/apple-touch-180-v1.png',sizes:'180x180'}]){const b=await readFile(path.join(root,i.src));assert.equal(b.subarray(1,4).toString(),'PNG');assert.equal(`${b.readUInt32BE(16)}x${b.readUInt32BE(20)}`,i.sizes);}
+for(const i of [...m.icons,{src:'/site/img/pwa/apple-touch-180-v2.png',sizes:'180x180'}]){const b=await readFile(path.join(root,i.src));assert.equal(b.subarray(1,4).toString(),'PNG');assert.equal(`${b.readUInt32BE(16)}x${b.readUInt32BE(20)}`,i.sizes);}
 if(process.argv[2]){const base=new URL(process.argv[2]);assert.ok(['http:','https:'].includes(base.protocol));for(const ref of [...refs,'/manifest.webmanifest','/push-sw.js']){const res=await fetch(new URL(ref,base),{redirect:'error',signal:AbortSignal.timeout(15000)});assert.equal(res.status,200,ref);await res.arrayBuffer();}}
 console.log(`Brand OK: ${refs.size} asset paths, manifest identity, PNG dimensions${process.argv[2]?', HTTP OK':''}.`);
