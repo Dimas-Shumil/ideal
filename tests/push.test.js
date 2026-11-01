@@ -55,8 +55,44 @@ beforeEach(async()=>{store.close();({app,store,users}=await createApp({config,db
 after(async()=>{store?.close();await clearCrm(p);await p.auditEvent.deleteMany();await p.authSession.deleteMany();await p.user.deleteMany();await db.close();});
 test('push: guest page/API and mutations independently guarded',async()=>{
  await request(app).get('/notifications').expect(303);await request(app).get('/api/push/config').expect(401);
- for(const path of ['subscribe','unsubscribe','status'])await request(app).post('/api/push/'+path).send(subscription()).expect(401);
+ for(const path of ['subscribe','unsubscribe','status','test'])await request(app).post('/api/push/'+path).send(subscription()).expect(401);
  for(const u of [owner,admin,trainer]){const s=await login(u.login);await s.agent.get('/notifications').expect(200);const r=await s.agent.get('/api/push/config').expect(200);assert.equal(r.body.publicKey,vapid.publicKey);assert.ok(!JSON.stringify(r.body).includes(vapid.privateKey));}
+});
+test('push: test notification targets ONLY the signed-in account and current device',async()=>{
+ const {s,sub}=await seed();
+ const stranger=await seed(other);
+ await post(s,'/api/push/test',{endpoint:stranger.sub.endpoint},409);
+ await post(s,'/api/push/test',{endpoint:sub.endpoint,userId:other.id},400);
+ assert.equal(await p.pushDelivery.count(),0);
+ const result=await post(s,'/api/push/test',{endpoint:sub.endpoint});
+ assert.equal(result.body.queued,true);
+ const replay=await post(s,'/api/push/test',{endpoint:sub.endpoint});
+ assert.equal(replay.body.queued,false);
+ const queued=await p.pushDelivery.findMany();
+ assert.equal(queued.length,1);
+ assert.equal(queued[0].userId,trainer.id);
+ assert.match(queued[0].eventKey,/^PUSH_TEST:/);
+ assert.equal(queued[0].payload.url,'/notifications');
+ let calls=0;
+ await deliver(async()=>{calls++;});
+ assert.equal(calls,1);
+ assert.equal((await p.pushDelivery.findFirst()).status,'SENT');
+});
+test('push: owner and administrator can test only their respective device',async()=>{
+ for(const actor of [owner,admin]){
+  const {s,sub}=await seed(actor);
+  const r=await post(s,'/api/push/test',{endpoint:sub.endpoint});
+  assert.equal(r.body.queued,true);
+ }
+ assert.equal(await p.pushDelivery.count(),2);
+ assert.equal(await p.pushDelivery.count({where:{userId:owner.id}}),1);
+ assert.equal(await p.pushDelivery.count({where:{userId:admin.id}}),1);
+});
+test('push: test is protected by CSRF and Origin',async()=>{
+ const {s,sub}=await seed();
+ await s.agent.post('/api/push/test').set('Origin',config.APP_ORIGIN).send({endpoint:sub.endpoint}).expect(403);
+ await s.agent.post('/api/push/test').set('Origin','https://evil.example').set('x-csrf-token',s.token).send({endpoint:sub.endpoint}).expect(403);
+ assert.equal(await p.pushDelivery.count(),0);
 });
 test('push: CSRF and strict Origin',async()=>{
  const s=await login(trainer.login),sub=subscription();
@@ -144,7 +180,7 @@ test('push: service worker route is JS only and retains Push with bounded PWA ca
 });
 test('push: disabled configuration keeps page available but refuses new registration',async()=>{
  store.close();({app,store,users}=await createApp({config:{...config,PUSH_PUBLIC_KEY:'',PUSH_PRIVATE_KEY:''},db}));
- const s=await login(trainer.login);await s.agent.get('/notifications').expect(200);await post(s,'/api/push/subscribe',subscription(),503);assert.equal(await p.pushSubscription.count(),0);
+ const s=await login(trainer.login);await s.agent.get('/notifications').expect(200);await post(s,'/api/push/subscribe',subscription(),503);await post(s,'/api/push/test',{endpoint:subscription().endpoint},503);assert.equal(await p.pushSubscription.count(),0);
 });
 test('push: provider permanent rejection and expired events never retry indefinitely',async()=>{
  await seed();await event(await lesson());await deliver(async()=>{throw {statusCode:400};});assert.equal((await p.pushDelivery.findFirst()).status,'FAILED');

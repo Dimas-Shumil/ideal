@@ -2,7 +2,7 @@
   const controls = document.querySelector('.notifications__controls');
   if (!controls) return;
   const status = controls.querySelector('[role="status"]');
-  const enable = controls.querySelector('[data-enable]'), disable = controls.querySelector('[data-disable]'), reset = controls.querySelector('[data-reset]');
+  const enable = controls.querySelector('[data-enable]'), disable = controls.querySelector('[data-disable]'), reset = controls.querySelector('[data-reset]'), testButton = controls.querySelector('[data-test]');
   if (!window.isSecureContext || !('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
     status.textContent = 'Web Push недоступен в этом браузере или требуется HTTPS.'; return;
   }
@@ -22,10 +22,27 @@
     status.textContent = 'Разрешение: ' + ({ granted: 'выдано', denied: 'запрещено в настройках браузера', default: 'не запрошено' }[Notification.permission]) + '. Это устройство: ' + (server.registered ? 'подключено.' : 'не подключено.');
     enable.hidden = !config.enabled || Notification.permission === 'denied' || server.registered;
     disable.hidden = !server.registered;
+    testButton.hidden = !config.enabled || !server.registered || Notification.permission !== 'granted';
     reset.hidden = !sub || server.registered;
     if (sub && !server.registered) status.textContent += ' В браузере есть прежняя подписка. Если включение отклоняется, сначала сбросьте её кнопкой ниже.';
   }
-  function busy(value) { enable.disabled = value; disable.disabled = value; reset.disabled = value; }
+  function busy(value) { enable.disabled = value; disable.disabled = value; reset.disabled = value; testButton.disabled = value; }
+  testButton.addEventListener('click', async () => {
+    busy(true);
+    status.textContent = 'Запрашиваем тестовое Push-уведомление для этого устройства…';
+    try {
+      const sub = await registration?.pushManager.getSubscription();
+      if (!sub || Notification.permission !== 'granted') {
+        await refresh();
+        status.textContent = 'Сначала разрешите уведомления и подключите это устройство.';
+        return;
+      }
+      const result = await api('test', { endpoint: sub.endpoint });
+      status.textContent = result.queued
+        ? 'Тест поставлен в очередь отправки только на это устройство. Если уведомление не появилось, проверьте разрешения браузера и настройки уведомлений ОС.'
+        : 'Тест уже запрошен для этого устройства в течение последней минуты. Повторите через минуту.';
+    } catch (error) { status.textContent = error.message; } finally { busy(false); }
+  });
   reset.addEventListener('click', async () => {
     busy(true);
     status.textContent = 'Сбрасываем подписку этого браузера…';

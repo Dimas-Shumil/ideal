@@ -41,6 +41,38 @@ export function pushSubscriptions(prisma) {
         return { ok: true };
       });
     },
+    async sendTest(ctx, input) {
+      const data = endpointBody.parse(input);
+      return mutate(ctx, async (tx, actor) => {
+        // A test is sent only to the authenticated user's CURRENT subscription.
+        // Never accept a userId, role or subscriptionId from the browser.
+        const subscription = await tx.pushSubscription.findFirst({
+          where: { endpoint: data.endpoint, userId: actor.id, role: actor.role, authVersion: actor.authVersion },
+          select: { id: true },
+        });
+        if (!subscription) throw Object.assign(new Error("NOT_SUBSCRIBED"), { status: 409 });
+        const now = Date.now();
+        const minute = Math.floor(now / 60000);
+        // Composite unique key (eventKey, subscriptionId) prevents duplicate tests
+        // within a minute, including across simultaneous browser tabs or workers.
+        const eventKey = `PUSH_TEST:${actor.id}:${minute}`;
+        const result = await tx.pushDelivery.createMany({
+          data: [{
+            eventKey, subscriptionId: subscription.id, userId: actor.id,
+            authVersion: actor.authVersion, role: actor.role,
+            payload: {
+              title: "ИДЕАЛ — проверка уведомлений",
+              body: "Тестовое Push-уведомление доставлено на это устройство.",
+              url: "/notifications",
+              tag: `ideal-push-test-${minute}`,
+            },
+          }],
+          skipDuplicates: true,
+        });
+        // Queued is not delivered: the existing worker sends the notification.
+        return { ok: true, queued: result.count === 1 };
+      });
+    },
     async remove(ctx, input) {
       const data = endpointBody.parse(input);
       return mutate(ctx, async (tx, actor) => {
