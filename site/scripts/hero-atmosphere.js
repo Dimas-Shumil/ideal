@@ -27,7 +27,7 @@
     const sun = hero.querySelector('.hero__sun');
     const clouds = hero.querySelector('.hero__clouds');
     const fog = hero.querySelector('.hero__ambient-fog');
-    const figure = hero.querySelector('.hero__foreground img');
+    const foreground = hero.querySelector('.hero__foreground');
     let timer = null;
     let inView = true;
     const updateMotion = () => {
@@ -41,7 +41,8 @@
       if (sun) sun.style.opacity = String(1 - amount);
       if (clouds) clouds.style.opacity = String(.82 - amount * .36);
       if (fog) fog.style.opacity = String(.65 - amount * .23);
-      if (figure) figure.style.filter = `brightness(${1 - amount * .28})`;
+      // Day: sculpture visible. Twilight: fade out. Night: fully hidden.
+      if (foreground) foreground.style.opacity = String(1 - amount);
     };
     const stop = () => { window.clearTimeout(timer); timer = null; };
     const schedule = () => {

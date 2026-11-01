@@ -3567,3 +3567,33 @@ html.hero-night {
 @media (prefers-reduced-motion: reduce) {
   .header { transition: none; }
 }
+
+/* IDEAL 2026-11-01 — sculpture edge treatment and nighttime integration.
+   Both source figure images end at the drapery; masking the cloth into the fog
+   avoids a visibly hard floating cut without inventing missing anatomy. */
+.hero .hero__foreground img {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 77%, rgba(0,0,0,.93) 83%, rgba(0,0,0,.55) 92%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 77%, rgba(0,0,0,.93) 83%, rgba(0,0,0,.55) 92%, transparent 100%);
+}
+html.hero-night .hero .hero__foreground img {
+  filter: brightness(.61) contrast(1.06) saturate(.78) drop-shadow(0 4px 24px rgba(8,15,28,.15));
+}
+@media (max-width:720px), (max-width:1024px) and (orientation:portrait) {
+  .hero .hero__foreground img {
+    /* Mobile figure occupies ~39–65% of its transparent source canvas. */
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 53%, rgba(0,0,0,.94) 57%, rgba(0,0,0,.35) 63%, transparent 68%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 53%, rgba(0,0,0,.94) 57%, rgba(0,0,0,.35) 63%, transparent 68%);
+  }
+}
+
+/* IDEAL — daytime sculpture only; night leaves sky, stars and fog visible. */
+.hero .hero__foreground {
+  transition: opacity 1.2s ease;
+}
+html[data-hero-phase='night'] .hero .hero__foreground {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero .hero__foreground { transition: none; }
+}

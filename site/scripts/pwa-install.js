@@ -2,6 +2,10 @@
   if (!window.isSecureContext || !('serviceWorker' in navigator)) return;
   const INSTALLED = 'ideal-pwa-installed';
   let deferredPrompt, banner, installButton, hint, dismissed = false;
+  // Unified with the Hero clock: Abakan UTC+7, irrespective of device timezone.
+  const abakanNight = () => { const hour = new Date(Date.now() + 7 * 3600000).getUTCHours(); return hour >= 21 || hour < 8; };
+  const updateBannerPhase = () => { if (banner) banner.dataset.pwaPhase = abakanNight() ? 'night' : 'day'; };
+  window.setInterval(() => { if (banner && !banner.hidden) updateBannerPhase(); }, 60000);
   const read = key => { try { return localStorage.getItem(key); } catch { return null; } };
   const write = (key, value) => { try { localStorage.setItem(key, value); } catch { /* Current page still works without storage. */ } };
   const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
@@ -28,10 +32,10 @@
   function show() {
     if (suppressed()) return;
     banner = document.createElement('aside');
-    banner.className = 'pwa-install'; banner.setAttribute('aria-label', 'Установка приложения ИДЕАЛ');
+    banner.className = 'pwa-install'; banner.setAttribute('aria-label', 'Установка приложения ИДЕАЛ'); updateBannerPhase();
     const content = document.createElement('div'); content.className = 'pwa-install__content';
-    const title = document.createElement('p'); title.className = 'pwa-install__title'; title.textContent = 'ИДЕАЛ всегда под рукой';
-    const text = document.createElement('p'); text.className = 'pwa-install__text'; text.textContent = 'Расписание, тренеры и магазин — в приложении клуба.';
+    const title = document.createElement('p'); title.className = 'pwa-install__title'; title.textContent = 'ИДЕАЛ — всегда рядом';
+    const text = document.createElement('p'); text.className = 'pwa-install__text'; text.textContent = 'Расписание, тренеры и абонементы — в приложении.';
     hint = document.createElement('p'); hint.className = 'pwa-install__hint'; hint.hidden = true; hint.setAttribute('role', 'status');
     hint.textContent = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
       ? 'Откройте меню «Поделиться» в браузере, выберите «На экран Домой» и подтвердите добавление.'
