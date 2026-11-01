@@ -2,8 +2,15 @@
   if (!window.isSecureContext || !('serviceWorker' in navigator)) return;
   const INSTALLED = 'ideal-pwa-installed';
   let deferredPrompt, banner, installButton, hint, dismissed = false;
-  // Unified with the Hero clock: Abakan UTC+7, irrespective of device timezone.
-  const abakanNight = () => { const hour = new Date(Date.now() + 7 * 3600000).getUTCHours(); return hour >= 21 || hour < 8; };
+  // Match the Hero's actual twilight threshold, not a separate 21:00–08:00 schedule.
+  // The homepage Hero owns the phase; on other public pages use its UTC+7 cutoff.
+  const abakanNight = () => {
+    const root = document.documentElement;
+    if (root.hasAttribute('data-hero-phase')) return root.classList.contains('hero-night');
+    const date = new Date(Date.now() + 7 * 3600000);
+    const minutes = date.getUTCHours() * 60 + date.getUTCMinutes();
+    return minutes >= 20 * 60 + 15 || minutes < 7 * 60 + 45;
+  };
   const updateBannerPhase = () => { if (banner) banner.dataset.pwaPhase = abakanNight() ? 'night' : 'day'; };
   window.setInterval(() => { if (banner && !banner.hidden) updateBannerPhase(); }, 60000);
   const read = key => { try { return localStorage.getItem(key); } catch { return null; } };
