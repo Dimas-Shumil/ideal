@@ -1300,6 +1300,217 @@ html.hero-intro.hero-intro-playing .hero__scroll {
     transform: none;
   }
 }
+.hero__night-sky, .hero__stars, .hero__sun, .hero__clouds, .hero__ambient-fog {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity 2s linear;
+}
+.hero__night-sky {
+  z-index: -1;
+  opacity: 0;
+  background: #0c121e;
+}
+.hero__night-sky::before, .hero__night-sky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.hero__night-sky::before {
+  background: url("../img/hero-desktop.webp") center/cover no-repeat;
+  filter: brightness(0.32) grayscale(1);
+  mask-image: linear-gradient(transparent 60%, #000 82%);
+}
+.hero__night-sky::after {
+  background: linear-gradient(#0c121e 0%, rgba(12, 18, 30, 0.9) 25%, rgba(12, 18, 30, 0.25) 65%, transparent);
+}
+.hero__stars {
+  z-index: 0;
+  opacity: 0;
+  overflow: hidden;
+  mask-image: linear-gradient(#000 0%, #000 60%, transparent 85%);
+}
+.hero__stars::before, .hero__stars::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  animation: ideal-stars-twinkle 4.5s ease-in-out infinite alternate;
+}
+.hero__stars::before {
+  background-image: radial-gradient(circle at 88% 7%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 67% 27%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 46% 69%, rgba(240, 244, 255, 0.9) 0 1px, transparent 2px), radial-gradient(circle at 76% 20%, rgba(240, 244, 255, 0.9) 0 1px, transparent 2px), radial-gradient(circle at 15% 35%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 43% 36%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 43% 41%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 74% 27%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 27% 16%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 51% 11%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 55% 4%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 76% 56%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 58% 40%, rgba(240, 244, 255, 0.9) 0 0.8px, transparent 1.8px), radial-gradient(circle at 83% 54%, rgba(240, 244, 255, 0.9) 0 0.8px, transparent 1.8px), radial-gradient(circle at 71% 15%, rgba(240, 244, 255, 0.9) 0 0.8px, transparent 1.8px), radial-gradient(circle at 51% 26%, rgba(240, 244, 255, 0.9) 0 0.8px, transparent 1.8px), radial-gradient(circle at 19% 65%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 72% 60%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 60% 63%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 68% 63%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 49% 56%, rgba(240, 244, 255, 0.9) 0 0.8px, transparent 1.8px), radial-gradient(circle at 2% 33%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 5% 61%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 59% 16%, rgba(240, 244, 255, 0.9) 0 1px, transparent 2px), radial-gradient(circle at 18% 62%, rgba(240, 244, 255, 0.9) 0 1px, transparent 2px), radial-gradient(circle at 59% 53%, rgba(240, 244, 255, 0.9) 0 1px, transparent 2px);
+}
+.hero__stars::after {
+  background-image: radial-gradient(circle at 96% 23%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 58% 40%, rgba(240, 244, 255, 0.9) 0 1px, transparent 2px), radial-gradient(circle at 88% 7%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 28% 41%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 14% 61%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 61% 66%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 86% 4%, rgba(240, 244, 255, 0.9) 0 0.8px, transparent 1.8px), radial-gradient(circle at 57% 37%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 12% 18%, rgba(240, 244, 255, 0.9) 0 0.8px, transparent 1.8px), radial-gradient(circle at 57% 38%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 16% 27%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 89% 10%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 85% 21%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 51% 39%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 74% 47%, rgba(240, 244, 255, 0.9) 0 1px, transparent 2px), radial-gradient(circle at 28% 35%, rgba(240, 244, 255, 0.9) 0 1px, transparent 2px), radial-gradient(circle at 9% 5%, rgba(240, 244, 255, 0.9) 0 1px, transparent 2px), radial-gradient(circle at 85% 28%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px), radial-gradient(circle at 27% 39%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 98% 66%, rgba(240, 244, 255, 0.9) 0 0.8px, transparent 1.8px), radial-gradient(circle at 43% 67%, rgba(240, 244, 255, 0.9) 0 1px, transparent 2px), radial-gradient(circle at 73% 41%, rgba(240, 244, 255, 0.9) 0 1px, transparent 2px), radial-gradient(circle at 84% 66%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 63% 9%, rgba(240, 244, 255, 0.9) 0 0.8px, transparent 1.8px), radial-gradient(circle at 21% 7%, rgba(240, 244, 255, 0.9) 0 1.2px, transparent 2.2px), radial-gradient(circle at 16% 67%, rgba(240, 244, 255, 0.9) 0 0.7px, transparent 1.7px);
+  animation-duration: 6.5s;
+  animation-delay: -5s;
+}
+.hero__sun {
+  z-index: 0;
+  opacity: 1;
+}
+.hero__sun::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  background: radial-gradient(ellipse at 25% 13%, rgba(255, 255, 249, 0.86), rgba(255, 255, 253, 0.18) 30%, transparent 55%);
+  animation: ideal-sun-breathe 7s ease-in-out -3s infinite alternate;
+}
+.hero__clouds {
+  z-index: 0;
+  opacity: 0.82;
+  overflow: hidden;
+}
+.hero__clouds::before, .hero__clouds::after {
+  content: "";
+  position: absolute;
+  inset: -8% -16%;
+  background: url("../img/hero-clouds-v1.svg") center/110% 100% no-repeat;
+  animation: ideal-cloud-drift 20s linear -7s infinite alternate;
+}
+.hero__clouds::after {
+  inset: 0 -22% -15%;
+  opacity: 0.7;
+  background-position: 80% 65%;
+  animation-duration: 29s;
+  animation-delay: -11s;
+  animation-direction: alternate-reverse;
+}
+.hero__ambient-fog {
+  z-index: 2;
+  top: 52%;
+  opacity: 0.65;
+  overflow: hidden;
+  mask-image: linear-gradient(transparent, #000 48%);
+}
+.hero__ambient-fog::before, .hero__ambient-fog::after {
+  content: "";
+  position: absolute;
+  inset: -20% -25%;
+  background: url("../img/hero-clouds-v1.svg") center/100% 150% no-repeat;
+  animation: ideal-fog-drift 14s linear -5s infinite alternate;
+}
+.hero__ambient-fog::after {
+  opacity: 0.65;
+  animation-duration: 21s;
+  animation-delay: -9s;
+  animation-direction: alternate-reverse;
+}
+.hero__foreground img {
+  transition: filter 2s linear;
+}
+.hero.is-atmosphere-paused .hero__stars::before, .hero.is-atmosphere-paused .hero__stars::after,
+.hero.is-atmosphere-paused .hero__sun::before,
+.hero.is-atmosphere-paused .hero__sun::after,
+.hero.is-atmosphere-paused .hero__clouds::before,
+.hero.is-atmosphere-paused .hero__clouds::after,
+.hero.is-atmosphere-paused .hero__ambient-fog::before,
+.hero.is-atmosphere-paused .hero__ambient-fog::after {
+  animation-play-state: paused;
+}
+
+html[data-hero-phase=night] .hero__night-sky, html[data-hero-phase=night] .hero__stars {
+  opacity: 1;
+}
+html[data-hero-phase=night] .hero__sun {
+  opacity: 0;
+}
+html[data-hero-phase=night] .hero__clouds {
+  opacity: 0.46;
+}
+html[data-hero-phase=night] .hero__ambient-fog {
+  opacity: 0.42;
+}
+html[data-hero-phase=night] .hero__foreground img {
+  filter: brightness(0.72);
+}
+
+html.hero-night .hero__type, html.hero-night .hero__manifesto, html.hero-night .hero__manifesto-bottom, html.hero-night .hero__address, html.hero-night .hero__hours, html.hero-night .hero__scroll, html.hero-night .hero__mobile-subtitle {
+  color: #f0f2f5;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.85);
+}
+html.hero-night .hero__type, html.hero-night .hero__manifesto {
+  background: rgba(10, 15, 23, 0.48);
+}
+html.hero-night .hero__manifesto-rule, html.hero-night .hero__address span, html.hero-night .hero__hours span, html.hero-night .hero__scroll-rule {
+  background: #d9dde4;
+}
+html.hero-night body:not(.menu-open) .header:not(.is-scrolled) {
+  background: rgba(15, 20, 29, 0.58);
+  border-bottom-color: rgba(255, 255, 255, 0.15);
+}
+html.hero-night body:not(.menu-open) .header:not(.is-scrolled) .header__nav-link {
+  color: #f0f2f5;
+}
+html.hero-night body:not(.menu-open) .header:not(.is-scrolled) .header__menu-toggle span {
+  background: #f0f2f5;
+}
+html.hero-night body:not(.menu-open) .header:not(.is-scrolled) .header__logo {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.55));
+}
+
+@keyframes ideal-cloud-drift {
+  from {
+    transform: translate3d(-12%, -3%, 0);
+  }
+  to {
+    transform: translate3d(12%, 4%, 0);
+  }
+}
+@keyframes ideal-fog-drift {
+  from {
+    transform: translate3d(-15%, 5%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(15%, -5%, 0) scale(1.1);
+  }
+}
+@keyframes ideal-sun-breathe {
+  from {
+    opacity: 0.18;
+    transform: translate3d(-1%, 0, 0) scale(0.98);
+  }
+  to {
+    opacity: 0.95;
+    transform: translate3d(2%, 1%, 0) scale(1.1);
+  }
+}
+@keyframes ideal-stars-twinkle {
+  from {
+    opacity: 0.15;
+  }
+  to {
+    opacity: 0.9;
+  }
+}
+@media (max-width: 720px), (max-width: 1024px) and (orientation: portrait) {
+  .hero__night-sky::before {
+    background-image: url("../img/hero-mobile.webp");
+  }
+  .hero__clouds::after {
+    display: none;
+  }
+  .hero__sun::before {
+    background: radial-gradient(ellipse at 62% 5%, rgba(255, 255, 249, 0.8), rgba(255, 255, 253, 0.12) 30%, transparent 58%);
+  }
+  .hero__ambient-fog {
+    top: 60%;
+  }
+  .hero__ambient-fog::after {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__stars, .hero__sun, .hero__clouds, .hero__ambient-fog {
+    transition: none;
+  }
+  .hero__stars::before, .hero__stars::after, .hero__sun::before, .hero__sun::after, .hero__clouds::before, .hero__clouds::after, .hero__ambient-fog::before, .hero__ambient-fog::after {
+    animation: none;
+  }
+  .hero__foreground img {
+    transition: none;
+  }
+}
 /* =============================================================
    IDEAL / MONO — Направления + Абонементы
    Два следующих экрана. Стили hero выше НЕ затронуты.

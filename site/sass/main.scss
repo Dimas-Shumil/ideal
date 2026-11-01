@@ -1430,6 +1430,227 @@ html.hero-intro .header {
   }
 }
 
+// Живая атмосфера hero. Время задаётся только скриптом главной страницы.
+.hero {
+  &__night-sky,
+  &__stars,
+  &__sun,
+  &__clouds,
+  &__ambient-fog {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transition: opacity 2s linear;
+  }
+  &__night-sky {
+    z-index: -1;
+    opacity: 0;
+    background: #0c121e;
+    &::before, &::after { content: ''; position: absolute; inset: 0; }
+    &::before {
+      background: url('../img/hero-desktop.webp') center / cover no-repeat;
+      filter: brightness(.32) grayscale(1);
+      mask-image: linear-gradient(transparent 60%, #000 82%);
+    }
+    &::after {
+      background: linear-gradient(#0c121e 0%, rgba(12,18,30,.9) 25%, rgba(12,18,30,.25) 65%, transparent);
+    }
+  }
+  &__stars {
+    z-index: 0;
+    opacity: 0;
+    overflow: hidden;
+    mask-image: linear-gradient(#000 0%, #000 60%, transparent 85%);
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-repeat: no-repeat;
+      animation: ideal-stars-twinkle 4.5s ease-in-out infinite alternate;
+    }
+    &::before {
+      background-image: radial-gradient(circle at 88% 7%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 67% 27%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 46% 69%, rgba(240,244,255,.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 76% 20%, rgba(240,244,255,.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 15% 35%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 43% 36%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 43% 41%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 74% 27%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 27% 16%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 51% 11%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 55% 4%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 76% 56%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 58% 40%, rgba(240,244,255,.9) 0 0.8px, transparent 1.8px),
+        radial-gradient(circle at 83% 54%, rgba(240,244,255,.9) 0 0.8px, transparent 1.8px),
+        radial-gradient(circle at 71% 15%, rgba(240,244,255,.9) 0 0.8px, transparent 1.8px),
+        radial-gradient(circle at 51% 26%, rgba(240,244,255,.9) 0 0.8px, transparent 1.8px),
+        radial-gradient(circle at 19% 65%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 72% 60%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 60% 63%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 68% 63%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 49% 56%, rgba(240,244,255,.9) 0 0.8px, transparent 1.8px),
+        radial-gradient(circle at 2% 33%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 5% 61%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 59% 16%, rgba(240,244,255,.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 18% 62%, rgba(240,244,255,.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 59% 53%, rgba(240,244,255,.9) 0 1px, transparent 2px);
+    }
+    &::after {
+      background-image: radial-gradient(circle at 96% 23%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 58% 40%, rgba(240,244,255,.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 88% 7%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 28% 41%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 14% 61%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 61% 66%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 86% 4%, rgba(240,244,255,.9) 0 0.8px, transparent 1.8px),
+        radial-gradient(circle at 57% 37%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 12% 18%, rgba(240,244,255,.9) 0 0.8px, transparent 1.8px),
+        radial-gradient(circle at 57% 38%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 16% 27%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 89% 10%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 85% 21%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 51% 39%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 74% 47%, rgba(240,244,255,.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 28% 35%, rgba(240,244,255,.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 9% 5%, rgba(240,244,255,.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 85% 28%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px),
+        radial-gradient(circle at 27% 39%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 98% 66%, rgba(240,244,255,.9) 0 0.8px, transparent 1.8px),
+        radial-gradient(circle at 43% 67%, rgba(240,244,255,.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 73% 41%, rgba(240,244,255,.9) 0 1px, transparent 2px),
+        radial-gradient(circle at 84% 66%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 63% 9%, rgba(240,244,255,.9) 0 0.8px, transparent 1.8px),
+        radial-gradient(circle at 21% 7%, rgba(240,244,255,.9) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 16% 67%, rgba(240,244,255,.9) 0 0.7px, transparent 1.7px);
+      animation-duration: 6.5s;
+      animation-delay: -5s;
+    }
+  }
+  &__sun {
+    z-index: 0;
+    opacity: 1;
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -12%;
+      background: radial-gradient(ellipse at 25% 13%, rgba(255,255,249,.86), rgba(255,255,253,.18) 30%, transparent 55%);
+      animation: ideal-sun-breathe 7s ease-in-out -3s infinite alternate;
+    }
+  }
+  &__clouds {
+    z-index: 0;
+    opacity: .82;
+    overflow: hidden;
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -8% -16%;
+      background: url('../img/hero-clouds-v1.svg') center / 110% 100% no-repeat;
+      animation: ideal-cloud-drift 20s linear -7s infinite alternate;
+    }
+    &::after {
+      inset: 0 -22% -15%;
+      opacity: .7;
+      background-position: 80% 65%;
+      animation-duration: 29s;
+      animation-delay: -11s;
+      animation-direction: alternate-reverse;
+    }
+  }
+  &__ambient-fog {
+    z-index: 2;
+    top: 52%;
+    opacity: .65;
+    overflow: hidden;
+    mask-image: linear-gradient(transparent, #000 48%);
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -20% -25%;
+      background: url('../img/hero-clouds-v1.svg') center / 100% 150% no-repeat;
+      animation: ideal-fog-drift 14s linear -5s infinite alternate;
+    }
+    &::after {
+      opacity: .65;
+      animation-duration: 21s;
+      animation-delay: -9s;
+      animation-direction: alternate-reverse;
+    }
+  }
+  &__foreground img { transition: filter 2s linear; }
+  &.is-atmosphere-paused {
+    .hero__stars,
+    .hero__sun,
+    .hero__clouds,
+    .hero__ambient-fog {
+      &::before, &::after { animation-play-state: paused; }
+    }
+  }
+}
+html[data-hero-phase='night'] .hero {
+  &__night-sky, &__stars { opacity: 1; }
+  &__sun { opacity: 0; }
+  &__clouds { opacity: .46; }
+  &__ambient-fog { opacity: .42; }
+  &__foreground img { filter: brightness(.72); }
+}
+html.hero-night {
+  .hero {
+    &__type, &__manifesto, &__manifesto-bottom,
+    &__address, &__hours, &__scroll, &__mobile-subtitle {
+      color: #f0f2f5;
+      text-shadow: 0 1px 12px rgba(0,0,0,.85);
+    }
+    &__type, &__manifesto { background: rgba(10,15,23,.48); }
+    &__manifesto-rule, &__address span, &__hours span, &__scroll-rule { background: #d9dde4; }
+  }
+  body:not(.menu-open) .header:not(.is-scrolled) {
+    background: rgba(15,20,29,.58);
+    border-bottom-color: rgba(255,255,255,.15);
+    .header__nav-link { color: #f0f2f5; }
+    .header__menu-toggle span { background: #f0f2f5; }
+    .header__logo { filter: drop-shadow(0 0 6px rgba(255,255,255,.55)); }
+  }
+}
+@keyframes ideal-cloud-drift {
+  from { transform: translate3d(-12%, -3%, 0); }
+  to { transform: translate3d(12%, 4%, 0); }
+}
+@keyframes ideal-fog-drift {
+  from { transform: translate3d(-15%, 5%, 0) scale(1); }
+  to { transform: translate3d(15%, -5%, 0) scale(1.1); }
+}
+@keyframes ideal-sun-breathe {
+  from { opacity: .18; transform: translate3d(-1%, 0, 0) scale(.98); }
+  to { opacity: .95; transform: translate3d(2%, 1%, 0) scale(1.1); }
+}
+@keyframes ideal-stars-twinkle {
+  from { opacity: .15; }
+  to { opacity: .9; }
+}
+@media (max-width: 720px), (max-width: 1024px) and (orientation: portrait) {
+  .hero__night-sky::before { background-image: url('../img/hero-mobile.webp'); }
+  .hero__clouds::after { display: none; }
+  .hero__sun::before {
+    background: radial-gradient(ellipse at 62% 5%, rgba(255,255,249,.8), rgba(255,255,253,.12) 30%, transparent 58%);
+  }
+  .hero__ambient-fog { top: 60%; }
+  .hero__ambient-fog::after { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    &__stars, &__sun, &__clouds, &__ambient-fog {
+      transition: none;
+      &::before, &::after { animation: none; }
+    }
+    &__foreground img { transition: none; }
+  }
+}
+
 /* =============================================================
    IDEAL / MONO — Направления + Абонементы
    Два следующих экрана. Стили hero выше НЕ затронуты.

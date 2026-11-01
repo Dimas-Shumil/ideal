@@ -1,0 +1,9 @@
+index.html
+site/sass/main.scss
+site/css/main.css
+site/css/main.min.css
+site/scripts/hero-atmosphere.js
+site/img/hero-clouds-v1.svg
+tests/hero-atmosphere.test.js
+docs/HERO_ATMOSPHERE_20261101.md
+docs/HERO_ATMOSPHERE_PATCH_FILES.txt

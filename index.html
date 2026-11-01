@@ -25,6 +25,7 @@
       href="site/img/hero-mobile.webp"
       media="(max-width: 720px), (max-width: 1024px) and (orientation: portrait)"
     />
+    <script src="site/scripts/hero-atmosphere.js"></script>
     <!-- Подготавливаем первый кадр до отрисовки CSS: без вспышки светлого hero. -->
     <script>
       (() => {
@@ -106,6 +107,11 @@
           />
         </picture>
 
+        <div class="hero__night-sky" aria-hidden="true"></div>
+        <div class="hero__stars" aria-hidden="true"></div>
+        <div class="hero__sun" aria-hidden="true"></div>
+        <div class="hero__clouds" aria-hidden="true"></div>
+
         <div class="hero__title-wrap">
           <h1 class="hero__title" id="hero-title">ИДЕАЛ</h1>
         </div>
@@ -117,6 +123,8 @@
           />
           <img src="site/img/figure-desktop.webp" alt="" decoding="async" />
         </picture>
+
+        <div class="hero__ambient-fog" aria-hidden="true"></div>
 
         <!-- Только вступительный затемняющий слой и дымка перехода. В финальном кадре невидимы. -->
         <div class="hero__cinema-veil" aria-hidden="true"></div>
