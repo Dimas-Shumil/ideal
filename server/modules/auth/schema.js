@@ -18,6 +18,7 @@ export const loginBody = z
       .max(128)
       .refine((s) => Buffer.byteLength(s) <= 256),
     _csrf: z.string().length(64).optional(),
+    rememberDevice: z.literal('on').optional(),
   })
   .strict();
 export const accountBody = z

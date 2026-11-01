@@ -18,6 +18,7 @@ const shape = z.object({
   TRUST_PROXY: z.enum(["none", "loopback"]).default("none"),
   SESSION_IDLE_HOURS: z.coerce.number().int().min(1).max(24).default(8),
   SESSION_ABSOLUTE_DAYS: z.coerce.number().int().min(1).max(30).default(7),
+  SESSION_TRUSTED_DAYS: z.coerce.number().int().min(7).max(30).default(30),
 });
 export function readConfig(input = process.env) {
   const result = shape.safeParse(input);
@@ -71,6 +72,7 @@ export function readConfig(input = process.env) {
     production: c.NODE_ENV === "production",
     idleMs: c.SESSION_IDLE_HOURS * 3600000,
     absoluteMs: c.SESSION_ABSOLUTE_DAYS * 86400000,
+    trustedMs: c.SESSION_TRUSTED_DAYS * 86400000,
     cookieName:
       c.NODE_ENV === "production"
         ? "__Host-ideal.sid"

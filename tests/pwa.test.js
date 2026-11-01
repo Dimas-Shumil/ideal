@@ -61,6 +61,10 @@ test('PWA HTTP: public manifest/offline/icons/SW, private application and no rep
  const {app,store}=await createApp({config,db:{pool:{query:async()=>{throw Error('Unexpected database access');}},prisma:{}}});
  try{
  const req=supertest(app);const m=await req.get('/manifest.webmanifest').expect(200);assert.match(m.headers['content-type'],/application\/manifest\+json/);assert.equal(m.headers['set-cookie'],undefined);
+ const staff=await req.get('/staff-manifest.webmanifest').expect(200);
+ assert.equal(staff.body?.id ?? JSON.parse(staff.text).id,'/ideal-staff-app');
+ assert.equal(staff.headers['set-cookie'],undefined);
+ await req.get('/workspace').expect(303).expect('Location','/login').expect('Cache-Control','no-store');
  for(const icon of JSON.parse(m.text).icons)await req.get(icon.src).expect(200).expect('Content-Type',/image\/png/);
  await req.get('/offline.html').expect(200);await req.get('/push-sw.js').expect(200).expect('Cache-Control','no-cache');
  await req.get('/application').expect(303).expect('Location','/login').expect('Cache-Control','no-store');

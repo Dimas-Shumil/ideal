@@ -80,7 +80,9 @@ export async function authRoutes({ prisma, store, config, users }) {
       req.session.userId = user.id;
       req.session.authVersion = user.authVersion;
       req.session.csrf = newCsrf();
-      req.session.cookie.maxAge = config.idleMs;
+      // Explicit opt-in: only a trusted personal device receives a persistent cookie.
+      req.session.rememberDevice = parsed.data.rememberDevice === 'on';
+      req.session.cookie.maxAge = req.session.rememberDevice ? config.trustedMs : config.idleMs;
       await store.establish(req.sessionID, req.session, user, req.id);
       await save(req);
       if (req.path.startsWith("/api/"))

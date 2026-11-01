@@ -17,6 +17,12 @@ export class AuthStore extends PgStore {
     this.db = pool;
     this.config = config;
   }
+  idleFor(sess) {
+    return sess.rememberDevice === true ? this.config.trustedMs : this.config.idleMs;
+  }
+  absoluteFor(sess) {
+    return sess.rememberDevice === true ? this.config.trustedMs : this.config.absoluteMs;
+  }
   get(sid, cb) {
     this.db
       .query(
@@ -40,7 +46,7 @@ export class AuthStore extends PgStore {
           [
             sid,
             JSON.stringify(sess),
-            this.config.idleMs,
+            this.idleFor(sess),
             userId,
             sess.authVersion,
           ],
@@ -62,8 +68,8 @@ export class AuthStore extends PgStore {
     this.db
       .query(
         `UPDATE "AuthSession" SET expire=LEAST(now()+$2::double precision * interval '1 millisecond',"absoluteAt")
-      WHERE sid=$1 AND "userId" IS NOT NULL AND expire>now()`,
-        [sid, this.config.idleMs],
+      WHERE sid=$1 AND "userId" IS NOT NULL AND expire>now() AND "absoluteAt">now()`,
+        [sid, this.idleFor(sess)],
       )
       .then(() => cb(), cb);
   }
@@ -83,8 +89,8 @@ export class AuthStore extends PgStore {
         [
           sid,
           JSON.stringify(sess),
-          this.config.idleMs,
-          this.config.absoluteMs,
+          this.idleFor(sess),
+          this.absoluteFor(sess),
           user.id,
           user.authVersion,
         ],

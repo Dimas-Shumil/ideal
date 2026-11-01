@@ -107,6 +107,12 @@ export async function createApp({
     res.set('Cache-Control', 'no-cache');
     res.type('application/manifest+json').sendFile(path.join(root, 'server/modules/pwa/manifest.json'));
   });
+  // Second installable application: existing public PWA keeps its own id/manifest.
+  // Manifest contains no session data; authenticated destinations remain protected.
+  app.get('/staff-manifest.webmanifest', (req, res) => {
+    res.set('Cache-Control', 'no-cache');
+    res.type('application/manifest+json').sendFile(path.join(root, 'server/modules/pwa/staff-manifest.json'));
+  });
   app.get('/offline.html', (req, res) => {
     res.set('Cache-Control', 'public, max-age=0, must-revalidate');
     res.sendFile(path.join(root, 'server/modules/pwa/offline.html'));
@@ -164,6 +170,10 @@ export async function createApp({
   const users = userService(db.prisma);
   app.use(await authRoutes({ config, prisma: db.prisma, store, users }));
   app.use(shopRoutes({config,prisma:db.prisma,indexHtml:index}));
+  // Stable installed-app entry point: choose the actual work area on each launch.
+  // Login is required even when the application is installed.
+  app.get('/workspace', requireAuth, requireRole('OWNER', 'ADMIN', 'TRAINER'), (req, res) =>
+    res.redirect(303, req.user.role === 'OWNER' ? '/admin' : req.user.role === 'ADMIN' ? '/crm/clients' : '/trainer'));
   app.get('/application', requireAuth, requireRole('OWNER', 'ADMIN', 'TRAINER'), (req, res) => res.render('pwa/panel', {user: req.user}));
   app.use(pushRoutes({ config, prisma: db.prisma }));
   app.use(crmRoutes({config,prisma:db.prisma}));

@@ -1,0 +1,47 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+const read = path => readFile(new URL('../'+path,import.meta.url),'utf8');
+test('public and staff PWA have separate identities, staff app starts in workspace',async()=>{
+  const publicManifest=JSON.parse(await read('server/modules/pwa/manifest.json'));
+  const staff=JSON.parse(await read('server/modules/pwa/staff-manifest.json'));
+  assert.notEqual(staff.id,publicManifest.id);
+  assert.equal(publicManifest.start_url,'/');
+  assert.equal(staff.start_url,'/workspace');
+  assert.equal(staff.scope,'/');
+  assert.equal(staff.display,'standalone');
+  assert.match(staff.name,/Управление/);
+  assert.ok(staff.icons.some(i=>i.purpose==='maskable'));
+  assert.doesNotMatch(JSON.stringify(staff),/csrf|cookie|userId|password/);
+  const privateHead=await read('server/views/partials/pwa-head.ejs');
+  assert.match(privateHead,/staff-manifest\.webmanifest/);
+  const publicHome=await read('index.html');
+  assert.match(publicHome,/manifest\.webmanifest/);
+  assert.doesNotMatch(publicHome,/staff-manifest\.webmanifest/);
+});
+test('trusted device is opt-in, bounded, and reuses server-side revocable session',async()=>{
+  const schema=await read('server/modules/auth/schema.js');
+  const routes=await read('server/modules/auth/routes.js');
+  const store=await read('server/modules/auth/session-store.js');
+  const cfg=await read('server/config/env.js');
+  const html=await read('server/views/auth/login.ejs');
+  const app=await read('server/app.js');
+  assert.match(html,/name="rememberDevice" type="checkbox"/);
+  assert.doesNotMatch(html,/name="rememberDevice"[^>]*checked/);
+  assert.match(schema,/rememberDevice: z\.literal\('on'\)\.optional\(\)/);
+  assert.match(routes,/req\.session\.rememberDevice = parsed\.data\.rememberDevice === 'on'/);
+  assert.match(store,/this\.idleFor\(sess\)/);
+  assert.match(store,/this\.absoluteFor\(sess\)/);
+  assert.match(store,/"absoluteAt">now\(\)/);
+  assert.match(cfg,/SESSION_TRUSTED_DAYS:.*max\(30\)\.default\(30\)/);
+  assert.match(app,/app\.get\('\/workspace', requireAuth, requireRole\('OWNER', 'ADMIN', 'TRAINER'\)/);
+  assert.match(app,/res\.redirect\(303, req\.user\.role === 'OWNER' \? '\/admin' : req\.user\.role === 'ADMIN' \? '\/crm\/clients' : '\/trainer'\)/);
+});
+test('single service worker never caches private navigation responses',async()=>{
+  const sw=await read('server/modules/push/sw.js');
+  assert.match(sw,/const STATIC = new Set\(\[OFFLINE, '\/site\/css\/pwa\.css'\]\)/);
+  assert.doesNotMatch(sw,/cache\.put\(request|skipWaiting\(/);
+  const staff=await read('server/views/pwa/panel.ejs');
+  assert.match(staff,/Оставаться в системе/);
+  assert.match(staff,/Открыть мой рабочий кабинет/);
+});

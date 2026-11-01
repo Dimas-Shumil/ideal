@@ -6,13 +6,13 @@ const source=await readFile(new URL('../site/scripts/pwa-install.js',import.meta
 function setup({stored={},standalone=false,blocked=false,hidden=false,ios=false}={}){
  const events={},timers=[],nodes=[],values=new Map(Object.entries(stored));
  class Node{
-  constructor(tag){this.tag=tag;this.children=[];this.events={};this.hidden=false;this.scrollHeight=100;this.clientHeight=100;}
+  constructor(tag){this.tag=tag;this.children=[];this.events={};this.dataset={};this.hidden=false;this.scrollHeight=100;this.clientHeight=100;}
   append(...children){this.children.push(...children);}
   setAttribute(){}
   addEventListener(n,f){this.events[n]=f;}
  }
- const document={hidden,body:{append:n=>nodes.push(n)},createElement:n=>new Node(n),addEventListener:(n,f)=>events[n]=f,removeEventListener:n=>delete events[n]};
- const window={isSecureContext:true,addEventListener:(n,f)=>events[n]=f};
+ const document={documentElement:{hasAttribute:()=>false,classList:{contains:()=>false}},hidden,body:{append:n=>nodes.push(n)},createElement:n=>new Node(n),addEventListener:(n,f)=>events[n]=f,removeEventListener:n=>delete events[n]};
+ const window={isSecureContext:true,setInterval:()=>0,addEventListener:(n,f)=>events[n]=f};
  const localStorage={getItem:k=>{if(blocked)throw Error();return values.get(k)??null;},setItem:(k,v)=>{if(blocked)throw Error();values.set(k,v);}};
  vm.runInNewContext(source,{window,navigator:{serviceWorker:{},standalone,userAgent:ios?'iPhone':'Chrome',platform:'',maxTouchPoints:0},document,localStorage,matchMedia:()=>({matches:standalone}),setTimeout:(f,ms)=>timers.push({f,ms}),Date});
  return {events,timers,nodes,values,document,show:()=>timers[0].f(),button:()=>nodes[0].children[1].children[0],later:()=>nodes[0].children[1].children[1],close:()=>nodes[0].children[2],hint:()=>nodes[0].children[0].children[2]};

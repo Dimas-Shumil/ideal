@@ -231,6 +231,36 @@ test("roles are enforced independently for pages/API; cookie and fixation", asyn
   assert.match(r.headers["set-cookie"][0], /SameSite=Lax/);
   assert.ok(!r.headers["set-cookie"][0].includes("Secure"));
 });
+test("staff PWA: trusted device opt-in sets 30-day bounded session and role-based entry", async () => {
+  const anon = request.agent(app);
+  const loginPage = await anon.get('/login').expect(200);
+  assert.match(loginPage.text, /name="rememberDevice" type="checkbox" value="on"/);
+  assert.match(loginPage.text, /href="\/staff-manifest\.webmanifest"/);
+  const csrf = loginPage.text.match(/name="_csrf" value="([a-f0-9]+)"/)[1];
+  const response = await anon.post('/login').set('Origin', config.APP_ORIGIN).type('form')
+    .send({login:'admin',password:secret,_csrf:csrf,rememberDevice:'on'})
+    .expect(303).expect('Location','/staff');
+  const cookie = response.headers['set-cookie'][0];
+  assert.match(cookie, new RegExp('Max-Age=' + config.trustedMs / 1000));
+  assert.match(cookie, /HttpOnly/);
+  const all = await db.prisma.authSession.findMany({where:{userId:admin.id}});
+  const row = all.find(x => x.sess.rememberDevice === true);
+  assert.ok(row, 'trusted session stored on server');
+  assert.ok(row.expire <= row.absoluteAt);
+  const days = (row.absoluteAt.getTime() - Date.now()) / 86400000;
+  assert.ok(days > config.trustedMs / 86400000 - .1 && days <= config.trustedMs / 86400000 + .01);
+  await anon.get('/workspace').expect(303).expect('Location','/crm/clients');
+  const me = await anon.get('/api/auth/me').expect(200);
+  await anon.post('/logout').set('Origin',config.APP_ORIGIN).type('form')
+    .send({_csrf: me.body.csrf}).expect(303);
+  await request(app).get('/api/auth/me').set('Cookie',cookie.split(';')[0]).expect(401);
+  const normal = await login('trainer');
+  const standard = await db.prisma.authSession.findMany({where:{userId:trainer.id}});
+  assert.ok(standard.some(x => x.sess.rememberDevice === false));
+  const session = standard.find(x => x.sess.rememberDevice === false);
+  assert.ok((session.absoluteAt.getTime() - Date.now()) / 86400000 <= config.SESSION_ABSOLUTE_DAYS + .01);
+  await normal.agent.get('/workspace').expect(303).expect('Location','/trainer');
+});
 test("logout requires POST, valid Origin/token; destroyed SID cannot be resurrected", async () => {
   const { agent, token, cookie } = await login("trainer");
   await agent.get("/logout").expect(404);

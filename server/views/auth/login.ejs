@@ -5,5 +5,6 @@
 <form class="auth__form" action="/login" method="post"><input type="hidden" name="_csrf" value="<%= csrf %>">
 <label for="login">Логин</label><input id="login" name="login" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="64" required>
 <label for="password">Пароль</label><input id="password" name="password" type="password" autocomplete="current-password" maxlength="128" required>
+<label class="auth__remember"><input name="rememberDevice" type="checkbox" value="on"><span>Оставаться в системе на этом личном устройстве до 30 дней. На общем компьютере не отмечайте.</span></label>
 <button class="auth__button" type="submit">Войти</button></form>
 <p class="auth__hint">Для восстановления доступа обратитесь к владельцу клуба. Владелец обращается в ShumDev.</p><a href="/">На главную</a></main></div></body></html>
