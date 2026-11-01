@@ -1853,7 +1853,7 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   flex: 0 0 clamp(205px, 18.4vw, 263px);
   display: flex;
   flex-direction: column;
-  min-height: 360px;
+  min-height: clamp(430px, 34vw, 560px);
   padding: 22px 19px 18px;
   border: 1px solid rgba(255, 255, 255, 0.32);
   border-radius: 7px;
@@ -2629,6 +2629,7 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   }
   .membership-card {
     flex-basis: 230px;
+    min-height: 440px;
   }
 }
 @media (max-width: 960px) {
@@ -2669,7 +2670,8 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   .directions__count {
     display: none;
   }
-  .direction-card {
+  .direction-card,
+  .membership-card {
     min-height: 470px;
   }
   .memberships__shell {
@@ -2797,7 +2799,7 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   }
   .membership-card {
     flex-basis: min(75vw, 315px);
-    min-height: 365px;
+    min-height: 475px;
   }
   .memberships__extras,
   .memberships__note {
