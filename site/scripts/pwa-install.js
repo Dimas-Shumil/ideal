@@ -75,7 +75,7 @@
       const upwards = dy <= -56 && Math.abs(dy) > Math.abs(dx) * 1.2 && banner.scrollHeight <= banner.clientHeight + 1;
       if (sideways || upwards) later();
     }, { passive: true });
-    const logo = document.createElement('img'); logo.className = 'pwa-install__logo'; logo.src = '/site/img/brand/ideal-logo-v2.webp'; logo.alt = ''; logo.width = 64; logo.height = 64;
+    const logo = document.createElement('img'); logo.className = 'pwa-install__logo'; logo.src = '/site/img/pwa/icon-192-orange-v3.png'; logo.alt = ''; logo.width = 64; logo.height = 64;
     title.append(logo); content.append(title, text, hint); actions.append(installButton, dismiss); banner.append(content, actions, close); document.body.append(banner);
     // Non-modal: never steal keyboard focus or prevent interaction with the page.
   }
