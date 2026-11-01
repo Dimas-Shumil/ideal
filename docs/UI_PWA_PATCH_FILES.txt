@@ -1,0 +1,14 @@
+docs/PWA.md
+docs/UI_PWA_20261101.md
+docs/UI_PWA_PATCH_FILES.txt
+site/css/main.css
+site/css/main.min.css
+site/css/pwa-install.css
+site/css/pwa-install.min.css
+site/css/trainers.css
+site/css/trainers.min.css
+site/sass/main.scss
+site/sass/pwa-install.scss
+site/sass/trainers.scss
+site/scripts/pwa-install.js
+tests/pwa-install.test.js

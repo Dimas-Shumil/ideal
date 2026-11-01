@@ -2920,6 +2920,17 @@ html.hero-intro.hero-intro-playing .hero__scroll {
   object-fit: cover;
   object-position: 50% 35%;
   filter: grayscale(1);
+  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 650ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .trainer-cta__portrait:hover .trainer-cta__image {
+    transform: translateY(-10px);
+    box-shadow: 0 28px 50px -14px rgba(0, 0, 0, 0.55);
+  }
+}
+.trainer-cta__portrait:focus-within .trainer-cta__image {
+  transform: translateY(-10px);
+  box-shadow: 0 28px 50px -14px rgba(0, 0, 0, 0.55);
 }
 .trainer-cta__caption {
   display: flex;
@@ -3081,8 +3092,11 @@ html.hero-intro.hero-intro-playing .hero__scroll {
     transform: none;
     transition: none;
   }
-  .trainer-cta__link {
+  .trainer-cta__link, .trainer-cta__image {
     transition: none;
+  }
+  .trainer-cta__portrait:hover .trainer-cta__image, .trainer-cta__portrait:focus-within .trainer-cta__image {
+    transform: none;
   }
 }
 

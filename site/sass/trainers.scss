@@ -22,11 +22,14 @@
 .trainers__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 72px 42px; margin: 0; padding: 0; list-style: none; }
 .trainer-card { min-width: 0; }
 .trainer-card:nth-child(even) { padding-top: 90px; }
-.trainer-card__visual { position: relative; overflow: hidden; aspect-ratio: 4 / 4.6; background: #222629; color: #e8e9e8; }
-.trainer-card__visual img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); transition: transform 1500ms cubic-bezier(.22, 1, .36, 1); }
+.trainer-card__visual { position: relative; overflow: hidden; aspect-ratio: 4 / 4.6; background: #222629; color: #e8e9e8; transition: transform 650ms cubic-bezier(.22, 1, .36, 1), box-shadow 650ms ease; }
+.trainer-card__visual img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); }
 .trainer-card__index { position: absolute; top: 24px; left: 24px; font-size: 10px; letter-spacing: .13em; }
 .trainer-card__stamp { position: absolute; bottom: 25px; left: 24px; font-size: clamp(30px, 4vw, 68px); line-height: .93; font-weight: 600; letter-spacing: -.05em; opacity: .55; }
-.trainer-card:hover img, .trainer-card:focus-within img { transform: scale(1.035); }
+@media (hover: hover) and (pointer: fine) {
+  .trainer-card:hover .trainer-card__visual { transform: translateY(-10px); box-shadow: 0 24px 42px -16px rgba(18, 23, 26, .38); }
+}
+.trainer-card:focus-within .trainer-card__visual { transform: translateY(-10px); box-shadow: 0 24px 42px -16px rgba(18, 23, 26, .38); }
 .trainer-card__info { padding: 24px 0 0; }
 .trainer-card__label { margin: 0 0 14px; font-size: 9px; letter-spacing: .15em; color: #61676a; }
 .trainer-card__info h2 { margin: 0 0 10px; font-weight: 450; font-size: clamp(26px, 2.8vw, 46px); letter-spacing: -.04em; }
@@ -69,8 +72,8 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .trainers-page [data-trainer-reveal].is-reveal-enabled { opacity: 1; transform: none; transition: none; }
-  .trainer-card__visual img, .trainer-card__profile, .trainers__closing a { transition: none; }
-  .trainer-card:hover img, .trainer-card:focus-within img { transform: none; }
+  .trainer-card__visual, .trainer-card__profile, .trainers__closing a { transition: none; }
+  .trainer-card:hover .trainer-card__visual, .trainer-card:focus-within .trainer-card__visual { transform: none; }
 }
 
 /* Catalog links now open the shared demonstration template. */

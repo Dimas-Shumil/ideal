@@ -1,20 +1,21 @@
 (() => {
   if (!window.isSecureContext || !('serviceWorker' in navigator)) return;
-  const LATER = 'ideal-pwa-later-until';
   const INSTALLED = 'ideal-pwa-installed';
-  const WEEK = 7 * 24 * 60 * 60 * 1000;
   let deferredPrompt, banner, installButton, hint, dismissed = false;
   const read = key => { try { return localStorage.getItem(key); } catch { return null; } };
   const write = (key, value) => { try { localStorage.setItem(key, value); } catch { /* Current page still works without storage. */ } };
   const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
   if (standalone()) write(INSTALLED, '1');
-  const suppressed = () => dismissed || standalone() || read(INSTALLED) === '1' || Number(read(LATER)) > Date.now();
+  const suppressed = () => dismissed || standalone() || read(INSTALLED) === '1';
   function later() {
-    dismissed = true; write(LATER, String(Date.now() + WEEK));
+    // Closing applies only to this document; the next page starts a new 10-second timer.
+    dismissed = true;
     if (banner) banner.hidden = true;
   }
   window.addEventListener('beforeinstallprompt', event => {
     event.preventDefault(); deferredPrompt = event;
+    // A fresh native offer also means a previous installation mark is stale.
+    write(INSTALLED, '0');
     if (hint) hint.hidden = true;
   });
   window.addEventListener('appinstalled', () => {
@@ -22,7 +23,7 @@
     if (banner) banner.hidden = true;
   });
   window.addEventListener('storage', event => {
-    if ((event.key === LATER || event.key === INSTALLED) && banner && suppressed()) banner.hidden = true;
+    if (event.key === INSTALLED && banner && suppressed()) banner.hidden = true;
   });
   function show() {
     if (suppressed()) return;
@@ -30,7 +31,7 @@
     banner.className = 'pwa-install'; banner.setAttribute('aria-label', 'Установка приложения ИДЕАЛ');
     const content = document.createElement('div'); content.className = 'pwa-install__content';
     const title = document.createElement('p'); title.className = 'pwa-install__title'; title.textContent = 'ИДЕАЛ всегда под рукой';
-    const text = document.createElement('p'); text.className = 'pwa-install__text'; text.textContent = 'Установите приложение клуба для быстрого доступа к сайту и магазину.';
+    const text = document.createElement('p'); text.className = 'pwa-install__text'; text.textContent = 'Расписание, тренеры и магазин — в приложении клуба.';
     hint = document.createElement('p'); hint.className = 'pwa-install__hint'; hint.hidden = true; hint.setAttribute('role', 'status');
     hint.textContent = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
       ? 'Откройте меню «Поделиться» в браузере, выберите «На экран Домой» и подтвердите добавление.'
@@ -51,8 +52,31 @@
       finally { installButton.disabled = false; }
     });
     banner.addEventListener('keydown', event => { if (event.key === 'Escape') { event.preventDefault(); later(); } });
+    const close = document.createElement('button'); close.type = 'button'; close.className = 'pwa-install__close'; close.textContent = '×'; close.setAttribute('aria-label', 'Закрыть предложение установки');
+    close.addEventListener('click', later);
+    let touch;
+    banner.addEventListener('touchstart', event => {
+      touch = null;
+      if (event.touches.length !== 1 || event.target.closest('button, a')) return;
+      const point = event.touches[0];
+      touch = { x: point.clientX, y: point.clientY };
+    }, { passive: true });
+    banner.addEventListener('touchmove', event => {
+      if (event.touches.length !== 1) touch = null;
+    }, { passive: true });
+    banner.addEventListener('touchcancel', () => { touch = null; }, { passive: true });
+    banner.addEventListener('touchend', event => {
+      const start = touch; touch = null;
+      if (!start || event.touches.length || event.changedTouches.length !== 1) return;
+      const point = event.changedTouches[0];
+      const dx = point.clientX - start.x, dy = point.clientY - start.y;
+      const sideways = Math.abs(dx) >= 56 && Math.abs(dx) > Math.abs(dy) * 1.2;
+      // Preserve vertical scrolling of long instructions on short/zoomed screens.
+      const upwards = dy <= -56 && Math.abs(dy) > Math.abs(dx) * 1.2 && banner.scrollHeight <= banner.clientHeight + 1;
+      if (sideways || upwards) later();
+    }, { passive: true });
     const logo = document.createElement('img'); logo.className = 'pwa-install__logo'; logo.src = '/site/img/brand/ideal-logo-v2.webp'; logo.alt = ''; logo.width = 64; logo.height = 64;
-    title.append(logo); content.append(title, text, hint); actions.append(installButton, dismiss); banner.append(content, actions); document.body.append(banner);
+    title.append(logo); content.append(title, text, hint); actions.append(installButton, dismiss); banner.append(content, actions, close); document.body.append(banner);
     // Non-modal: never steal keyboard focus or prevent interaction with the page.
   }
   setTimeout(() => {

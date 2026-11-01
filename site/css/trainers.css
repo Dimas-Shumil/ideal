@@ -144,6 +144,7 @@
   aspect-ratio: 4/4.6;
   background: #222629;
   color: #e8e9e8;
+  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 650ms ease;
 }
 
 .trainer-card__visual img {
@@ -152,7 +153,6 @@
   height: 100%;
   object-fit: cover;
   filter: grayscale(1);
-  transition: transform 1500ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .trainer-card__index {
@@ -174,8 +174,15 @@
   opacity: 0.55;
 }
 
-.trainer-card:hover img, .trainer-card:focus-within img {
-  transform: scale(1.035);
+@media (hover: hover) and (pointer: fine) {
+  .trainer-card:hover .trainer-card__visual {
+    transform: translateY(-10px);
+    box-shadow: 0 24px 42px -16px rgba(18, 23, 26, 0.38);
+  }
+}
+.trainer-card:focus-within .trainer-card__visual {
+  transform: translateY(-10px);
+  box-shadow: 0 24px 42px -16px rgba(18, 23, 26, 0.38);
 }
 
 .trainer-card__info {
@@ -359,10 +366,10 @@
     transform: none;
     transition: none;
   }
-  .trainer-card__visual img, .trainer-card__profile, .trainers__closing a {
+  .trainer-card__visual, .trainer-card__profile, .trainers__closing a {
     transition: none;
   }
-  .trainer-card:hover img, .trainer-card:focus-within img {
+  .trainer-card:hover .trainer-card__visual, .trainer-card:focus-within .trainer-card__visual {
     transform: none;
   }
 }

@@ -3033,7 +3033,11 @@ html.hero-intro .header {
     span:nth-child(2) { margin-left: clamp(32px, 4vw, 72px); color: #b9bcbe; }
   }
   &__portrait { grid-column: 3; grid-row: 1 / 3; margin: 52px -24px 0 0; min-width: 0; }
-  &__image { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 35%; filter: grayscale(1); }
+  &__image { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 35%; filter: grayscale(1); transition: transform 650ms $ease-ideal, box-shadow 650ms ease; }
+  @media (hover: hover) and (pointer: fine) {
+    &__portrait:hover &__image { transform: translateY(-10px); box-shadow: 0 28px 50px -14px rgba(0, 0, 0, .55); }
+  }
+  &__portrait:focus-within &__image { transform: translateY(-10px); box-shadow: 0 28px 50px -14px rgba(0, 0, 0, .55); }
   &__caption { display: flex; justify-content: space-between; gap: 12px; padding-top: 16px; color: #b9bcbe; font-size: 9px; letter-spacing: .12em; }
   &__copy { grid-column: 1 / 3; grid-row: 2; max-width: 450px; padding-right: 32px; }
   &__lead { margin: 0 0 20px; font-size: clamp(20px, 2vw, 28px); line-height: 1.3; letter-spacing: -.035em; }
@@ -3084,7 +3088,8 @@ html.hero-intro .header {
     &.is-reveal-enabled {
       .trainer-cta__title, .trainer-cta__copy, .trainer-cta__portrait { opacity: 1; transform: none; transition: none; }
     }
-    &__link { transition: none; }
+    &__link, &__image { transition: none; }
+    &__portrait:hover &__image, &__portrait:focus-within &__image { transform: none; }
   }
 }
 

@@ -1,27 +1,40 @@
 .pwa-install {
-  position: fixed; z-index: 12000; top: 16px; left: 50%; transform: translateX(-50%); box-sizing: border-box;
-  width: calc(100% - 32px); max-width: 1000px; padding: 20px 24px; display: flex; align-items: center; gap: 24px;
+  position: fixed; z-index: 12000; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); box-sizing: border-box;
+  width: calc(100% - 32px); max-width: 820px; max-height: calc(100dvh - 24px - env(safe-area-inset-top)); overflow: auto;
+  padding: 16px 64px 16px 20px; display: flex; align-items: center; gap: 18px;
   background: #fbfaf6; color: #242424; border: 1px solid #d4d0c8; border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(0,0,0,.18); font: 16px/1.5 'Segoe UI', Arial, sans-serif;
+  box-shadow: 0 12px 40px rgba(0,0,0,.18); font: 14px/1.5 'Segoe UI', Arial, sans-serif;
   animation: pwa-install-enter .6s ease both;
   &[hidden] { display: none; }
   &__content { flex: 1; min-width: 0; }
-  &__title { margin: 0 0 4px; font-size: 20px; font-weight: 700; }
-  &__text, &__hint { margin: 0; }
+  &__title { margin: 0 0 4px; font-size: 18px; font-weight: 700; }
+  &__text, &__hint { margin: 0; overflow-wrap: anywhere; }
   &__hint { margin-top: 10px; }
-  &__actions { display: flex; gap: 10px; flex-shrink: 0; }
-  &__button { padding: 12px 18px; border: 2px solid #242424; border-radius: 8px; background: #242424; color: #fff;
+  &__actions { display: flex; gap: 8px; flex-shrink: 0; }
+  &__button { min-height: 44px; padding: 10px 14px; border: 2px solid #242424; border-radius: 8px; background: #242424; color: #fff;
     font: inherit; font-weight: 600; cursor: pointer; transition: transform .2s, background .2s;
     &:hover { background: #484848; }
     &:active { transform: scale(.98); }
-    &:focus-visible { outline: 3px solid #a85035; outline-offset: 4px; }
+    &:focus-visible { outline: 3px solid #a85035; outline-offset: 3px; }
     &:disabled { opacity: .65; cursor: wait; }
-    &--later { background: #5b5b56; border-color: #5b5b56; color: #fff; &:hover { background: #707068; } }
+    &--later { background: transparent; color: #242424; border-color: #d4d0c8; &:hover { background: #e8e5df; } }
   }
+  &__close { position: absolute; top: 6px; right: 6px; display: grid; place-items: center; width: 44px; height: 44px;
+    padding: 0; border: 0; border-radius: 50%; background: transparent; color: #555; font: 28px/1 Arial, sans-serif; cursor: pointer;
+    &:hover { background: #e8e5df; }
+    &:focus-visible { outline: 3px solid #a85035; outline-offset: -3px; }
+  }
+  // More specific than the shared brand stylesheet, which loads after this file.
+  .pwa-install__logo { width: 44px; height: 44px; margin: 2px 12px 0 0; }
 }
 @keyframes pwa-install-enter { from { opacity: 0; transform: translate(-50%, -30px); } to { opacity: 1; transform: translate(-50%, 0); } }
-@media (max-width: 600px) { .pwa-install { top: 8px; padding: 16px; gap: 14px; flex-direction: column; align-items: stretch;
-  max-height: calc(100dvh - 16px); overflow: auto;
-  &__title { font-size: 18px; } &__actions { flex-wrap: wrap; } &__button { flex: 1; }
+@media (max-width: 600px) { .pwa-install {
+  top: max(8px, env(safe-area-inset-top)); width: calc(100% - 16px); max-height: calc(100dvh - 16px - env(safe-area-inset-top));
+  padding: 14px 16px; gap: 12px; flex-direction: column; align-items: stretch;
+  &__title { padding-right: 32px; font-size: 16px; line-height: 1.4; min-height: 28px; }
+  &__text { font-size: 13px; }
+  &__actions { flex-wrap: wrap; }
+  &__button { flex: 1; }
+  .pwa-install__logo { width: 36px; height: 36px; margin-right: 10px; }
 } }
 @media (prefers-reduced-motion: reduce) { .pwa-install { animation: none; &__button { transition: none; } } }
