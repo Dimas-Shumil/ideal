@@ -1,0 +1,35 @@
+<% const names={clients:'клиента',sessions:'тренировку',expenses:'расход',tasks:'задачу'}; const value=(key,fallback='')=>item?.[key]??fallback; const isNew=!item; %>
+<p><a href="<%= base+'/'+kind %>">Вернуться к списку</a></p><h1><%= readOnly?'Просмотр записи':isNew?'Добавить '+names[kind]:'Редактировать '+names[kind] %></h1>
+<% if(kind==='sessions'){ %><p>Время Абакана (UTC+7). Доход учитывается после смены статуса на «Проведена». Напоминание придёт на устройства с подключёнными Push-уведомлениями.</p><% } if(kind==='tasks'){ %><p>Время Абакана (UTC+7). Чтобы получать напоминания, подключите Push-уведомления. Напоминание задаётся на будущее время.</p><% } %>
+<% if(kind==='sessions'&&!clients.length){ %><p class="coach__empty">Сначала добавьте персонального клиента.</p><% if(!readOnly){ %><a href="<%= base %>/clients/new">Добавить клиента</a><% } %>
+<% }else{ %><form class="panel__form coach__form" method="post" action="<%= base+'/'+kind+(item?'/'+item.id:'') %>">
+<% if(!readOnly){ %><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><% if(item){ %><input type="hidden" name="version" value="<%= item.version %>"><% }} %>
+<fieldset <%= readOnly?'disabled':'' %>>
+<% if(kind==='clients'){ %>
+<label>Имя клиента<input name="name" required minlength="2" maxlength="160" value="<%= value('name') %>"></label>
+<label>Телефон<input type="tel" name="phone" maxlength="30" value="<%= value('phone') %>"></label>
+<label>Заметки<textarea name="notes" maxlength="3000" rows="5"><%= value('notes') %></textarea></label>
+<label>Состояние<select name="archived"><option value="false">Действующий</option><option value="true" <%= value('archived',false)?'selected':'' %>>В архиве</option></select></label>
+<% }else if(kind==='sessions'){ %>
+<label>Клиент<select name="clientId" required><option value="">Выберите клиента</option><% clients.forEach(client=>{ %><option value="<%= client.id %>" <%= value('clientId')===client.id?'selected':'' %>><%= client.name %><%= client.archived?' · в архиве':'' %></option><% }); %></select></label>
+<div class="coach__fields"><label>Начало<input type="datetime-local" name="startsAt" required value="<%= item?inputDate(item.startsAt):today+'T18:00' %>"></label><label>Окончание<input type="datetime-local" name="endsAt" required value="<%= item?inputDate(item.endsAt):today+'T19:00' %>"></label></div>
+<label>Стоимость, ₽<input name="price" required inputmode="decimal" pattern="[0-9]{1,7}([.,][0-9]{1,2})?" value="<%= item?(item.priceCents/100).toFixed(2):'' %>"></label>
+<label>Статус<select name="status"><% for(const [key,label] of Object.entries(statuses)){ %><option value="<%= key %>" <%= value('status','SCHEDULED')===key?'selected':'' %>><%= label %></option><% } %></select></label>
+<label>Напомнить<select name="reminderMinutes"><% for(const [key,label] of [['','Без напоминания'],['120','За 2 часа'],['180','За 3 часа'],['1440','За сутки']]){ %><option value="<%= key %>" <%= String(value('reminderMinutes','')||'')===key?'selected':'' %>><%= label %></option><% } %></select></label>
+<label>Комментарий<textarea name="comment" maxlength="3000" rows="4"><%= value('comment') %></textarea></label>
+<% }else if(kind==='expenses'){ %>
+<label>Название расхода<input name="title" required minlength="2" maxlength="240" value="<%= value('title') %>"></label>
+<label>Категория<input name="category" required maxlength="100" value="<%= value('category') %>" placeholder="Например, аренда или инвентарь"></label>
+<label>Дата<input type="date" name="expenseDate" required value="<%= item?club(item.expenseDate).date:today %>"></label>
+<label>Сумма, ₽<input name="amount" required inputmode="decimal" pattern="[0-9]{1,7}([.,][0-9]{1,2})?" value="<%= item?(item.amountCents/100).toFixed(2):'' %>"></label>
+<label>Комментарий<textarea name="comment" maxlength="2000" rows="4"><%= value('comment') %></textarea></label>
+<% }else{ %>
+<label>Название задачи<input name="title" required minlength="2" maxlength="240" value="<%= value('title') %>"></label>
+<label>Срок<input type="datetime-local" name="dueAt" value="<%= inputDate(value('dueAt',null)) %>"></label>
+<label>Когда напомнить<input type="datetime-local" name="reminderAt" value="<%= inputDate(value('reminderAt',null)) %>"></label>
+<label>Приоритет<select name="priority"><option value="NORMAL">Обычный</option><option value="IMPORTANT" <%= value('priority')==='IMPORTANT'?'selected':'' %>>Важный</option></select></label>
+<label>Состояние<select name="completed"><option value="false">Открыта</option><option value="true" <%= value('completed',false)?'selected':'' %>>Завершена</option></select></label>
+<label>Комментарий<textarea name="comment" maxlength="2000" rows="4"><%= value('comment') %></textarea></label>
+<% } %>
+<% if(!readOnly){ %><button><%= isNew?'Добавить':'Сохранить изменения' %></button><% } %></fieldset></form>
+<% if(!readOnly&&item&&['tasks','expenses'].includes(kind)){ %><details class="coach__delete"><summary>Удалить запись</summary><form method="post" action="<%= base+'/'+kind+'/'+item.id+'/delete' %>"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><input type="hidden" name="version" value="<%= item.version %>"><label><input type="checkbox" name="confirm" value="DELETE" required>Подтверждаю удаление этой записи</label><button>Удалить</button></form></details><% } %><% } %>

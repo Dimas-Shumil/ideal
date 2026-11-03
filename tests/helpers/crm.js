@@ -1,5 +1,9 @@
 // Only imported by suites whose test-only database guard runs before hooks.
 export async function clearCrm(p) {
+  await p.coachSession.deleteMany();
+  await p.coachClient.deleteMany();
+  await p.coachExpense.deleteMany();
+  await p.coachTask.deleteMany();
   await p.contentPhoto.deleteMany();
   await p.contentEntry.updateMany({data:{data:{},visible:false,publicOrder:0,version:1}});
   await p.shopOrderEvent.deleteMany();

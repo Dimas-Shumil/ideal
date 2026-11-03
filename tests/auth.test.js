@@ -343,7 +343,7 @@ test("password reset, role change and deactivation revoke ALL exact user session
     .expect(401);
   await users.change(trainer.id, { active: true });
 });
-test("self password change for TRAINER; privilege escalation/mass assignment rejected", async () => {
+test("TRAINER self password change is disabled; privilege escalation/mass assignment rejected", async () => {
   const { agent, token, cookie } = await login("trainer");
   await agent
     .post("/api/auth/password")
@@ -354,13 +354,13 @@ test("self password change for TRAINER; privilege escalation/mass assignment rej
       _csrf: token,
       role: "OWNER",
     })
-    .expect(400);
+    .expect(403);
   await agent
     .post("/api/auth/password")
     .set("Origin", config.APP_ORIGIN)
     .send({ currentPassword: secret, newPassword: secret, _csrf: token })
-    .expect(200);
-  await request(app).get("/api/auth/me").set("Cookie", cookie).expect(401);
+    .expect(403);
+  await request(app).get("/api/auth/me").set("Cookie", cookie).expect(200);
   await assert.rejects(() =>
     users.change(
       trainer.id,
@@ -777,7 +777,7 @@ test("TRAINER shell: every page is private, roles exclusive, identity server-own
   // Isolate the new suite from earlier tests' accumulated process-local rate counters.
   store.close();
   ({ app, store, users } = await createApp({ config, db, log: (line) => logs.push(line) }));
-  const paths = ["/trainer", "/trainer/clients", "/trainer/lessons", "/trainer/account"];
+  const paths = ["/trainer", "/trainer/clients", "/trainer/lessons"];
   for (const path of paths) await request(app).get(path).expect(303).expect("Location", "/login");
   for (const role of ["owner", "admin"]) {
     const s = await login(role);
@@ -797,10 +797,7 @@ test("TRAINER shell: every page is private, roles exclusive, identity server-own
       assert.ok(!r.text.includes(field));
     assert.match(r.text, /method="post" action="\/logout"/);
   }
-  const account = await s.agent.get("/trainer/account");
-  assert.match(account.text, /Логин: trainer/);
-  assert.match(account.text, /Роль: тренер/);
-  assert.ok(!account.text.includes('name="userId"'));
+  await s.agent.get("/trainer/account").expect(403);
   for (const [path, message] of [["clients", /Клиентов не найдено/], ["lessons", /Занятий нет/]]) {
     const r = await s.agent.get(`/trainer/${path}`);
     assert.match(r.text, message);
@@ -812,33 +809,15 @@ test("TRAINER shell: every page is private, roles exclusive, identity server-own
   await s.agent.get(`/trainer/account/${owner.id}`).expect(404);
   await s.agent.post("/trainer/clients").send({ userId: owner.id }).expect(404);
 });
-test("TRAINER password form: Origin/CSRF, strict fields, errors and all-session revocation", async () => {
-  const path = "/trainer/account/password";
-  // Negative security requests consume the real shared password limiter.
-  // Keep them in a separate app instance from the password-change scenario.
-  const security = await login("trainer");
-  const securityBody = { _csrf: security.token, currentPassword: secret, newPassword: secret };
-  await request(app).post(path).send(securityBody).expect(303);
-  await security.agent.post(path).send(securityBody).expect(403);
-  await security.agent.post(path).set("Origin", "https://evil.example").send(securityBody).expect(403);
-  await security.agent.post(path).set("Origin", config.APP_ORIGIN).send({ ...securityBody, _csrf: "" }).expect(403);
-  store.close();
-  ({ app, store, users } = await createApp({ config, db, log: (line) => logs.push(line) }));
-  // New agents must target the new app; persistent sessions remain in the test DB.
-  const a = await login("trainer"), b = await login("trainer");
-  const body = { _csrf: a.token, currentPassword: secret, newPassword: secret };
-  for (const changes of [{ userId: owner.id }, { currentPassword: "incorrect" }]) {
-    const r = await a.agent.post(path).set("Origin", config.APP_ORIGIN).type("form").send({ ...body, ...changes }).expect(400);
-    assert.match(r.text, /Проверьте текущий пароль/);
-    assert.match(r.text, /action="\/trainer\/account\/password"/);
-    assert.ok(!r.text.includes(secret));
-  }
-  await a.agent.post(path).set("Origin", config.APP_ORIGIN).type("form").send(body).expect(303).expect("Location", "/login");
-  for (const s of [a, b]) {
-    await s.agent.get("/trainer/account").expect(303);
-    await s.agent.get("/api/trainer/check").expect(401);
-  }
-  await (await login("trainer")).agent.get("/trainer").expect(200);
+test("TRAINER password endpoints reject valid authenticated forms without changing credentials", async () => {
+  const s = await login("trainer");
+  const before = await db.prisma.user.findUnique({where:{id:trainer.id}});
+  for(const path of ["/trainer/account/password", "/api/auth/password", "/admin/account/password"])
+    await s.agent.post(path).set("Origin",config.APP_ORIGIN).send({_csrf:s.token,currentPassword:secret,newPassword:secret}).expect(403);
+  const after = await db.prisma.user.findUnique({where:{id:trainer.id}});
+  assert.equal(after.passwordHash,before.passwordHash);
+  assert.equal(after.authVersion,before.authVersion);
+  await s.agent.get("/api/trainer/check").expect(200);
 });
 test("TRAINER shell: disabled, changed-role and revoked sessions lose every private page", async () => {
   for (const change of [{ active: false }, { role: "ADMIN" }, { password: secret }]) {

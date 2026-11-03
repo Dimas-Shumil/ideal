@@ -1,0 +1,41 @@
+// Coach workspace shares the existing panel layout and light app theme.
+.coach {
+  &__tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;
+    a { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 14px; border: 1px solid #bbc7d0; border-radius: 12px; color: #263b4a; text-decoration: none; }
+    a[aria-current] { background: #263b4a; color: #fff; }
+    a:focus-visible { outline: 3px solid #b34a20; outline-offset: 3px; }
+  }
+  &__metrics, &__grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin: 20px 0; }
+  &__metrics .panel__card { margin: 0; min-width: 0; }
+  &__metrics h2 { font-size: 14px; color: #60707c; }
+  &__metrics strong { display: block; font-size: clamp(22px,2.5vw,32px); overflow-wrap: anywhere; }
+  &__list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; margin: 18px 0 28px; }
+  &__list .panel__card, &__grid .panel__card { margin: 0; min-width: 0; }
+  &__numbers { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 10px; }
+  &__numbers dd { margin: 0; font-weight: 700; text-align: right; }
+  &__text { white-space: pre-wrap; overflow-wrap: anywhere; }
+  &__muted { color: #60707c; font-size: 14px; line-height: 1.6; }
+  &__badge { font-size: 13px; font-weight: 700; color: #73501e; }
+  &__empty { padding: 20px; border: 1px dashed #b4bfca; border-radius: 12px; color: #53616c; }
+  &__form { max-width: 900px; }
+  &__form fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 18px; }
+  &__form fieldset:disabled { opacity: 1; }
+  &__form fieldset:disabled :is(input,select,textarea) { opacity: 1; -webkit-text-fill-color: #273844; color: #273844; }
+  &__fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+  &__delete { margin-top: 24px; max-width: 900px; }
+  &__delete summary { cursor: pointer; min-height: 44px; }
+  &__delete form { display: grid; gap: 16px; }
+  &__delete input[type=checkbox] { width: 20px; height: 20px; }
+  .panel__card, h1, h2, h3 { overflow-wrap: anywhere; }
+  input, select, textarea { box-sizing: border-box; min-width: 0; max-width: 100%; }
+}
+@media (max-width: 1100px) { .coach__metrics, .coach__grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 680px) {
+  .coach__list, .coach__grid, .coach__fields { grid-template-columns: minmax(0,1fr); }
+  .coach__metrics { gap: 10px; }
+  .coach__metrics .panel__card { padding: 14px; }
+  .coach__metrics h2 { font-size: 12px; }
+  .coach__metrics strong { font-size: 21px; }
+  .coach__tabs { gap: 6px; }
+  .coach__tabs a { padding: 8px 10px; font-size: 13px; }
+}

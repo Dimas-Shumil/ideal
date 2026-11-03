@@ -31,7 +31,7 @@ export function seoFor(config, path, query = {}, product = null, options = {}) {
 }
 export function seoHead(seo) {
   return `<title>${escape(seo.title)}</title><meta name="description" content="${escape(seo.description)}"><meta name="robots" content="${seo.robots}">` +
-    (seo.canonical ? `<link rel="canonical" href="${escape(seo.canonical)}"><meta property="og:type" content="website"><meta property="og:locale" content="ru_RU"><meta property="og:site_name" content="ИДЕАЛ"><meta property="og:title" content="${escape(seo.title)}"><meta property="og:description" content="${escape(seo.description)}"><meta property="og:url" content="${escape(seo.canonical)}"><meta property="og:image" content="${escape(seo.origin)}/site/img/brand/ideal-og-v2.png"><meta name="twitter:card" content="summary_large_image">` : '');
+    (seo.canonical ? `<link rel="canonical" href="${escape(seo.canonical)}"><meta property="og:type" content="website"><meta property="og:locale" content="ru_RU"><meta property="og:site_name" content="ИДЕАЛ"><meta property="og:title" content="${escape(seo.title)}"><meta property="og:description" content="${escape(seo.description)}"><meta property="og:url" content="${escape(seo.canonical)}"><meta property="og:image" content="${escape(seo.origin)}/site/img/brand/ideal-og-orange-v4.png"><meta name="twitter:card" content="summary_large_image">` : '');
 }
 export function applySeo(res, config, path, html, query = {}, siteContacts = {}) {
   const seo = seoFor(config, path, query);
@@ -46,8 +46,8 @@ export function applySeo(res, config, path, html, query = {}, siteContacts = {})
         '@type': 'HealthClub', '@id': seo.origin + '/#club',
         name: 'ИДЕАЛ', url: seo.origin + '/', telephone: siteContacts.phone,
         address: { '@type': 'PostalAddress', streetAddress: siteContacts.address, addressLocality: 'Абакан', addressRegion: 'Республика Хакасия', addressCountry: 'RU' },
-        image: seo.origin + '/site/img/brand/ideal-og-v2.png',
-        logo: seo.origin + '/site/img/brand/ideal-logo-v2.png'
+        image: seo.origin + '/site/img/brand/ideal-og-orange-v4.png',
+        logo: seo.origin + '/site/img/brand/ideal-logo-orange-v4.png'
       };
       const sameAs = [siteContacts.vk, siteContacts.telegram].filter(Boolean);
       if (sameAs.length) business.sameAs = sameAs;

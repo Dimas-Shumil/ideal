@@ -46,7 +46,7 @@ self.addEventListener('fetch', event => {
     }
   })());
 });
-const allowedPaths = new Set(["/trainer/lessons", "/crm/schedule", "/notifications", "/shop-panel/orders"]);
+const allowedPaths = new Set(["/trainer/lessons", "/trainer/workspace/sessions", "/trainer/workspace/tasks", "/crm/schedule", "/notifications", "/shop-panel/orders"]);
 function safeUrl(value) {
   try {
     const url = new URL(value, self.location.origin);

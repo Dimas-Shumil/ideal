@@ -1,3 +1,4 @@
+import { coachRoutes } from './modules/coach/routes.js';
 import { contentManagementRoutes } from './modules/content/routes.js';
 import { contentPublicRoutes, publicContacts } from './modules/content/public.js';
 import { publicTrainerRoutes } from './modules/public/trainers.js';
@@ -135,6 +136,10 @@ export async function createApp({
   app.use(["/crm/schedule/:id/publication", "/api/crm/schedule/:id/publication"],
     express.urlencoded({ extended: false, limit: "32kb", parameterLimit: 210 }),
     express.json({ limit: "32kb", strict: true }));
+  // Bounded room for trainer notes and comments in UTF-8 HTML forms.
+  app.use(["/trainer/workspace", "/api/trainer/workspace"],
+    express.urlencoded({ extended: false, limit: "64kb", parameterLimit: 24 }),
+    express.json({ limit: "32kb", strict: true }));
   // Product descriptions need bounded room for UTF-8 URL-encoded form fields.
   app.use(["/shop-panel/products", "/api/shop-panel/products"],
     express.urlencoded({ extended: false, limit: "128kb", parameterLimit: 12 }),
@@ -179,6 +184,7 @@ export async function createApp({
   app.use(crmRoutes({config,prisma:db.prisma}));
   app.use(scheduleRoutes({ config, prisma: db.prisma }));
   app.use(trainerManagementRoutes({ config, prisma: db.prisma }));
+  app.use(coachRoutes({config, prisma: db.prisma}));
   app.use(ownerRoutes({ config, prisma: db.prisma, users }));
   app.use(trainerRoutes());
   for (const [route, role, label] of [

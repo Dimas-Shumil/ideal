@@ -91,3 +91,6 @@
 }
 @media (max-width: 480px) { .trainer__contacts { gap: 8px; } .trainer__contact { padding: 10px 12px; } }
 @media (prefers-reduced-motion: reduce) { .trainer__contact { transition: none; } }
+
+// Rounded primary action on the public trainer profile.
+.trainer__button { border-radius: 14px; min-height: 48px; padding: 16px 24px; }

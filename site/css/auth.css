@@ -118,5 +118,24 @@
     transition: none;
   }
 }
-.auth .auth__remember { display: flex; align-items: flex-start; gap: 10px; margin: 6px 0 0; font-size: 13px; line-height: 1.45; color: #3c4845; cursor: pointer; }
-.auth .auth__remember input[type="checkbox"] { width: 18px; height: 18px; min-height: 18px; padding: 0; flex: 0 0 18px; margin: 1px 0 0; accent-color: #191c1e; cursor: pointer; }
+.auth .auth__remember {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #3c4845;
+  cursor: pointer;
+}
+
+.auth .auth__remember input[type=checkbox] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  padding: 0;
+  flex: 0 0 18px;
+  margin: 1px 0 0;
+  accent-color: #191c1e;
+  cursor: pointer;
+}

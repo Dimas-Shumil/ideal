@@ -40,7 +40,7 @@
   function show() {
     if (suppressed() || banner) return;
     banner = document.createElement('aside');
-    banner.className = 'pwa-install'; banner.setAttribute('aria-label', staff ? 'Установка приложения ИДЕАЛ — Управление клубом' : 'Установка приложения ИДЕАЛ'); updateBannerPhase();
+    banner.className = staff ? 'pwa-install pwa-install--staff' : 'pwa-install'; banner.setAttribute('aria-label', staff ? 'Установка приложения ИДЕАЛ — Управление клубом' : 'Установка приложения ИДЕАЛ'); updateBannerPhase();
     const content = document.createElement('div'); content.className = 'pwa-install__content';
     const title = document.createElement('p'); title.className = 'pwa-install__title'; title.textContent = staff ? 'ИДЕАЛ — Управление клубом' : 'ИДЕАЛ — всегда рядом';
     const text = document.createElement('p'); text.className = 'pwa-install__text'; text.textContent = staff ? 'Рабочее приложение сотрудников: клиенты, расписание и управление клубом.' : 'Расписание, тренеры и абонементы — в приложении.';

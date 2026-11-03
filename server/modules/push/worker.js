@@ -1,3 +1,4 @@
+import { enqueueCoachReminders, coachReminderIsCurrent, coachReminderSent } from '../coach/reminders.js';
 import { createHash } from "node:crypto";
 import { allowedEndpoint } from "./schema.js";
 import { enqueueTrainerReminders, trainerReminderIsCurrent } from "./reminders.js";
@@ -8,6 +9,7 @@ export function pushWorker({ prisma, config, send, log = entry => console.error(
   async function processBatch() {
     if (!config.PUSH_PUBLIC_KEY || !config.PUSH_PRIVATE_KEY) return;
     await enqueueTrainerReminders(prisma);
+    await enqueueCoachReminders(prisma);
     await prisma.pushDelivery.deleteMany({ where: { createdAt: { lt: new Date(Date.now() - 7 * 86400000) } } });
     for (let i = 0; i < 25 && !stopped; i++) {
       const lease = new Date(Date.now() + 120000);
@@ -26,7 +28,7 @@ export function pushWorker({ prisma, config, send, log = entry => console.error(
       if (!user.active || user.authVersion !== delivery.authVersion || user.role !== delivery.role ||
           sub.authVersion !== user.authVersion || sub.role !== user.role || !allowedEndpoint(sub.endpoint) ||
           delivery.createdAt < new Date(Date.now() - 86400000) ||
-          !await trainerReminderIsCurrent(prisma, delivery)) {
+          !await trainerReminderIsCurrent(prisma, delivery) || !await coachReminderIsCurrent(prisma, delivery)) {
         await finish({ status: "SKIPPED" }); continue;
       }
       try {
@@ -36,6 +38,7 @@ export function pushWorker({ prisma, config, send, log = entry => console.error(
           vapidDetails: { subject: config.PUSH_SUBJECT, publicKey: config.PUSH_PUBLIC_KEY, privateKey: config.PUSH_PRIVATE_KEY },
         });
         await finish({ status: "SENT", lastStatus: 201 });
+        await coachReminderSent(prisma, delivery);
         await prisma.pushSubscription.updateMany({ where: { id: sub.id }, data: { lastSuccessAt: new Date() } });
       } catch (error) {
         const status = Number.isInteger(error.statusCode) ? error.statusCode : 0;

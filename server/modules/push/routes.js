@@ -11,14 +11,21 @@ export function pushRoutes({ config, prisma }) {
   const limit = rateLimit({ windowMs: 900000, limit: 60, keyGenerator: req => req.user.id, standardHeaders: "draft-8", legacyHeaders: false });
   // Separate cap prevents accidental test-notification spam.
   const testLimit = rateLimit({ windowMs: 900000, limit: 5, keyGenerator: req => req.user.id, standardHeaders: "draft-8", legacyHeaders: false });
+  const statusLimit = rateLimit({ windowMs: 900000, limit: 120, keyGenerator: req => req.user.id, standardHeaders: "draft-8", legacyHeaders: false });
   const enabled = Boolean(config.PUSH_PUBLIC_KEY && config.PUSH_PRIVATE_KEY);
   const context = req => ({ user: req.user, sessionId: req.sessionID, requestId: req.id });
   router.get("/notifications", requireAuth, roles, (req, res) => res.render("push/panel", { user: req.user, csrf: req.session.csrf, enabled }));
-  router.get("/api/push/config", requireAuth, roles, (req, res) => res.json({ enabled, publicKey: enabled ? config.PUSH_PUBLIC_KEY : null, userId: req.user.id }));
-  router.post("/api/push/status", requireAuth, roles, limit, csrf(config), async (req, res) => {
+  router.get("/api/push/config", requireAuth, roles, (req, res) => res.json({ enabled, publicKey: enabled ? config.PUSH_PUBLIC_KEY : null, userId: req.user.id, origin: config.APP_ORIGIN }));
+  router.post("/api/push/status", requireAuth, roles, statusLimit, csrf(config), async (req, res) => {
     const data = endpointBody.parse(req.body);
-    const sub = await prisma.pushSubscription.findFirst({ where: { endpoint: data.endpoint, userId: req.user.id, role: req.user.role, authVersion: req.user.authVersion }, select: { id: true } });
-    res.json({ registered: Boolean(sub) });
+    const sub = await prisma.pushSubscription.findFirst({ where: { endpoint: data.endpoint, userId: req.user.id }, select: { id: true, role: true, authVersion: true } });
+    const registered = Boolean(sub && sub.role === req.user.role && sub.authVersion === req.user.authVersion);
+    const lastTest = registered ? await prisma.pushDelivery.findFirst({
+      where: { subscriptionId: sub.id, userId: req.user.id, eventKey: { startsWith: "PUSH_TEST:" } },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      select: { eventKey: true, status: true, lastStatus: true },
+    }) : null;
+    res.json({ registered, owned: Boolean(sub), lastTest });
   });
   router.post("/api/push/subscribe", requireAuth, roles, limit, csrf(config), async (req, res) => {
     if (!enabled) throw Object.assign(new Error("PUSH_DISABLED"), { status: 503 });

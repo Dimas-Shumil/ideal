@@ -70,7 +70,7 @@ export function pushSubscriptions(prisma) {
           skipDuplicates: true,
         });
         // Queued is not delivered: the existing worker sends the notification.
-        return { ok: true, queued: result.count === 1 };
+        return { ok: true, queued: result.count === 1, eventKey };
       });
     },
     async remove(ctx, input) {

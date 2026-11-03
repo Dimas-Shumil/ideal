@@ -19,6 +19,10 @@ model User {
   authVersion Int @default(1)
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  coachClients CoachClient[]
+  coachSessions CoachSession[]
+  coachExpenses CoachExpense[]
+  coachTasks CoachTask[]
   trainerProfile TrainerProfile?
   crmEvents CrmEvent[]
   crmOperations CrmOperation[]
@@ -419,4 +423,72 @@ model ContentPhoto {
   publicOrder Int @default(0)
   data Bytes
   @@index([entryId, slot, publicOrder, id])
+}
+
+// Per-trainer workspace. Personal clients are separate from the club's shared CRM.
+model CoachClient {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  name String @db.VarChar(160)
+  phone String @default("") @db.VarChar(30)
+  notes String @default("") @db.VarChar(3000)
+  archived Boolean @default(false)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  sessions CoachSession[]
+  @@unique([id, userId])
+  @@index([userId, archived, name])
+}
+model CoachSession {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  clientId String @db.Uuid
+  client CoachClient @relation(fields: [clientId, userId], references: [id, userId], onDelete: Restrict)
+  startsAt DateTime @db.Timestamptz(3)
+  endsAt DateTime @db.Timestamptz(3)
+  priceCents Int
+  status String @default("SCHEDULED") @db.VarChar(12)
+  comment String @default("") @db.VarChar(3000)
+  reminderMinutes Int?
+  reminderSentAt DateTime? @db.Timestamptz(3)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  @@index([userId, startsAt])
+  @@index([status, startsAt])
+}
+model CoachExpense {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  title String @db.VarChar(240)
+  category String @db.VarChar(100)
+  expenseDate DateTime @db.Timestamptz(3)
+  amountCents Int
+  comment String @default("") @db.VarChar(2000)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  @@index([userId, expenseDate])
+}
+model CoachTask {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  title String @db.VarChar(240)
+  dueAt DateTime? @db.Timestamptz(3)
+  comment String @default("") @db.VarChar(2000)
+  priority String @default("NORMAL") @db.VarChar(10)
+  completed Boolean @default(false)
+  completedAt DateTime? @db.Timestamptz(3)
+  reminderAt DateTime? @db.Timestamptz(3)
+  reminderSentAt DateTime? @db.Timestamptz(3)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  @@index([userId, completed, dueAt])
+  @@index([completed, reminderAt])
 }

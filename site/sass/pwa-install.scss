@@ -97,3 +97,49 @@
   .pwa-install__button { min-height: 32px; padding: 6px 8px; font-size: 11px; }
 }
 @media (prefers-reduced-motion:reduce) { .pwa-install { transition: none; } }
+
+// Keep the install banner independent of the surrounding panel's button styles.
+.pwa-install.pwa-install--staff {
+  &[hidden] { display: none; }
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 36px;
+  align-items: center;
+  gap: 14px;
+  max-width: 760px;
+  padding: 14px;
+
+  .pwa-install__title { margin: 0 0 5px; gap: 10px; font-size: 14px; line-height: 1.35; }
+  .pwa-install__logo { order: -1; width: 34px; height: 34px; }
+  .pwa-install__text { font-size: 11px; line-height: 1.45; }
+  .pwa-install__actions { display: flex; gap: 8px; }
+  .pwa-install__button {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 40px; margin: 0; padding: 9px 14px;
+    border: 1px solid var(--pwa-primary); border-radius: 10px;
+    background: var(--pwa-primary); color: var(--pwa-primary-fg);
+    font: 600 12px/1.25 'Segoe UI', Arial, sans-serif;
+    &:hover { background: var(--pwa-primary); color: var(--pwa-primary-fg); filter: brightness(.93); }
+    &--later { background: var(--pwa-secondary); border-color: var(--pwa-secondary-border); color: var(--pwa-fg); }
+    &--later:hover { background: var(--pwa-secondary-hover); color: var(--pwa-fg); filter: none; }
+  }
+  .pwa-install__close {
+    position: static; display: grid; place-items: center;
+    width: 36px; min-width: 36px; height: 36px; min-height: 36px;
+    margin: 0; padding: 0; border: 1px solid var(--pwa-border); border-radius: 50%;
+    background: transparent; color: var(--pwa-muted); font: 22px/1 Arial, sans-serif;
+    &:hover { background: var(--pwa-secondary-hover); color: var(--pwa-fg); }
+  }
+}
+@media (max-width: 600px) {
+  .pwa-install.pwa-install--staff {
+    grid-template-columns: minmax(0, 1fr) 36px;
+    grid-template-areas: 'content close' 'actions actions';
+    width: calc(100% - 16px); max-width: 430px; padding: 12px; gap: 10px;
+    .pwa-install__content { grid-area: content; }
+    .pwa-install__title { padding: 0; font-size: 13px; gap: 8px; }
+    .pwa-install__logo { width: 30px; height: 30px; }
+    .pwa-install__actions { grid-area: actions; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pwa-install__button { min-height: 44px; padding: 10px 12px; }
+    .pwa-install__close { grid-area: close; align-self: start; }
+  }
+}

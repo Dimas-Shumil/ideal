@@ -1,19 +1,20 @@
 <%
-  const navPath = typeof currentPath === 'string' ? currentPath : '';
+  const navPath = typeof currentPath === 'string' ? (currentPath === '/trainer/workspace' ? '/trainer' : currentPath) : '';
   const navItems = ['OWNER','ADMIN'].includes(user.role) ? [
     ['/admin','Обзор',true], ['/crm/clients','Клиенты'], ['/crm/plans','Тарифы'],
     ['/crm/schedule','Расписание'], ['/crm/visits','Посещения'],
     ['/shop-panel/orders','Заказы магазина'], ['/shop-panel/products','Товары'],
     ['/admin/public-trainers','Публичные тренеры'], ['/admin/content','Контент сайта'], ['/admin/employees','Сотрудники'], ['/admin/account','Мой аккаунт'],
   ] : user.role === 'TRAINER' ? [
-    ['/trainer','Обзор',true], ['/trainer/clients','Назначенные клиенты'],
-    ['/trainer/lessons','Мои занятия'], ['/trainer/account','Мой аккаунт'],
+    ['/trainer','Обзор',true], ['/trainer/workspace/clients','Персональные клиенты'], ['/trainer/workspace/sessions','Персональные тренировки'], ['/trainer/workspace/expenses','Финансы'], ['/trainer/workspace/tasks','Задачи и напоминания'], ['/trainer/workspace/calendar','Календарь'], ['/trainer/workspace/statistics','Статистика'], ['/trainer/clients','Назначенные клиенты'],
+    ['/trainer/lessons','Мои занятия'],
   ] : [ ['/crm/clients','Клиенты'], ['/crm/plans','Тарифы'],
     ['/crm/schedule','Расписание'], ['/crm/visits','Посещения'], ['/shop-panel/orders','Заказы магазина'] ];
+  if (user.role === 'OWNER') navItems.splice(navItems.findIndex(item => item[0] === '/admin/employees'), 0, ['/admin/trainer-workspaces','Работа тренеров']);
   if (user.role === 'ADMIN') navItems.splice(navItems.findIndex(item => item[0] === '/admin/employees'), 1);
   navItems.push(['/application','Приложение'], ['/notifications','Уведомления'], ['/','Открыть сайт клуба',true]);
 
-  const iconFor = url => url.includes('schedule') || url.includes('lessons') ? 'calendar-days' : url.includes('clients') || url.includes('employees') ? 'users-round' : url.includes('plans') ? 'tickets' : url.includes('visits') ? 'clipboard-check' : url.includes('orders') || url.includes('products') ? 'shopping-bag' : url.includes('notifications') ? 'bell' : url.includes('account') ? 'user-round' : url.includes('public-trainers') ? 'contact-round' : url.includes('content') ? 'panels-top-left' : url.includes('application') ? 'smartphone' : url === '/' ? 'external-link' : 'layout-dashboard';
+  const iconFor = url => url.includes('calendar') || url.includes('sessions') || url.includes('schedule') || url.includes('lessons') ? 'calendar-days' : url.includes('clients') || url.includes('employees') ? 'users-round' : url.includes('plans') ? 'tickets' : url.includes('visits') ? 'clipboard-check' : url.includes('orders') || url.includes('products') ? 'shopping-bag' : url.includes('notifications') ? 'bell' : url.includes('account') ? 'user-round' : url.includes('public-trainers') ? 'contact-round' : url.includes('content') ? 'panels-top-left' : url.includes('application') ? 'smartphone' : url === '/' ? 'external-link' : 'layout-dashboard';
   const dockUrls = user.role === 'TRAINER' ? ['/trainer','/trainer/clients','/trainer/lessons'] : ['OWNER','ADMIN'].includes(user.role) ? ['/admin','/crm/clients','/crm/schedule'] : ['/crm/clients','/crm/schedule','/shop-panel/orders'];
   const dockLabel = url => url === '/admin' || url === '/trainer' ? 'Обзор' : url.includes('clients') ? 'Клиенты' : url.includes('lessons') ? 'Занятия' : url.includes('orders') ? 'Заказы' : 'Расписание';
   const navSelected = (url,exact) => exact ? navPath === url : navPath === url || navPath.startsWith(url + '/');
