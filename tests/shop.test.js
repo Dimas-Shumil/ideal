@@ -159,7 +159,7 @@ test("shop public: catalog/card/home server data, hidden products and unknown qu
   await request(app).get("/product.html?id=demo-01").expect(400);
   await request(app).get("/shop.html?price=1").expect(400);
 });
-test("shop RBAC: pages/API separately protected, ADMIN orders only, TRAINER denied", async () => {
+test("shop RBAC: pages/API separately protected, ADMIN catalog and orders, TRAINER denied", async () => {
   for (const path of [
     "/orders",
     "/orders/" + randomUUID(),
@@ -181,10 +181,10 @@ test("shop RBAC: pages/API separately protected, ADMIN orders only, TRAINER deni
     await request(app).get(path).expect(303);
     await ts.agent.get(path).expect(403);
   }
-  await as.agent.get("/shop-panel/products").expect(403);
-  await as.agent.get("/api/shop-panel/products/" + product.id).expect(403);
+  await as.agent.get("/shop-panel/products").expect(200);
+  await as.agent.get("/api/shop-panel/products/" + product.id).expect(200);
   await as.agent.get("/shop-panel/orders").expect(200);
-  await post(as, "/products", {}, 403);
+  await post(as, "/products", {}, 400);
   await post(ts, "/orders/" + randomUUID() + "/status", {}, 403);
   const page = await os.agent
     .get("/shop-panel/products/" + product.id)
@@ -512,7 +512,7 @@ test("shop Push: active OWNER/ADMIN only, no private data, no catalog spam or re
   });
   assert.equal(await p.pushDelivery.count(), 2);
 });
-test("shop uploads: multipart without JS, raster validation, fixed MIME and OWNER guard", async () => {
+test("shop uploads: multipart without JS, raster validation, fixed MIME and staff guard", async () => {
   const data = await sharp({
     create: { width: 40, height: 40, channels: 3, background: "white" },
   })
@@ -529,7 +529,7 @@ test("shop uploads: multipart without JS, raster validation, fixed MIME and OWNE
         filename: "photo.png",
         contentType: "image/png",
       });
-  await upload(as, data).expect(403);
+  await upload(as, Buffer.from("<svg/>")).expect(400);
   await upload(ts, data).expect(403);
   await upload(os, Buffer.from("<svg/>")).expect(400);
   await upload(os, data).expect(303);
@@ -621,7 +621,7 @@ test('Shop create with photo: multipart, safe WebP, atomic validation and replay
   await sendPhoto(os,fields).expect(303);assert.equal(await p.shopProduct.count({where:{name:fields.name}}),1);
   await sendPhoto(os,{...fields,key:randomUUID(),name:'Неверная фотография'},Buffer.from('<svg></svg>'),'image/svg+xml').expect(400);
   assert.equal(await p.shopProduct.count({where:{name:'Неверная фотография'}}),0);
-  await sendPhoto(as,{...fields,_csrf:as.csrf,key:randomUUID()}).expect(403);
+  await sendPhoto(as,{...fields,_csrf:as.csrf,key:randomUUID(),name:"Создан администратором"}).expect(303);
   await sendPhoto(ts,{...fields,_csrf:ts.csrf,key:randomUUID()}).expect(403);
   const bad={...fields,key:randomUUID()};delete bad._csrf;await sendPhoto(os,bad).expect(403);
   let noImage=os.agent.post('/shop-panel/products/new/with-photo').set('Origin',origin);
@@ -635,7 +635,8 @@ test('Shop deletion: guards, version, snapshots, unavailable basket and replay',
   const g2=await guest();await add(g2);const pending=await checkout(g2);
   await p.shopImage.create({data:{productId:product.id,data:await sharp({create:{width:5,height:5,channels:3,background:'#fff'}}).webp().toBuffer()}});
   const path='/products/'+product.id+'/delete';
-  for(const actor of [as,ts])await post(actor,path,{version:1,confirm:'delete'},403);
+  await post(ts,path,{version:1,confirm:'delete'},403);
+  await post(as,path,{version:99,confirm:'delete'},409);
   await post(os,path,{version:1},400);await post(os,path,{version:2,confirm:'delete'},409);
   await os.agent.post('/api/shop-panel'+path).set('Origin',origin).send({key:randomUUID(),version:1,confirm:'delete'}).expect(403);
   const data={_csrf:os.csrf,key:randomUUID(),version:1,confirm:'delete'};

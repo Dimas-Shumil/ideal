@@ -10,7 +10,7 @@ import {contentService,fail} from './service.js';
 import {definitions,operation,entryKey,photoSlots} from './schema.js';
 export function contentManagementRoutes({prisma,config}) {
  const r=Router(), service=contentService(prisma),guard=csrf(config), base='/admin/content';
- r.use(base,requireAuth,requireRole('OWNER'));
+ r.use(base,requireAuth,requireRole('OWNER','ADMIN'));
  const limit=rateLimit({windowMs:900000,limit:100,keyGenerator:req=>req.user.id,standardHeaders:'draft-8',legacyHeaders:false});
  const saveGuard=(req,res,next)=>guard(req,res,error=>{
   if(error?.status===403){

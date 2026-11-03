@@ -22,7 +22,7 @@ export function contentService(prisma) {
   return prisma.$transaction(async tx=>{
    await accessLock(tx);
    const actor=await tx.user.findUnique({where:{id:ctx.actorId}});
-   if(!actor?.active||actor.role!=='OWNER'||actor.authVersion!==ctx.authVersion||!ctx.sessionId||!await tx.authSession.findFirst({where:{sid:ctx.sessionId,userId:actor.id,authVersion:actor.authVersion,expire:{gt:new Date()},absoluteAt:{gt:new Date()}}})) throw fail(403,'Доступ запрещён.');
+   if(!actor?.active||!['OWNER','ADMIN'].includes(actor.role)||actor.authVersion!==ctx.authVersion||!ctx.sessionId||!await tx.authSession.findFirst({where:{sid:ctx.sessionId,userId:actor.id,authVersion:actor.authVersion,expire:{gt:new Date()},absoluteAt:{gt:new Date()}}})) throw fail(403,'Доступ запрещён.');
    const old=await tx.crmOperation.findUnique({where:{actorId_key:{actorId:actor.id,key:ctx.key}}});
    if(old){if(old.fingerprint!==fingerprint) throw fail(409,'Эта форма уже использована.'); return old.result;}
    const p=await current(tx,key,ctx.version);

@@ -1,6 +1,6 @@
 <%
   const navPath = typeof currentPath === 'string' ? currentPath : '';
-  const navItems = user.role === 'OWNER' ? [
+  const navItems = ['OWNER','ADMIN'].includes(user.role) ? [
     ['/admin','Обзор',true], ['/crm/clients','Клиенты'], ['/crm/plans','Тарифы'],
     ['/crm/schedule','Расписание'], ['/crm/visits','Посещения'],
     ['/shop-panel/orders','Заказы магазина'], ['/shop-panel/products','Товары'],
@@ -10,10 +10,11 @@
     ['/trainer/lessons','Мои занятия'], ['/trainer/account','Мой аккаунт'],
   ] : [ ['/crm/clients','Клиенты'], ['/crm/plans','Тарифы'],
     ['/crm/schedule','Расписание'], ['/crm/visits','Посещения'], ['/shop-panel/orders','Заказы магазина'] ];
+  if (user.role === 'ADMIN') navItems.splice(navItems.findIndex(item => item[0] === '/admin/employees'), 1);
   navItems.push(['/application','Приложение'], ['/notifications','Уведомления'], ['/','Открыть сайт клуба',true]);
 
   const iconFor = url => url.includes('schedule') || url.includes('lessons') ? 'calendar-days' : url.includes('clients') || url.includes('employees') ? 'users-round' : url.includes('plans') ? 'tickets' : url.includes('visits') ? 'clipboard-check' : url.includes('orders') || url.includes('products') ? 'shopping-bag' : url.includes('notifications') ? 'bell' : url.includes('account') ? 'user-round' : url.includes('public-trainers') ? 'contact-round' : url.includes('content') ? 'panels-top-left' : url.includes('application') ? 'smartphone' : url === '/' ? 'external-link' : 'layout-dashboard';
-  const dockUrls = user.role === 'TRAINER' ? ['/trainer','/trainer/clients','/trainer/lessons'] : user.role === 'OWNER' ? ['/admin','/crm/clients','/crm/schedule'] : ['/crm/clients','/crm/schedule','/shop-panel/orders'];
+  const dockUrls = user.role === 'TRAINER' ? ['/trainer','/trainer/clients','/trainer/lessons'] : ['OWNER','ADMIN'].includes(user.role) ? ['/admin','/crm/clients','/crm/schedule'] : ['/crm/clients','/crm/schedule','/shop-panel/orders'];
   const dockLabel = url => url === '/admin' || url === '/trainer' ? 'Обзор' : url.includes('clients') ? 'Клиенты' : url.includes('lessons') ? 'Занятия' : url.includes('orders') ? 'Заказы' : 'Расписание';
   const navSelected = (url,exact) => exact ? navPath === url : navPath === url || navPath.startsWith(url + '/');
   const overflowActive = navItems.some(([url,,exact]) => !dockUrls.includes(url) && navSelected(url,exact));

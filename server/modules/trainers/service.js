@@ -22,6 +22,9 @@ export const ownerProfileSelect = {
   approach: true,
   directions: true,
   achievements: true,
+  phone: true,
+  vkUrl: true,
+  maxUrl: true,
   photo: { select: { trainerId: true } },
   user: { select: { displayName: true, role: true, active: true } },
 };
@@ -38,7 +41,7 @@ export function trainerProfileService(prisma) {
         const actor = await tx.user.findUnique({ where: { id: ctx.actorId } });
         if (
           !actor?.active ||
-          actor.role !== "OWNER" ||
+          !["OWNER", "ADMIN"].includes(actor.role) ||
           actor.authVersion !== ctx.authVersion ||
           !ctx.sessionId ||
           !(await tx.authSession.findFirst({

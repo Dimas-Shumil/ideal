@@ -221,7 +221,7 @@ export function shopRoutes({ prisma, config, indexHtml }) {
   );
   r.get(
     ["/shop-panel/products", "/api/shop-panel/products"],
-    requireRole("OWNER"),
+    requireRole("OWNER", "ADMIN"),
     async (req, res) => {
       const query = z
         .object({ page: s.int(1, 100000).default(1) })
@@ -241,12 +241,12 @@ export function shopRoutes({ prisma, config, indexHtml }) {
         : panel(req, res, "products", { products, total, query });
     },
   );
-  r.get("/shop-panel/products/new", requireRole("OWNER"), (req, res) =>
+  r.get("/shop-panel/products/new", requireRole("OWNER", "ADMIN"), (req, res) =>
     panel(req, res, "product", { product: null }),
   );
   r.get(
     ["/shop-panel/products/:id", "/api/shop-panel/products/:id"],
-    requireRole("OWNER"),
+    requireRole("OWNER", "ADMIN"),
     async (req, res) => {
       const product = await service.product(req.params.id, true);
       return req.path.startsWith("/api/")
@@ -264,7 +264,7 @@ export function shopRoutes({ prisma, config, indexHtml }) {
   const post = (path, fn, owner = false) =>
     r.post(
       [path, "/api" + path],
-      ...(owner ? [requireRole("OWNER")] : []),
+      ...(owner ? [requireRole("OWNER", "ADMIN")] : []),
       adminLimit,
       guard,
       async (req, res) => {
@@ -276,7 +276,7 @@ export function shopRoutes({ prisma, config, indexHtml }) {
           : res.redirect(303, result.url);
       },
     );
-  r.post("/shop-panel/products/new/with-photo", requireRole("OWNER"), imageLimit,
+  r.post("/shop-panel/products/new/with-photo", requireRole("OWNER", "ADMIN"), imageLimit,
     (req, res, next) => req.get("Origin") === config.APP_ORIGIN ? next() : next(fail(403, "Доступ запрещён.")),
     parseProductImage, guard, async (req, res) => {
       const { _csrf, key, version, ...data } = req.body;
@@ -334,7 +334,7 @@ export function shopRoutes({ prisma, config, indexHtml }) {
   );
   r.post(
     "/shop-panel/products/:id/images",
-    requireRole("OWNER"),
+    requireRole("OWNER", "ADMIN"),
     imageLimit,
     (req, res, next) =>
       req.get("Origin") === config.APP_ORIGIN
@@ -354,7 +354,7 @@ export function shopRoutes({ prisma, config, indexHtml }) {
     const image = await prisma.shopImage.findFirst({
       where: {
         id: req.params.id,
-        product: req.user?.role === "OWNER" ? {} : { active: true },
+        product: ["OWNER", "ADMIN"].includes(req.user?.role) ? {} : { active: true },
       },
       select: { data: true },
     });

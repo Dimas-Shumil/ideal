@@ -182,7 +182,7 @@ export function shopService(prisma, quoteSecret) {
         if (
           !actor?.active ||
           actor.authVersion !== ctx.authVersion ||
-          !(ownerOnly ? ["OWNER"] : ["OWNER", "ADMIN"]).includes(actor.role)
+          !["OWNER", "ADMIN"].includes(actor.role)
         )
           throw fail(403, "Доступ запрещён.");
         await session(tx, ctx.sessionId);

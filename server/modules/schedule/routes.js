@@ -72,10 +72,10 @@ export function scheduleRoutes({ config, prisma }) {
     if (req.path.startsWith("/api/")) return res.json(data);
     return render(req, res, "list", { ...data, trainers: await service.trainers() });
   });
-  router.get("/crm/schedule/:id/publication", requireAuth, requireRole("OWNER"), async (req, res) =>
+  router.get("/crm/schedule/:id/publication", requireAuth, requireRole("OWNER", "ADMIN"), async (req, res) =>
     render(req, res, "publication", await service.publicationOptions(req.params.id)));
-  post(["/crm/schedule/:id/publication", "/api/crm/schedule/:id/publication"], ["OWNER"], (req, ctx, input) => service.publish(ctx, req.params.id, input), req => `/crm/schedule/${uuid.parse(req.params.id)}/publication`);
-  post(["/crm/schedule/:id/public-trainer", "/api/crm/schedule/:id/public-trainer"], ["OWNER"], (req, ctx, input) => service.publicTrainer(ctx, req.params.id, input), req => `/crm/schedule/${uuid.parse(req.params.id)}/publication`);
+  post(["/crm/schedule/:id/publication", "/api/crm/schedule/:id/publication"], ["OWNER", "ADMIN"], (req, ctx, input) => service.publish(ctx, req.params.id, input), req => `/crm/schedule/${uuid.parse(req.params.id)}/publication`);
+  post(["/crm/schedule/:id/public-trainer", "/api/crm/schedule/:id/public-trainer"], ["OWNER", "ADMIN"], (req, ctx, input) => service.publicTrainer(ctx, req.params.id, input), req => `/crm/schedule/${uuid.parse(req.params.id)}/publication`);
   router.get("/crm/schedule/new", requireAuth, requireRole("OWNER", "ADMIN"), async (req, res) =>
     render(req, res, "new", { trainers: await service.trainers() }),
   );
@@ -103,8 +103,8 @@ export function scheduleRoutes({ config, prisma }) {
   });
 
   post(["/crm/schedule", "/api/crm/schedule"], ["OWNER", "ADMIN"], (_req, ctx, input) => service.create(ctx, input), (_req, result) => `/crm/schedule/${result.id}`);
-  post(["/crm/schedule/:id/delete", "/api/crm/schedule/:id/delete"], ["OWNER"], (req, ctx, input) => service.deleteLesson(ctx, req.params.id, input), () => "/crm/schedule");
-  post(["/crm/schedule/:id/bookings/:bookingId/delete", "/api/crm/schedule/:id/bookings/:bookingId/delete"], ["OWNER"], (req, ctx, input) => service.deleteBooking(ctx, req.params.id, req.params.bookingId, input), (req) => `/crm/schedule/${uuid.parse(req.params.id)}`);
+  post(["/crm/schedule/:id/delete", "/api/crm/schedule/:id/delete"], ["OWNER", "ADMIN"], (req, ctx, input) => service.deleteLesson(ctx, req.params.id, input), () => "/crm/schedule");
+  post(["/crm/schedule/:id/bookings/:bookingId/delete", "/api/crm/schedule/:id/bookings/:bookingId/delete"], ["OWNER", "ADMIN"], (req, ctx, input) => service.deleteBooking(ctx, req.params.id, req.params.bookingId, input), (req) => `/crm/schedule/${uuid.parse(req.params.id)}`);
   post(["/crm/schedule/:id/move", "/api/crm/schedule/:id/move"], ["OWNER", "ADMIN"], (req, ctx, input) => service.move(ctx, req.params.id, input), (req) => `/crm/schedule/${uuid.parse(req.params.id)}`);
   post(["/crm/schedule/:id/cancel", "/api/crm/schedule/:id/cancel"], ["OWNER", "ADMIN"], (req, ctx, input) => service.cancelLesson(ctx, req.params.id, input), (req) => `/crm/schedule/${uuid.parse(req.params.id)}`);
   post(["/crm/schedule/:id/book", "/api/crm/schedule/:id/book"], ["OWNER", "ADMIN"], (req, ctx, input) => service.book(ctx, req.params.id, input), (req) => `/crm/schedule/${uuid.parse(req.params.id)}`);

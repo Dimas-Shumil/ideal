@@ -437,7 +437,7 @@ export function scheduleService(prisma) {
         orderBy: [{ name: "asc" }, { id: "asc" }],
         take: 100,
       });
-      const canDeleteLesson = context.role === "OWNER" && lesson.status === "CANCELLED" &&
+      const canDeleteLesson = ["OWNER", "ADMIN"].includes(context.role) && lesson.status === "CANCELLED" &&
         lesson.bookings.every(b => b.status === "CANCELLED") &&
         !(await prisma.visit.count({ where: { lessonId: lesson.id } }));
       return { lesson, candidates, query: q, canDeleteLesson };
@@ -463,7 +463,7 @@ export function scheduleService(prisma) {
       const data = publicationBody.parse(input);
       const selected = data.lessons.map(value => { const [id, v] = value.split(":"); return { id: uuid.parse(id), version: version.parse(v) }; });
       check(new Set(selected.map(v => v.id)).size === selected.length, "Повторяющиеся занятия.");
-      return mutate(ctx, "LESSON_PUBLICATION_CHANGED", id, input, ["OWNER"], async (tx, actor) => {
+      return mutate(ctx, "LESSON_PUBLICATION_CHANGED", id, input, ["OWNER", "ADMIN"], async (tx, actor) => {
         const anchor = await tx.lesson.findUnique({ where: { id: uuid.parse(id) } });
         check(anchor?.kind === "GROUP", "Публикация доступна только групповым занятиям.");
         for (const item of selected) {
@@ -483,7 +483,7 @@ export function scheduleService(prisma) {
     },
     async publicTrainer(ctx, id, input) {
       const data = publicTrainerBody.parse(input);
-      return mutate(ctx, "TRAINER_PUBLIC_NAME_CHANGED", id, input, ["OWNER"], async (tx) => {
+      return mutate(ctx, "TRAINER_PUBLIC_NAME_CHANGED", id, input, ["OWNER", "ADMIN"], async (tx) => {
         const lesson = await tx.lesson.findUnique({ where: { id: uuid.parse(id) } });
         check(lesson, "Занятие не найдено.");
         const profile = await tx.trainerProfile.updateMany({ where: { id: lesson.trainerId, publicVersion: data.publicVersion }, data: { publicName: data.publicName, publicVersion: { increment: 1 } } });
@@ -578,7 +578,7 @@ export function scheduleService(prisma) {
       uuid.parse(id);
       uuid.parse(bookingId);
       const expected = version.parse(ctx.version);
-      return mutate(ctx, "BOOKING_DELETED", bookingId, { ...input, lessonId: id }, ["OWNER"], async (tx, actor) => {
+      return mutate(ctx, "BOOKING_DELETED", bookingId, { ...input, lessonId: id }, ["OWNER", "ADMIN"], async (tx, actor) => {
         const lesson = await lessonForActor(tx, actor, id);
         const booking = await tx.lessonBooking.findFirst({ where: { id: bookingId, lessonId: id } });
         if (!booking) throw fail(404, "Запись не найдена.");
@@ -594,7 +594,7 @@ export function scheduleService(prisma) {
     async deleteLesson(ctx, id, input) {
       const data = deleteBody.parse(input);
       const expected = version.parse(ctx.version);
-      return mutate(ctx, "LESSON_DELETED", id, input, ["OWNER"], async (tx, actor) => {
+      return mutate(ctx, "LESSON_DELETED", id, input, ["OWNER", "ADMIN"], async (tx, actor) => {
         const lesson = await lessonForActor(tx, actor, id, expected);
         check(lesson.status === "CANCELLED", "Сначала отмените занятие и уведомите участников.");
         check(lesson.bookings.every(b => b.status === "CANCELLED"), "У занятия есть записи, которые нельзя удалить.");

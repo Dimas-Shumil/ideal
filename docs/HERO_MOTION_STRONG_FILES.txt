@@ -1,6 +1,0 @@
-site/sass/main.scss
-site/css/main.css
-site/css/main.min.css
-site/scripts/hero-atmosphere.js
-docs/HERO_MOTION_STRONG_20261101.md
-docs/HERO_MOTION_STRONG_FILES.txt

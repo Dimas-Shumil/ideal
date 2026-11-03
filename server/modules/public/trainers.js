@@ -18,6 +18,9 @@ export const publicTrainerSelect = Object.freeze({
   approach: true,
   directions: true,
   achievements: true,
+  phone: true,
+  vkUrl: true,
+  maxUrl: true,
   photo: { select: { trainerId: true } },
 });
 export const publicTrainerCardSelect = Object.freeze({
@@ -46,6 +49,9 @@ export function trainerDto(row, detail = true) {
       "approach",
       "directions",
       "achievements",
+      "phone",
+      "vkUrl",
+      "maxUrl",
     ])
       result[key] = row[key];
   return result;

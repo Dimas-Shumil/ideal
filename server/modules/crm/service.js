@@ -76,7 +76,7 @@ export function crmService(prisma) {
         if (
           !actor?.active ||
           actor.authVersion !== ctx.authVersion ||
-          !(ownerOnly ? ["OWNER"] : ["OWNER", "ADMIN"]).includes(actor.role)
+          !["OWNER", "ADMIN"].includes(actor.role)
         )
           throw fail(403, "Доступ запрещён.");
         if (

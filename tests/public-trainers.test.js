@@ -111,6 +111,9 @@ test("public trainers: DTO strips private extras and exposes only public URLs", 
       "approach",
       "directions",
       "achievements",
+      "phone",
+      "vkUrl",
+      "maxUrl",
     ].sort(),
   );
   assert.doesNotMatch(JSON.stringify(dto), /PRIVATE/);
@@ -192,6 +195,9 @@ test("public trainers: strict text schema and offline boundary", async () => {
       "approach",
       "directions",
       "achievements",
+      "phone",
+      "vkUrl",
+      "maxUrl",
     ].map((k) => [k, ""]),
   );
   assert.equal(

@@ -4,21 +4,23 @@
   const update = document.querySelector('[data-pwa-update]');
   const install = document.querySelector('[data-pwa-install]');
   const check = document.querySelector('[data-pwa-check]');
+  const staffPromotion = !!document.querySelector('script[data-pwa-staff]');
   let prompt, registration;
   const installed = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
   function state() {
     if (status) status.textContent = !navigator.onLine ? 'Нет соединения. Серверные операции недоступны.' : installed() ? 'Приложение открыто в отдельном окне.' : 'Установка доступна через поддерживаемый браузер.';
-    if (install) install.hidden = !prompt || installed();
+    if (install) install.hidden = (!prompt && !staffPromotion) || installed();
   }
   function waiting() {
     if (update) update.textContent = registration?.waiting ? 'Доступна новая версия. Завершите работу и закройте все вкладки и окна ИДЕАЛ, затем откройте приложение снова.' : 'Ожидающих обновлений нет. Проверка требует соединения с сервером.';
   }
   window.addEventListener('beforeinstallprompt', event => {
     // Suppress automatic promotion only where our explicit install control exists.
-    if (!install) return;
+    if (!install || staffPromotion) return;
     event.preventDefault(); prompt = event; state();
   });
   install?.addEventListener('click', async () => {
+    if (staffPromotion) { window.dispatchEvent(new Event('ideal-staff-install')); return; }
     if (!prompt) return;
     const current = prompt; prompt = null; state();
     try { await current.prompt(); await current.userChoice; }

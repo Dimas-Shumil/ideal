@@ -103,10 +103,10 @@ export function crmRoutes({ prisma, config }) {
       ? res.json({ plans })
       : render(req, res, "plans", { plans });
   });
-  router.get("/crm/plans/new", requireRole("OWNER"), (req, res) =>
+  router.get("/crm/plans/new", requireRole("OWNER", "ADMIN"), (req, res) =>
     render(req, res, "plan-form", { plan: null }),
   );
-  router.get("/crm/plans/:id", requireRole("OWNER"), async (req, res) => {
+  router.get("/crm/plans/:id", requireRole("OWNER", "ADMIN"), async (req, res) => {
     uuid.parse(req.params.id);
     const plan = await prisma.membershipPlan.findUnique({
       where: { id: req.params.id },
@@ -118,7 +118,7 @@ export function crmRoutes({ prisma, config }) {
     const apiPath = "/api" + path;
     router.post(
       [path, apiPath],
-      ...(ownerOnly ? [requireRole("OWNER")] : []),
+      ...(ownerOnly ? [requireRole("OWNER", "ADMIN")] : []),
       limit,
       guard,
       async (req, res, next) => {

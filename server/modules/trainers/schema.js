@@ -9,7 +9,20 @@ export const trainerFields = {
   approach: 3000,
   directions: 2000,
   achievements: 3000,
+  phone: 30,
+  vkUrl: 500,
+  maxUrl: 500,
 };
+// Only HTTPS links to the named services can be published.
+const socialUrl = hosts => z.string().trim().max(500).default("").refine(value => {
+  if (!value) return true;
+  if (/[\\\r\n]/.test(value)) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && hosts.includes(url.hostname.toLowerCase()) &&
+      !url.username && !url.password && !url.port && url.pathname !== "/";
+  } catch { return false; }
+}, "Укажите полную HTTPS-ссылку на профиль ВК или MAX.");
 export const profileBody = z
   .object(
     Object.fromEntries(
@@ -19,7 +32,13 @@ export const profileBody = z
       ]),
     ),
   )
-  .extend({ publicOrder: z.coerce.number().int().min(0).max(99999) })
+  .extend({
+    publicOrder: z.coerce.number().int().min(0).max(99999),
+    phone: z.string().trim().max(30).default("").refine(value => !value ||
+      (/^\+?[\d ()-]+$/.test(value) && value.replace(/\D/g, "").length >= 10 && value.replace(/\D/g, "").length <= 15), "Проверьте номер телефона."),
+    vkUrl: socialUrl(["vk.com", "www.vk.com", "vk.ru", "www.vk.ru"]),
+    maxUrl: socialUrl(["max.ru", "www.max.ru"]),
+  })
   .strict();
 export const publishBody = z
   .object({ visible: z.enum(["true", "false"]), confirm: z.literal("PUBLIC") })

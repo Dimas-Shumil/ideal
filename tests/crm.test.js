@@ -159,11 +159,11 @@ test("CRM: pages and APIs independently guard guest, ADMIN, OWNER and TRAINER", 
       await s.agent.get(path).expect(200);
     await s.agent.get("/trainer/clients").expect(403);
   }
-  await a.agent.get("/crm/plans/new").expect(403);
+  await a.agent.get("/crm/plans/new").expect(200);
   await a.agent.get("/admin/employees").expect(403);
   for (const path of ["/crm/clients", "/api/crm/clients", "/crm/plans"])
     await t.agent.get(path).expect(403);
-  await post(a, "/crm/plans", planInput(), 403);
+  await post(a, "/crm/plans", planInput());
   await post(t, "/crm/clients", {}, 403);
   await a.agent.get("/staff").expect(303).expect("Location", "/crm/clients");
 });
@@ -596,7 +596,7 @@ test("CRM: DUO atomic pair payment, linked freeze/extension, independent cancell
   assert.equal((await getMember(a, cb)).cancelledAt, null);
   assert.equal((await getMember(a, cb)).priceCents, 320000);
 });
-test("CRM: OWNER refunds only, total cap, concurrent retries and closed subscription", async () => {
+test("CRM: OWNER/ADMIN refunds, total cap, concurrent retries and closed subscription", async () => {
   const o = await login("crmowner"),
     a = await login("crmadmin");
   const id = await makeClient(a),
@@ -609,13 +609,13 @@ test("CRM: OWNER refunds only, total cap, concurrent retries and closed subscrip
     method: "TRANSFER",
     reason: "Согласованный возврат",
   };
-  await post(a, "/crm/memberships/" + m.id + "/refund", body, 403);
+  await post(a, "/crm/memberships/" + m.id + "/refund", { ...body, version: m.version + 1 }, 409);
   const key = randomUUID(),
     send = () =>
-      o.agent
+      a.agent
         .post("/api/crm/memberships/" + m.id + "/refund")
         .set("Origin", origin)
-        .send({ _csrf: o.token, key, ...body });
+        .send({ _csrf: a.token, key, ...body });
   const rs = await Promise.all([send(), send()]);
   assert.deepEqual(
     rs.map((r) => r.status),
@@ -1008,7 +1008,7 @@ test('Public tariffs: OWNER publication, ordering, escaping, live prices and pre
   assert.doesNotMatch(page.text,new RegExp(prefix+'_(HIDDEN|INACTIVE)'));
   assert.match(page.text,/Условия оформления/);assert.match(page.text,/Одно посещение/);
   assert.equal(page.headers['cache-control'],'no-store');
-  await post(a,'/crm/plans/'+pub,{...planInput({publicVisible:'false'}),version:1},403);
+  await post(a,'/crm/plans/'+pub,{...planInput({publicVisible:'false'}),version:99},409);
   await post(t,'/crm/plans/'+pub,{...planInput({publicVisible:'false'}),version:1},403);
   await post(o,'/crm/plans/'+pub,{...planInput({name:prefix+'_<script>"',price:'4321.09',publicVisible:'true',publicOrder:'20'}),version:1});
   page=await request(app).get('/').expect(200);
@@ -1029,12 +1029,13 @@ test('Public tariffs: empty publication renders no fabricated prices or checkout
   assert.doesNotMatch(r.text,/data-buy-plan=/);
 });
 
-test('Tariff deletion: OWNER only, independent guards and explicit confirmation',async()=>{
+test('Tariff deletion: OWNER/ADMIN, independent guards and explicit confirmation',async()=>{
   const o=await login('crmowner'),a=await login('crmadmin'),t=await login('crmta');
   const id=await makePlan(o);
   await o.agent.get('/crm/plans/'+id+'/delete').expect(404);
   await request(app).post('/api/crm/plans/'+id+'/delete').send({confirm:'delete'}).expect(401);
-  for(const actor of [a,t])await post(actor,'/crm/plans/'+id+'/delete',{version:1,confirm:'delete'},403);
+  await post(t,'/crm/plans/'+id+'/delete',{version:1,confirm:'delete'},403);
+  await post(a,'/crm/plans/'+id+'/delete',{version:99,confirm:'delete'},409);
   for(const fields of [{},{confirm:'yes'},{confirm:'delete',force:true}])await post(o,'/crm/plans/'+id+'/delete',{version:1,...fields},400);
   await o.agent.post('/api/crm/plans/'+id+'/delete').set('Origin',origin).send({key:randomUUID(),version:1,confirm:'delete'}).expect(403);
   await o.agent.post('/api/crm/plans/'+id+'/delete').set('Origin','https://wrong.example').send({_csrf:o.token,key:randomUUID(),version:1,confirm:'delete'}).expect(403);

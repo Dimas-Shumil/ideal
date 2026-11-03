@@ -90,6 +90,9 @@ model TrainerProfile {
   approach String @default("") @db.VarChar(3000)
   directions String @default("") @db.VarChar(2000)
   achievements String @default("") @db.VarChar(3000)
+  phone String @default("") @db.VarChar(30)
+  vkUrl String @default("") @db.VarChar(500)
+  maxUrl String @default("") @db.VarChar(500)
   photo TrainerPhoto?
   assignments TrainerAssignment[]
   lessons Lesson[]

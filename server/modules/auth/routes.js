@@ -127,7 +127,7 @@ export async function authRoutes({ prisma, store, config, users }) {
     },
   );
   router.post("/trainer/account/password", requireAuth, requireRole("TRAINER"));
-  router.post("/admin/account/password", requireAuth, requireRole("OWNER"));
+  router.post("/admin/account/password", requireAuth, requireRole("OWNER", "ADMIN"));
   router.post(
     ["/api/auth/password", "/admin/account/password", "/trainer/account/password"],
     requireAuth,

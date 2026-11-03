@@ -215,7 +215,7 @@ test("roles are enforced independently for pages/API; cookie and fixation", asyn
     for (const other of ["admin", "staff", "trainer"].filter(
       (x) => x !== path,
     )) {
-      await agent.get(`/${other}`).expect(403);
+      await agent.get(`/${other}`).expect(name === "admin" && other === "admin" ? 200 : 403);
       await agent.get(`/api/${other}/check`).expect(403);
     }
     const me = await agent.get("/api/auth/me").expect(200);
@@ -568,7 +568,7 @@ test("OWNER panel: independent authorization for every new page and operation", 
       .expect(path.startsWith("/api/") ? 401 : 303);
   for (const role of ["admin", "trainer"]) {
     const session = await login(role);
-    for (const path of paths) await session.agent.get(path).expect(403);
+    for (const path of paths) await session.agent.get(path).expect(role === "admin" && path === "/admin/account" ? 200 : 403);
     for (const path of [
       "/api/admin/employees",
       `/api/admin/employees/${admin.id}/name`,

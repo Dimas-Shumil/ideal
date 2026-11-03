@@ -10,7 +10,7 @@ export function trainerManagementRoutes({ config, prisma }) {
   const router = Router(),
     service = trainerProfileService(prisma),
     guard = csrf(config);
-  router.use("/admin/public-trainers", requireAuth, requireRole("OWNER"));
+  router.use("/admin/public-trainers", requireAuth, requireRole("OWNER", "ADMIN"));
   const limit = rateLimit({
     windowMs: 900000,
     limit: 100,

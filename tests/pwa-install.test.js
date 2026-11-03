@@ -3,15 +3,16 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 const source=await readFile(new URL('../site/scripts/pwa-install.js',import.meta.url),'utf8');
-function setup({stored={},standalone=false,blocked=false,hidden=false,ios=false}={}){
+function setup({stored={},standalone=false,blocked=false,hidden=false,ios=false,staff=false}={}){
  const events={},timers=[],nodes=[],values=new Map(Object.entries(stored));
  class Node{
   constructor(tag){this.tag=tag;this.children=[];this.events={};this.dataset={};this.hidden=false;this.scrollHeight=100;this.clientHeight=100;}
   append(...children){this.children.push(...children);}
+  click(){return this.events.click?.();}
   setAttribute(){}
   addEventListener(n,f){this.events[n]=f;}
  }
- const document={documentElement:{hasAttribute:()=>false,classList:{contains:()=>false}},hidden,body:{append:n=>nodes.push(n)},createElement:n=>new Node(n),addEventListener:(n,f)=>events[n]=f,removeEventListener:n=>delete events[n]};
+ const document={currentScript:{hasAttribute:()=>staff},documentElement:{hasAttribute:()=>false,classList:{contains:()=>false}},hidden,body:{append:n=>nodes.push(n)},createElement:n=>new Node(n),addEventListener:(n,f)=>events[n]=f,removeEventListener:n=>delete events[n]};
  const window={isSecureContext:true,setInterval:()=>0,addEventListener:(n,f)=>events[n]=f};
  const localStorage={getItem:k=>{if(blocked)throw Error();return values.get(k)??null;},setItem:(k,v)=>{if(blocked)throw Error();values.set(k,v);}};
  vm.runInNewContext(source,{window,navigator:{serviceWorker:{},standalone,userAgent:ios?'iPhone':'Chrome',platform:'',maxTouchPoints:0},document,localStorage,matchMedia:()=>({matches:standalone}),setTimeout:(f,ms)=>timers.push({f,ms}),Date});
@@ -78,4 +79,24 @@ test('public PWA: short/diagonal/down gestures, buttons and multitouch do not di
 test('public PWA: overflowing instructions retain vertical scrolling and horizontal dismissal',()=>{
  const w=setup();w.show();w.nodes[0].scrollHeight=300;swipe(w,0,-80);assert.equal(w.nodes[0].hidden,false);
  swipe(w,80,0);assert.equal(w.nodes[0].hidden,true);
+});
+
+test('staff PWA: separate installed state and staff label; public app does not suppress staff install',()=>{
+ const w=setup({staff:true,stored:{'ideal-pwa-installed':'1'}});w.show();
+ assert.equal(w.nodes.length,1);
+ assert.equal(w.nodes[0].children[0].children[0].textContent,'ИДЕАЛ — Управление клубом');
+ assert.equal(w.nodes[0].dataset.pwaPhase,'day');
+ w.events.appinstalled();
+ assert.equal(w.values.get('ideal-staff-pwa-installed'),'1');
+ assert.equal(w.nodes[0].hidden,true);
+ const installed=setup({staff:true,stored:{'ideal-staff-pwa-installed':'1'}});installed.show();assert.equal(installed.nodes.length,0);
+});
+
+test('staff PWA: application screen requests the same native prompt, banner is created only once',async()=>{
+ const w=setup({staff:true});let calls=0;
+ w.events.beforeinstallprompt({preventDefault(){},prompt:async()=>{calls++;},userChoice:Promise.resolve({outcome:'dismissed'})});
+ assert.equal(calls,0);w.events['ideal-staff-install']();
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(calls,1);assert.equal(w.nodes.length,1);assert.equal(w.nodes[0].hidden,true);
+ w.show();assert.equal(w.nodes.length,1);
 });

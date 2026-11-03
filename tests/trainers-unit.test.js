@@ -161,7 +161,7 @@ test("trainer mutations fixture: transaction rechecks owner, authVersion, sessio
       () => f.service.save({ ...f.ctx(), ...patch }, f.profile.id, fields),
       (e) => e.status === 403,
     );
-  f.owner.role = "ADMIN";
+  f.owner.role = "TRAINER";
   await assert.rejects(
     () => f.service.save(f.ctx(), f.profile.id, fields),
     (e) => e.status === 403,
@@ -204,8 +204,8 @@ test("trainer mutations fixture: identical replay has one audit, changed replay 
   assert.equal(f.state.profile.publicVersion, 2);
   assert.equal(f.state.operations.length, 1);
 });
-test("trainer management HTTP fixture: each route rejects ADMIN/TRAINER before data or upload parsing", async () => {
-  for (const role of ["ADMIN", "TRAINER"]) {
+test("trainer management HTTP fixture: each route rejects TRAINER before data or upload parsing", async () => {
+  for (const role of ["TRAINER"]) {
     const app = express();
     app.use((req, res, next) => {
       req.user = { id: randomUUID(), role };

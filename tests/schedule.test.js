@@ -248,13 +248,13 @@ test("attendance: cancelling a lesson compensates confirmed visits and cancels r
   assert.equal(visit.status, "REVERSED");
 });
 
-test("schedule delete: OWNER only; guest, CSRF, Origin, confirm and DTO guards", async () => {
+test("schedule delete: OWNER/ADMIN; guest, CSRF, Origin, confirm and DTO guards", async () => {
   const o = await login("schedowner"), a = await login("schedadmin"), t = await login("schedta");
   const l = await directLesson({ kind: "PERSONAL", date: addDays(today(), 10) });
   const path = `/crm/schedule/${l.id}/delete`, input = { version: 1, reason: "Тестовое удаление", confirm: "DELETE" };
   await request(app).post('/api' + path).send(input).expect(401);
   await request(app).post(path).send(input).expect(303);
-  await post(a, path, input, 403); await post(t, path, input, 403);
+  await post(a, path, input, 409); await post(t, path, input, 403);
   await o.agent.post('/api' + path).set('Origin', origin).send({ key: randomUUID(), ...input }).expect(403);
   await o.agent.post('/api' + path).set('Origin', 'https://evil.example').send({ _csrf: o.token, key: randomUUID(), ...input }).expect(403);
   await post(o, path, { ...input, confirm: "" }, 400);
@@ -271,7 +271,7 @@ test("schedule delete: cancelled booking removed, replay stable, history/client 
   await post(o, path, data, 409);
   await post(a, `/crm/schedule/${l.id}/bookings/${b.id}/cancel`, { reason: "Тестовая отмена" });
   await post(o, path, data, 409); // stale version
-  await post(a, path, { ...data, version: 2 }, 403);
+  await post(a, path, { ...data, version: 99 }, 409);
   const key = randomUUID(); const first = await post(o, path, { ...data, version: 2 }, 200, key);
   const replay = await post(o, path, { ...data, version: 2 }, 200, key);
   assert.deepEqual(replay.body, first.body);
@@ -340,12 +340,13 @@ test("panel navigation: identical order and one active item across OWNER CRM and
 async function setPublic(session, lesson, visible = 'true', key = randomUUID()) {
   return post(session, `/crm/schedule/${lesson.id}/publication`, { visible, lessons: `${lesson.id}:${lesson.version}`, confirm: 'PUBLIC' }, 200, key);
 }
-test('public schedule: publication page and both mutation APIs independently enforce OWNER, Origin and CSRF', async () => {
+test('public schedule: publication page and both mutation APIs independently enforce OWNER/ADMIN, Origin and CSRF', async () => {
   const lesson = await directLesson({date:addDays(today(),30)});
   const ownerSession=await login('schedowner'), adminSession=await login('schedadmin'), trainer=await login('schedta');
   await request(app).get(`/crm/schedule/${lesson.id}/publication`).expect(303);
   await ownerSession.agent.get(`/crm/schedule/${lesson.id}/publication`).expect(200);
-  for(const s of [adminSession,trainer]) {
+  await adminSession.agent.get(`/crm/schedule/${lesson.id}/publication`).expect(200);
+  for(const s of [trainer]) {
     await s.agent.get(`/crm/schedule/${lesson.id}/publication`).expect(403);
     for(const suffix of ['publication','public-trainer']) await post(s,`/crm/schedule/${lesson.id}/${suffix}`,{},403);
   }

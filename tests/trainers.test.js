@@ -116,9 +116,9 @@ after(async () => {
   await db.prisma.user.deleteMany();
   await db.close();
 });
-test("trainers: OWNER-only pages/mutations and CSRF/Origin guards", async () => {
+test("trainers: OWNER/ADMIN pages/mutations and CSRF/Origin guards", async () => {
   await request(app).get("/admin/public-trainers").expect(303);
-  for (const name of ["pubtrainer", "pubadmin"]) {
+  for (const name of ["pubtrainer"]) {
     const s = await login(name);
     await s.agent.get("/admin/public-trainers").expect(403);
     await post(s, trainer.id, "create", {}, 403);

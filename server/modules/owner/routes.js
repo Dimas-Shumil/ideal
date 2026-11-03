@@ -24,7 +24,8 @@ const filters = z
 const fail = (status, message) => Object.assign(new Error(message), { status });
 export function ownerRoutes({ config, prisma, users }) {
   const router = Router();
-  router.use(["/admin", "/api/admin"], requireAuth, requireRole("OWNER"));
+  router.use(["/admin", "/api/admin"], requireAuth, requireRole("OWNER", "ADMIN"));
+  router.use(["/admin/employees", "/api/admin/employees"], requireRole("OWNER"));
   const guard = csrf(config);
   const limit = rateLimit({
     windowMs: 900000,

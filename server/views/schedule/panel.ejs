@@ -54,7 +54,7 @@
         <p>Участников: <%= item._count.bookings %> / <%= item.capacity %></p>
         <div class="schedule__card-actions">
           <a href="<%= base %>/<%= item.id %>">Открыть занятие</a>
-          <% if (isOwner && item.status === 'CANCELLED') { %>
+          <% if (!isTrainer && item.status === 'CANCELLED') { %>
             <a class="schedule__card-button schedule__card-button--delete" href="/crm/schedule/<%= item.id %>#delete-lesson">Удалить</a>
           <% } else if (!isTrainer && item.status === 'SCHEDULED') { %>
             <a class="schedule__card-button" href="/crm/schedule/<%= item.id %>#cancel-lesson">Отменить</a>
@@ -111,7 +111,7 @@
 <% } else if (page === 'detail') { const current = lesson; const start = club(current.startsAt), end = club(current.endsAt); const started = new Date(current.startsAt) <= new Date(); %>
   <a href="<%= base %>">Все занятия</a>
   <div class="panel__heading"><div><p class="panel__eyebrow"><%= start.date %> · <%= start.time %>–<%= end.time %></p><h1><%= current.title %></h1></div><span class="panel__badge"><%= statusName[current.status] %></span></div>
-  <% if (isOwner && current.kind === "GROUP") { %><p><a href="/crm/schedule/<%= current.id %>/publication">Публикация на сайте и публичное имя тренера</a> · <%= current.publicVisible ? "Опубликовано" : "Скрыто" %></p><% } %>
+  <% if (!isTrainer && current.kind === "GROUP") { %><p><a href="/crm/schedule/<%= current.id %>/publication">Публикация на сайте и публичное имя тренера</a> · <%= current.publicVisible ? "Опубликовано" : "Скрыто" %></p><% } %>
   <section class="panel__card">
     <h2>Параметры</h2>
     <dl class="schedule__details">
@@ -140,7 +140,7 @@
     </section>
   <% } %>
 
-  <% if (isOwner && current.status === 'CANCELLED') { %>
+  <% if (!isTrainer && current.status === 'CANCELLED') { %>
     <section class="panel__card schedule__delete" id="delete-lesson" tabindex="-1">
       <h2>Удалить занятие навсегда</h2>
       <% if (canDeleteLesson) { %>
@@ -179,7 +179,7 @@
               <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><input type="hidden" name="status" value="ATTENDED"><input type="hidden" name="reason" value="Исправление неявки"><button>Исправить: посетил</button>
             </form>
           <% } %>
-          <% if (isOwner && booking.status === 'CANCELLED' && !booking.visits.length) { %>
+          <% if (!isTrainer && booking.status === 'CANCELLED' && !booking.visits.length) { %>
             <details class="schedule__delete-booking"><summary>Удалить отменённую запись</summary>
             <form method="post" action="/crm/schedule/<%= current.id %>/bookings/<%= booking.id %>/delete">
               <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="key" value="<%= newKey() %>"><input type="hidden" name="version" value="<%= booking.version %>">

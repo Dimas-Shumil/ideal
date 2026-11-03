@@ -165,7 +165,7 @@ export async function createApp({
   );
   app.use(loadUser(db.prisma));
   app.use((req, res, next) => { res.locals.currentPath = req.path; next(); });
-  // CMS mutations remain OWNER-only and use CSRF, Origin and version checks.
+  // CMS mutations require OWNER/ADMIN and retain CSRF, Origin and version checks.
   app.use(contentManagementRoutes({config,prisma:db.prisma}));
   const users = userService(db.prisma);
   app.use(await authRoutes({ config, prisma: db.prisma, store, users }));

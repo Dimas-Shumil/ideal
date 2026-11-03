@@ -1,6 +1,7 @@
 (() => {
   if (!window.isSecureContext || !('serviceWorker' in navigator)) return;
-  const INSTALLED = 'ideal-pwa-installed';
+  const staff = document.currentScript?.hasAttribute('data-pwa-staff') === true;
+  const INSTALLED = staff ? 'ideal-staff-pwa-installed' : 'ideal-pwa-installed';
   let deferredPrompt, banner, installButton, hint, dismissed = false;
   // Match the Hero's actual twilight threshold, not a separate 21:00–08:00 schedule.
   // The homepage Hero owns the phase; on other public pages use its UTC+7 cutoff.
@@ -11,7 +12,7 @@
     const minutes = date.getUTCHours() * 60 + date.getUTCMinutes();
     return minutes >= 20 * 60 + 15 || minutes < 7 * 60 + 45;
   };
-  const updateBannerPhase = () => { if (banner) banner.dataset.pwaPhase = abakanNight() ? 'night' : 'day'; };
+  const updateBannerPhase = () => { if (banner) banner.dataset.pwaPhase = staff ? 'day' : abakanNight() ? 'night' : 'day'; };
   window.setInterval(() => { if (banner && !banner.hidden) updateBannerPhase(); }, 60000);
   const read = key => { try { return localStorage.getItem(key); } catch { return null; } };
   const write = (key, value) => { try { localStorage.setItem(key, value); } catch { /* Current page still works without storage. */ } };
@@ -37,12 +38,12 @@
     if (event.key === INSTALLED && banner && suppressed()) banner.hidden = true;
   });
   function show() {
-    if (suppressed()) return;
+    if (suppressed() || banner) return;
     banner = document.createElement('aside');
-    banner.className = 'pwa-install'; banner.setAttribute('aria-label', 'Установка приложения ИДЕАЛ'); updateBannerPhase();
+    banner.className = 'pwa-install'; banner.setAttribute('aria-label', staff ? 'Установка приложения ИДЕАЛ — Управление клубом' : 'Установка приложения ИДЕАЛ'); updateBannerPhase();
     const content = document.createElement('div'); content.className = 'pwa-install__content';
-    const title = document.createElement('p'); title.className = 'pwa-install__title'; title.textContent = 'ИДЕАЛ — всегда рядом';
-    const text = document.createElement('p'); text.className = 'pwa-install__text'; text.textContent = 'Расписание, тренеры и абонементы — в приложении.';
+    const title = document.createElement('p'); title.className = 'pwa-install__title'; title.textContent = staff ? 'ИДЕАЛ — Управление клубом' : 'ИДЕАЛ — всегда рядом';
+    const text = document.createElement('p'); text.className = 'pwa-install__text'; text.textContent = staff ? 'Рабочее приложение сотрудников: клиенты, расписание и управление клубом.' : 'Расписание, тренеры и абонементы — в приложении.';
     hint = document.createElement('p'); hint.className = 'pwa-install__hint'; hint.hidden = true; hint.setAttribute('role', 'status');
     hint.textContent = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
       ? 'Откройте меню «Поделиться» в браузере, выберите «На экран Домой» и подтвердите добавление.'
@@ -90,6 +91,12 @@
     title.append(logo); content.append(title, text, hint); actions.append(installButton, dismiss); banner.append(content, actions, close); document.body.append(banner);
     // Non-modal: never steal keyboard focus or prevent interaction with the page.
   }
+  if (staff) window.addEventListener('ideal-staff-install', () => {
+    if (standalone()) return;
+    dismissed = false;
+    if (!banner) { write(INSTALLED, '0'); show(); }
+    if (banner) { banner.hidden = false; installButton.click(); }
+  });
   setTimeout(() => {
     if (!document.hidden) show();
     else document.addEventListener('visibilitychange', function visible() {
