@@ -67,6 +67,7 @@ run("--test", [
   "tests/public-trainers.test.js",
   "tests/trainers-unit.test.js",
   "tests/trainers.test.js",
+  "tests/trainer-gallery.test.js",
   "tests/crm.test.js",
   "tests/schedule.test.js",
   "tests/push.test.js",

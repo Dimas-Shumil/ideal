@@ -1,3 +1,4 @@
+import { trainerGalleryRoutes } from './modules/trainer-gallery/routes.js';
 import { coachRoutes } from './modules/coach/routes.js';
 import { contentManagementRoutes } from './modules/content/routes.js';
 import { contentPublicRoutes, publicContacts } from './modules/content/public.js';
@@ -183,6 +184,7 @@ export async function createApp({
   app.use(pushRoutes({ config, prisma: db.prisma }));
   app.use(crmRoutes({config,prisma:db.prisma}));
   app.use(scheduleRoutes({ config, prisma: db.prisma }));
+  app.use(trainerGalleryRoutes({ config, prisma: db.prisma }));
   app.use(trainerManagementRoutes({ config, prisma: db.prisma }));
   app.use(coachRoutes({config, prisma: db.prisma}));
   app.use(ownerRoutes({ config, prisma: db.prisma, users }));

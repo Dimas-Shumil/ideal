@@ -7,7 +7,7 @@
     ['/admin/public-trainers','Публичные тренеры'], ['/admin/content','Контент сайта'], ['/admin/employees','Сотрудники'], ['/admin/account','Мой аккаунт'],
   ] : user.role === 'TRAINER' ? [
     ['/trainer','Обзор',true], ['/trainer/workspace/clients','Персональные клиенты'], ['/trainer/workspace/sessions','Персональные тренировки'], ['/trainer/workspace/expenses','Финансы'], ['/trainer/workspace/tasks','Задачи и напоминания'], ['/trainer/workspace/calendar','Календарь'], ['/trainer/workspace/statistics','Статистика'], ['/trainer/clients','Назначенные клиенты'],
-    ['/trainer/lessons','Мои занятия'],
+    ['/trainer/lessons','Мои занятия'], ['/trainer/gallery','Мои фотографии'],
   ] : [ ['/crm/clients','Клиенты'], ['/crm/plans','Тарифы'],
     ['/crm/schedule','Расписание'], ['/crm/visits','Посещения'], ['/shop-panel/orders','Заказы магазина'] ];
   if (user.role === 'OWNER') navItems.splice(navItems.findIndex(item => item[0] === '/admin/employees'), 0, ['/admin/trainer-workspaces','Работа тренеров']);

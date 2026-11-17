@@ -13,6 +13,7 @@ export const publicTrainerSelect = Object.freeze({
   specialty: true,
   summary: true,
   biography: true,
+  galleryPhotos: { select: { id: true, caption: true }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 20 },
   experience: true,
   qualification: true,
   approach: true,
@@ -54,6 +55,7 @@ export function trainerDto(row, detail = true) {
       "maxUrl",
     ])
       result[key] = row[key];
+  if (detail) result.gallery = (row.galleryPhotos || []).map(photo => ({ url: "/trainers/" + row.publicKey + "/gallery/" + photo.id, caption: photo.caption }));
   return result;
 }
 export async function publicTrainers(prisma) {
@@ -122,6 +124,17 @@ export function publicTrainerRoutes({ config, prisma }) {
     } catch {
       res.status(503).send("Фотография временно недоступна.");
     }
+  });
+  router.get("/trainers/:key/gallery/:id", async (req, res) => {
+    if (!publicTrainerKey.safeParse(req.params.key).success || !z.string().uuid().safeParse(req.params.id).success) return res.sendStatus(404);
+    try {
+      const photo = await prisma.trainerGalleryPhoto.findFirst({
+        where: { id: req.params.id, trainer: { ...publicTrainerWhere, publicKey: req.params.key } },
+        select: { data: true },
+      });
+      if (!photo) return res.sendStatus(404);
+      res.type('image/webp').send(Buffer.from(photo.data));
+    } catch { res.status(503).send('Фотография временно недоступна.'); }
   });
   router.get("/trainers/:key", async (req, res) => {
     if (!publicTrainerKey.safeParse(req.params.key).success)

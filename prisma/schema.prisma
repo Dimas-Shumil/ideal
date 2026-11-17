@@ -97,6 +97,7 @@ model TrainerProfile {
   phone String @default("") @db.VarChar(30)
   vkUrl String @default("") @db.VarChar(500)
   maxUrl String @default("") @db.VarChar(500)
+  galleryPhotos TrainerGalleryPhoto[]
   photo TrainerPhoto?
   assignments TrainerAssignment[]
   lessons Lesson[]
@@ -491,4 +492,14 @@ model CoachTask {
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
   @@index([userId, completed, dueAt])
   @@index([completed, reminderAt])
+}
+
+model TrainerGalleryPhoto {
+  id String @id @default(uuid()) @db.Uuid
+  trainerId String @db.Uuid
+  trainer TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  caption String @default("") @db.VarChar(300)
+  data Bytes
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([trainerId, createdAt, id])
 }
